@@ -26,13 +26,23 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 
 ***
 
-# 2. 엔티티 매핑
+## 2. 엔티티 매핑
 **Entity를 데이터베이스 테이블에 매핑할 때 사용되는 Annotation들은 아래와 같다.**
 + @Entity: JPA가 관리하는 클래스. 클래스 이름과 동일한 데이터베이스 테이블로 암묵적으로 매핑된다.
+  + 기본 생성자가 필요하다. 생성자를 만들지 않으면 컴파일 시 자동으로 생성해주지만, 직접 정의한 경우 기본 생성자는 반드시 생성되어야 한다.
 + @Table: 엔티티와 매핑할 데이터베이스 테이블을 명시적으로 지정한다
   + name="...": 매핑할 데이터베이스 테이블 이름
   + uniqueConstraints=...: 테이블의 Unique Key 조건을 생성
 + @Column(name="..."): @Entity로 관리되는 클래스의 변수(속성)의 칼럼명을 명시적으로 지정함.
+  + nullable= : null값 가능 여부 지정(기본 값 false)
+  + length= : 변수가 String일 때, varchar 길이를 지정함.(기본 값 255)
 + @Enumerated(Type.String | Type.Ordinal): @Entity로 관리되는 클래스에 Enum 타입의 변수를 테이블에 매핑한다.
   + Type을 반드시 String으로 설정해야 하는 이유는 무엇인가? ~~타입이 Ordinal일 때 Enum 클래스의 변수가 추가되면 문제됨~~
-+
++ @Temporal: Java의 날짜 타입 객체를 매핑할 때 사용함.
++ @Lob: Lob(String) 타입을 지정함.
++ @Transient: @Entity로 관리되는 클래스 내의 변수(속성)을 데이터베이스 테이블에 매핑하지 않고자 할 때 사용함.
+
++ 기본 키(Primary Key) 매핑 방법
+  + @Id: 엔티티 중 기본 키로 설정할 변수
+  + @GeneratedValue: 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
+    +
