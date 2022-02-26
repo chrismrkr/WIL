@@ -44,5 +44,8 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 
 + 기본 키(Primary Key) 매핑 방법
   + @Id: 엔티티 중 기본 키로 설정할 변수
-  + @GeneratedValue: 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
-    +
+  + @GeneratedValue(strategy= ..): 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
+
++ 기본 키(Primary Key) 자동 생성 전략?
+  + IDENTITY 전략: 기본 키 생성을 데이터베이스에 위임함.
+    + 그러므로, 
