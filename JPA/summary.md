@@ -1,5 +1,5 @@
 # JPA(JAVA Persistence API)
-
+***
 ## 1. JPA 소개
 **JPA란 JAVA Persistent API의 약자로 관계형 데이터베이스를 객체지향 언어인 Java로 운영 및 개발할 때 발생하는 패러다임의 불일치를 해결하기 위한 기술이다.**
 
@@ -99,3 +99,30 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 
 ***
 
+## 3. 연관관계 매핑
+**연관관계 매핑 시, 연관관계의 주인이 되는 엔티티가 항상 외래키(FK)를 속성으로 갖는다.**
+
+### 3.1 다대일(N:1) 매핑
+ex. 회원(N)과 부서(1), 회원은 2개 이상의 부서에 포함될 수 없다.
++ 단방향 매핑
+```java
+@Entity
+public class Member {
+  ...
+  @ManyToOne
+  @JoinColumn(name="DEPARTMENT_ID") // 종속되는 엔티티의 기본 키 칼럼명
+  private Department department;
+  ...
+  }
+ ```
+ 
++ 양방향 매핑
+ ```java
+ @Entity
+ public class Department {
+  ...
+  @OneToMany(mappedby = "department")
+  private ArrayList<Member> members = new ArrayList<>();
+  ...
+  ```
+ + 매핑시 연관관계 주인이 되는 부분만 영속(persist)해주면 된다. 그러나, 테스트 코드를 작성하는 등 순수 객체 관점에서 둘 다 영속해주는 것이 옳다.
