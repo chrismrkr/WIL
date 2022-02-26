@@ -95,3 +95,7 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
    }
   ```
  바람직한 기본 키 생성 전략은? Long형 + (IDENTITY | SEQUENCE | TABLE) + 자체 로직
+
+
+***
+
