@@ -48,4 +48,14 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 
 + 기본 키(Primary Key) 자동 생성 전략?
   + IDENTITY 전략: 기본 키 생성을 데이터베이스에 위임함.
-    + 그러므로, 
+    + 그러므로, DB에 아직 저장되지 않은 영속 상태인 엔티티의 기본 키를 조회하면 데이터베이스 조회가 필요하다.
+  + SEQUENCE 전략: 시퀀스는 유일한 값을 순서대로 생성하는 데이터베이스 오브젝트임. 아래의 코드 예시를 통해 확인하도록 한다.
+  
+'''java
+  @Entity
+  @SequenceGenerator {
+    name = "SQG",
+    sequenceName = "BS",
+    
+  
+'''
