@@ -27,7 +27,7 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 ***
 
 ## 2. 엔티티 매핑
-**Entity를 데이터베이스 테이블에 매핑할 때 사용되는 Annotation들은 아래와 같다.**
+### Entity를 데이터베이스 테이블에 매핑할 때 사용되는 Annotation들은 아래와 같다.
 + @Entity: JPA가 관리하는 클래스. 클래스 이름과 동일한 데이터베이스 테이블로 암묵적으로 매핑된다.
   + 기본 생성자가 필요하다. 생성자를 만들지 않으면 컴파일 시 자동으로 생성해주지만, 직접 정의한 경우 기본 생성자는 반드시 생성되어야 한다.
 + @Table: 엔티티와 매핑할 데이터베이스 테이블을 명시적으로 지정한다
@@ -42,20 +42,56 @@ Entity Manager를 통해 데이터베이스로부터 엔티티를 불러올 때 
 + @Lob: Lob(String) 타입을 지정함.
 + @Transient: @Entity로 관리되는 클래스 내의 변수(속성)을 데이터베이스 테이블에 매핑하지 않고자 할 때 사용함.
 
-+ 기본 키(Primary Key) 매핑 방법
-  + @Id: 엔티티 중 기본 키로 설정할 변수
-  + @GeneratedValue(strategy= ..): 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
 
-+ 기본 키(Primary Key) 자동 생성 전략?
-  + IDENTITY 전략: 기본 키 생성을 데이터베이스에 위임함.
-    + 그러므로, DB에 아직 저장되지 않은 영속 상태인 엔티티의 기본 키를 조회하면 데이터베이스 조회가 필요하다.
-  + SEQUENCE 전략: 시퀀스는 유일한 값을 순서대로 생성하는 데이터베이스 오브젝트임. 아래의 코드 예시를 통해 확인하도록 한다.
+### 기본 키(Primary Key) 매핑 방법
++ @Id: 엔티티 중 기본 키로 설정할 변수
++ @GeneratedValue(strategy= ..): 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
+
+
+### 기본 키(Primary Key) 자동 생성 전략?
++ IDENTITY 전략: 기본 키 생성을 데이터베이스에 위임함.
+  + 그러므로, DB에 아직 저장되지 않은 영속 상태인 엔티티의 기본 키를 조회하면 데이터베이스 조회가 필요하다.
   
-'''c
+  
++ SEQUENCE 전략: 시퀀스는 유일한 값을 순서대로 생성하는 데이터베이스 오브젝트임. 아래의 코드 예시를 통해 확인하고 작동 과정을 살펴보도록 한다.
+  
+  ```java
   @Entity
-  @SequenceGenerator {
+  @SequenceGenerator (
     name = "SQG",
     sequenceName = "BS",
-    
-  
-'''
+    initialValue = 1, allocationSize = 50
+    )
+   public class Board {
+   @Id
+   @GeneratedValue(strategy = GenerationType.SEQUENCE,
+                    generator = "SQG")
+   private Long Id;
+   
+   ...
+   }
+  ```
+    + 데이터베이스에 "BS"라는 시퀀스 오브젝트를 생성한다. 초기 값은 1이고 한번 호출될 때마다 50씩 증가한다.
+    + 첫 em.persist() 시 DB로 부터 초기값 1과 50을 가져와 영속성 컨텍스트에 저장한다.
+    + em.persist()가 발생할 때 마다 영속성 컨텍스트에 저장된 1부터 51까지의 값을 순서대로 지정한다. 그러므로, IDENTITY 전략에 비해 네트워킹으로 인한 비용이 적다.
+    + em.persist()시 영속성 컨텍스트에 저장된 값이 모두 사용되었다면, 마찬가지로 101을 가져와 영속성 컨텍스트에 저장한다.
+  + 이 과정을 반복한다.
+
++ TABLE 전략: 키 생성 전용 테이블을 하나 만들고 칼럼을 만들어 데이터베이스 시퀀스를 흉내내도록 한다.
+  ```java
+  @Entity
+  @TableGenerator (
+    name = "TableGenerate",
+    table = "TG",
+    pkColumnValue = "TG_pk", allocationSize = 1)
+    )
+   public class Board {
+   @Id
+   @GeneratedValue(strategy = GenerationType.TABLE,
+                    generator = "TableGenerate")
+   private Long Id;
+   
+   ...
+   }
+  ```
+ 바람직한 기본 키 생성 전략은? Long형 + (IDENTITY | SEQUENCE | TABLE) + 자체 로직
