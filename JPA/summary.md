@@ -125,4 +125,58 @@ public class Member {
   private ArrayList<Member> members = new ArrayList<>();
   ...
   ```
- + 매핑시 연관관계 주인이 되는 부분만 영속(persist)해주면 된다. 그러나, 테스트 코드를 작성하는 등 순수 객체 관점에서 둘 다 영속해주는 것이 옳다.
+ + 연관관계의 주인이 되는 엔티티(N)
+ 가 외래키를 관리한다. 즉, Member 엔티티에서 Department 외래키를 관리한다. 양방향 매핑 시 연관관계의 주인이 되는 부분에서만 저장해도 실제 데이터베이스에 반영된다. 그러나, 객체 지향적 관점에서 양방향 모두 저장해주는 것이 옳다.
+
+```java
+void main() {
+  Department department = new Department();
+  Member member1 = new Member();
+  Member member2 = new Member();
+  
+  member1.setDepartment(department);
+  member2.setDepartment(department); 
+  em.persist(member1);
+  em.persist(member2);
+  
+  department.setMember(member1);
+  department.setMember(member2); 
+  // 이 코드는 없어도 데이터베이스에서는 아무 영향이 없다.
+  // 그러나, 객체 관점에서는 세팅을 해주는 것이 옳다.
+  
+  em.persist(department);
+```
+
+
+### 3.2 일대다(1:N) 매핑
+**일대다 관계와 다대일 관계 모두 외래 키는 항상 다(N)쪽 테이블에 존재한다. 그러나, 연관관계의 주인은 외래키가 없는 일(1)이고, 일(1)에서 다(N)의 외래키를 관리한다는 점에서 다대일 매핑과 차이가 있다.**
+
++ 단방향 매핑: 원칙적으로 일대다(1:N) 매핑은 단방향만 존재한다.
+```java
+@Entity
+public class Team {
+  ...
+   @OneToMany
+   @JoinColumn(name="Member_ID")
+   private List<Member> members = new ArrayList<>(); // List 뿐만 아니라 Set, HashMap 등의 자료구조도 사용가능.
+   ...
+   }
+
+....
+```
+
++ 양방향 매핑: 원칙적으로 일대다 양방향 매핑은 불가능하다. 그러나, 아래와 같이 바꿀 수있다.
+```java
+@Entity
+public class Member {
+  ...
+  @ManyToOne
+  @JoinColumn(name="team_id", insertable=false, updatable=false)
+  private Team team;
+  ...
+  }
+```
+
+
+  
+  
