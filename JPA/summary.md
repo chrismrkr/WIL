@@ -274,6 +274,8 @@ public class Order {
   
 ```
 
+### 3.5 상속관계 매핑
+
 
 
 
