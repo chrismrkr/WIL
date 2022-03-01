@@ -277,7 +277,65 @@ public class Order {
 ### 3.5 상속관계 매핑
 **관계형 데이터베이스에서 상속관계를 직접적으로 다룰 수 없다. 그러나, 슈퍼타입-서브타입 모델로 상속 관계와 근접하게 표현할 수 있다.**
 
+부모인 Item 엔티티와 자식인 Album, Book 엔티티가 존재한다고 예를 들자. 자식 엔티티는 부모 엔티티의 속성을 모두 상속 받는다. 이를 나타낼 수 있는 전략은 아래와 같다.
 
++ 조인 전략
+
+Album과 Book 엔티티(클래스)는 Item 엔티티(추상 클래스)를 상속받는다. 이에 따라, 데이터베이스에서 Album 테이블과 Book 테이블이 개별적으로 존재하게 된다.
+
+```java
+@Entity
+@Inheritence(strategy = Joined)
+@Discriminator(name="DTYPE")
+public abstract class Item {
+  @Id @GeneratedValue
+  @Column(name="ITEM_ID")
+  private Long Id;
+  
+  ...
+  
+  }
+  
+@Entity
+@DiscriminatorValue("Book")
+@PrimaryKeyJoinColumn(
+public class Book extends Item {
+  private Type anotherAttribute1;
+  private Type anotherAttribute2;
+  ...
+  }
+
+```
+
++ 단일 테이블 전략
+
+Album, Book과 같은 자식 엔티티를 개별 테이블로 관리하는 것이 아닌 하나의 테이블로 관리하는 전략이다. 
+
+데이터베이스에 하나의 테이블에 모든 애트리뷰트가 포함되어 있다. 그리고 DTYPE 칼럼으로 구분된다. 만약, Book 엔티티가 저장된다면 Album에 해당되는 애트리뷰트는 Null 처리된다.
+
+```java
+@Entity
+@Inheritence(strategy = SingleTable) // 이 부분만 달라짐.
+@Discriminator(name="DTYPE")
+public abstract class Item {
+  @Id @GeneratedValue
+  @Column(name="ITEM_ID")
+  private Long Id;
+  
+  ...
+  
+  }
+  
+@Entity
+@DiscriminatorValue("Book")
+@PrimaryKeyJoinColumn(
+public class Book extends Item {
+  private Type anotherAttribute1;
+  private Type anotherAttribute2;
+  ...
+  }
+
+```
 
 
 
