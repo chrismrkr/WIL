@@ -269,12 +269,13 @@ public class Order {
   @JoinColumn(name="PRODUCT_ID")
   private List<Product> products = new ArrayList<>();
   
-  ... 추가 Arribute .... 
+  ... 추가 attribute .... 
   }
   
 ```
 
 ### 3.5 상속관계 매핑
+**관계형 데이터베이스에서 상속관계를 직접적으로 다룰 수 없다. 그러나, 슈퍼타입-서브타입 모델로 상속 관계와 근접하게 표현할 수 있다.**
 
 
 
