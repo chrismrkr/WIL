@@ -367,7 +367,85 @@ public class Book extends Item {
  ### 3.6 복합 키와 식별 관계 매핑
  **복합 키란 2개 이상의 애트리뷰트로 이루어진 기본 키를 의미한다. 식별관계란 부모로부터 상속받은 기본키(외래키)를 자식에서 기본키로 사용하는 관계를 의미하고, 비식별관계란 부모로 부터 상속받은 기본키를 외래키로만 사용하는 관계를 의미한다.**
  
- 
++복합키 생성 방법
+```java
+public class MemberId implements Serializable {
+  private String id1;
+  private String id2;
+  
+  public MemberId() {}
+  public MemberId(String id1, String id2) {
+    this.id1 = id1;
+    this.id2 = id2;
+    }
+  @Override
+  public boolean equals(Object o) { ... }
+  @Override
+  public int hashCode() { ... }
+  }
+  
+  // 기본 생성자, eqauls, hashCode 멤버함수는 반드시 정의되어야 한다.
+  
+@Entity
+@IdClass(MemberId.class)
+public class Member {
+  @Id
+  @Column(name="MEMBER_ID1")
+  private String id1;
+  
+  @Id
+  @Column(name="MEMBER_ID2")
+  private String id2;
+  
+  ...
+  
+  }
+  
+```
+
+**물론, @EmbeddedId를 통해 더 객체지향적인 방법으로 설계가 가능하다.**
+
+  ```java
+@Embeddable // <-----
+public class MemberId implements Serializable {
+  @Column(name="MEMBER_ID1")
+  private String id1;
+  @Column(name="MEMBER_ID2")
+  private String id2;
+  
+  public MemberId() {}
+  public MemberId(String id1, String id2) {
+    this.id1 = id1;
+    this.id2 = id2;
+    }
+  @Override
+  public boolean equals(Object o) { ... }
+  @Override
+  public int hashCode() { ... }
+  }
+  
+  // 기본 생성자, eqauls, hashCode 멤버함수는 반드시 정의되어야 한다.
+  
+@Entity
+public class Member {
+  @Embedded // <---------
+  private MemberId id;
+  ...
+  
+  }
+```
+
+복합 키 생성 시 어떤 방식을 사용해도 문제 없다. 그러나, @EmbeddableId에서 JPQL이 더욱 길어질 수 있다. 
+
+**왜 equals(), hashCode() 멤버함수를 구현해야 할까?**
+
+기본적으로 equals() 멤버함수는 동일성(==) 비교를 한다. 즉, 사용자가 Override하지 않으면 값이 아닌 주소 비교를 하게 되므로, 값이 같아도 false를 반환하게 된다.
+
+따라서, 동등성 비교(값이 같은지를 비교)를 위해서 equals()와 hashCode() 멤버함수를 생성하는 것이 필요하다.
+
+
+
+
 
 
 
