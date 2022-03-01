@@ -236,3 +236,46 @@ public class Member {
 
 이는 일대일 관계에서 일대다 관계로 변화된 것을 의미한다. 대상 테이블에서 외래키를 관리한 경우, 쉽게 로직을 변경할 수 있지만, 주 테이블에서 관리했다면 그렇지 않다. 
   
+### 3.4 다대다(N:N) 매핑
+**다대다(N:N) 관계는 일대다, 또는 다대일 관계로 풀어서 매핑해야 한다.**
+
+회원이 상품을 주문할 수 있다는 요구사항을 예로 들자. 회원 엔티티와 상품 엔티티만 존재한다면, 이를 주문할 수 있는 요구사항으로 연결하기 위해서는 다대다(N:N) 매핑이 필요하다. 
+
+그러나, 주문 날짜, 주문 일자와 같은 추가적인 속성이 필요할 수 있으므로 새로운 엔티티를 통해 다대다 관계를 풀어내는 것이 필요하다.
+
+기존의 Member, Product 엔티티가 존재하고 새로운 엔티티 Order을 생성하고자 하면 아래와 같이 쓸 수 있다.
+
+```java
+public class OrderId implements Serializable {
+  private String member;
+  private String team;
+  
+  @Override
+  public boolean equals(object o) { ... }
+  }
+  
+@Entity
+@IdClass(OrderId.clasS) 
+// 복합 기본 키 생성을 위해서 사용한다.(식별 관계) 물론, Order 엔티티 자체에 대한 새로운 기본 키 생성도 가능하다.(비식별 관계) 
+public class Order {
+  ...
+  @Id
+  @ManyToOne
+  @JoinColumn(name="MEMBER_ID")
+  private Member member;
+  
+  @Id
+  @OneToMany
+  @JoinColumn(name="PRODUCT_ID")
+  private List<Product> products = new ArrayList<>();
+  
+  ... 추가 Arribute .... 
+  }
+  
+```
+
+
+
+
+
+
