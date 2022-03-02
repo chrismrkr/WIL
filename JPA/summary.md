@@ -505,4 +505,16 @@ public class GrandChildId implements Serializable {
 
 
 ***
+## 4. 프록시와 연관관계 관리
+**프록시란 문자 그대로 대리인이라는 의미를 갖는다. 예를 들어, 회원 엔티티와 팀 엔티티가 서로 연관되어 있다고 하자. EntityManger를 통해 회원 엔티티를 검색하면 회원 엔티티와 연관된 팀 엔티티와 같은 것들이 모두 조회하는 쿼리가 생성된다. 그러나, 실제로 사용자는 회원의 팀에 대한 정보를 원하지 않을 수 있다. 엔티티 객체 자체를 영속성 컨텍스트에 불러오는 것 대신에 프록시 객체를 불러온다. 사용자는 프록시 객체를 통해 엔티티에 대한 정보를 요청할 수 있고, 요청이 있을 때 실제로 쿼리가 발생하여 불필요한 것을 줄일 수 있다. 프록시가 엔티티에 접근하는 것을 대신한다는 점에서 의미가 통한다.**
 
+```java
+void main() {
+  EntityManager em = EntityMangerFactory.createEntityManager();
+  
+  // 1. 엔티티 자체 조회
+  Member member1 = em.find(ID, Member.class);
+  
+  // 2. 엔티티 프록시 조회
+  Member member2 = em.reference(ID, Member.class);
+```
