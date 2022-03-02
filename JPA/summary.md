@@ -523,4 +523,41 @@ void main() {
 ### 4.1 지연로딩과 즉시로딩
 **즉시로딩이란 엔티티를 조회할 때 연관된 모든 엔티티를 함께 조회하는 것을 의미하고, 지연로딩은 엔티티 조회 후, 연관된 엔티티는 실제 사용할 때만 로딩하는 것을 의미한다.**
 
+``java
+  @Entity
+  public class Member {
+    ...
+    @ManyToOne(fetch=LAZY) // 지연 로딩
+    ...
+    
+    @MantyToOne(fetch=EAGER) // 즉시 로딩
+    
+   }
+```
+
+가급적이면, 지연로딩을 사용하는 것이 바람직하다. 왜냐하면, 즉시로딩은 N+1 문제를 일으킬 수 있다.
+
++ **즉시로딩 시 발생하는 N+1 문제란?**
+아래와 같은 JPQL을 실행했다고 가정하면,
+```java
+List<Member> members = em.createQuery("select m from Member m", member.class).getResultList();
+```
+
+기대되는 SQL은 아래와 같다.
+
+```SQL
+select *
+from Member
+```
+
+만약, Member가 즉시로딩이라면, 조회된 Member의 개수만큼 연관 엔티티를 찾기 위해 아래의 쿼리가 발생한다. 이처럼, 즉시로딩 상황에서 불필요한 쿼리가 발생하는 것을 N+1 문제라고 한다.
+
+```SQL
+select * 
+from ORDERS
+WHERE MEMBER_ID = ?
+```
+
+
+    
 
