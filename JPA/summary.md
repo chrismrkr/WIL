@@ -566,3 +566,45 @@ WHERE MEMBER_ID = ?
 물론, 지연 로딩일 때도 N+1 문제가 발생할 수 있지만, 추후 다루도록 한다.
     
 
+### 4.2 영속성 전이: CASCADE
+**특정 엔티티를 영속 상태로 만들고자 할 때, 연관 엔티티까지 모두 영속 상태로 만들 때 사용하는 기법**
+```java
+@Entity
+public class Parent {
+  ...
+  @OneToMany(mappedby="parent", fetch=LAZY, cascade=persist)
+  private List<Child> children = new ArrayList<>();
+  ...
+  }
+  
+@Entity
+public class Child {
+  ...
+   @ManyToOne(fetch=LAZY)
+   @JoinColumn(name="PARENT_ID")
+   private Parent parent;
+   ...
+   }
+   
+void main() {
+  Parent parent = new Parent();
+  Child child1 = new Child();
+  Child child2 = new Child();
+  
+  child1.setParent(parent);
+  child2.setParent(parent);
+  
+  parent.getChildren.add(child1);
+  parent.getChildren.add(child2);
+  
+  em.persist(parent); // 자식 엔티티까지 모두 영속된다.
+  }
+```
+
+cascade 옵션은 대표적으로 persist, remove, 그리고 all이 있다.
+
+
+### 4.3 고아객체
+**부모 엔티티와 연관관계가 끊긴 자식 엔티티를 자동으로 삭제하는 기법이다.**
+
+그러므로, 참조되는 곳이 하나일 때만 사용 가능하다. (@OrphanRemoval=true (ex. OneToMany, OneToOne))
