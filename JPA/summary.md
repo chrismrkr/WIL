@@ -364,7 +364,7 @@ public class Book extends Item {
     
  ```
  
- ### 3.6 복합 키와 식별 관계 매핑
+ ### 3.6 복합 키 
  **복합 키란 2개 이상의 애트리뷰트로 이루어진 기본 키를 의미한다.**
  
 + 복합키 생성 방법
@@ -444,6 +444,65 @@ public class Member {
 따라서, **동등성 비교(값이 같은지를 비교)** 를 위해서 equals()와 hashCode() 멤버함수를 생성하는 것이 필요하다.
 
 
-### 3.7 @IdClass를 통한 식별관계 매핑
-**식별관계란 부모로부터 상속받은 기본키(외래키)를 자식에서 기본키로 사용하는 관계를 의미하고, 비식별관계란 부모로 부터 상속받은 기본키를 외래키로만 사용하는 관계를 의미한다. 식별관계 매핑을 통해 상속 관계를 표현할 수 있다.**
+### 3.7 식별관계 매핑
+**식별관계란 부모로부터 상속받은 기본키(외래키)를 자식에서 기본 키로 사용하는 관계를 의미하고, 비식별관계란 부모로 부터 상속받은 기본키를 외래키로만 사용하는 관계를 의미한다. 식별관계 매핑을 통해 상속 관계를 표현할 수 있다.**
+
+복합 키를 갖는 식별관계를 어떻게 매핑할 것인지 알아본다. 부모, 자식, 손자 엔티티가 있다고 하자. 부모의 기본 키는 부모id, 자식의 기본 키는 (부모 id, 자식 id), 손자의 기본 키는 (부모 id, 자식id, 손자id)라고 하자. 아래와 같이 @IdClass를 통해 표현할 수 있다.
+
+```java
+@Entity 
+public class Parent {
+  @Id @GeneratedValue
+  @Column(name="PARENT_ID")
+  private Long id;
+  ...
+  }
+
+@Entity
+@IdClass(ChildId.class)
+public class Child {
+  @Id
+  @ManyToOne
+  @JoinColumn(name="PARENT_ID")
+  private Parent parent;
+  
+  @Id @Column(name="CHILD_ID")
+  private String childId;
+  ... 
+  }
+  
+public class ChildId implements Serializable {
+  private String parent;
+  private String child;
+  ...equals(), ... hashCode()
+  }
+
+@Entity
+@IdClass(GrandChildId.class)
+public class GrandChild {
+  @Id @ManyToOne
+  @JoinColumns({
+    @JoinColumn(name="CHILD_ID"),
+    @JoinColumn(name="PARENT_ID")
+    })
+  private Child child;
+  
+  @Id @Column(name="GRANDCHILD_ID")
+  private String id;
+  ...
+  }
+
+public class GrandChildId implements Serializable {
+  private ChildId child;
+  private String grandChild;
+  ... equals(), ...hashCode()
+  }
+```
+
+유사한 방법으로 @EmbeddedId를 통해서도 구현이 가능하다. 그러나, 식별 관계 매핑보다는 비식별 관계 매핑이 더욱 선호된다.
++ 식별 관계 사이에 조인해야 할 기본 키가 불필요하게 많아 질 수 있다.
++ 자식 엔티티가 존재하기 위해서는 반드시 부모 엔티티가 존재해야 한다. 왜냐하면 기본 키에 Null이 존재할 수 없기 때문이다. 그러나, 비즈니스 로직이 변화함에 따라 테이블 구조는 유연하게 변화할 수 있어야 한다.
+
+
+***
 
