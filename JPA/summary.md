@@ -516,5 +516,5 @@ void main() {
   Member member1 = em.find(ID, Member.class);
   
   // 2. 엔티티 프록시 조회
-  Member member2 = em.reference(ID, Member.class);
+  Member member2 = em.getReference(ID, Member.class);
 ```
