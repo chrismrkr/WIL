@@ -538,9 +538,13 @@ void main() {
 가급적이면, 지연로딩을 사용하는 것이 바람직하다. 왜냐하면, 즉시로딩은 N+1 문제를 일으킬 수 있다.
 
 + **즉시로딩 시 발생하는 N+1 문제란?**
+
 아래와 같은 JPQL을 실행했다고 가정하면,
+
 ```java
+
 List<Member> members = em.createQuery("select m from Member m", member.class).getResultList();
+
 ```
 
 기대되는 SQL은 아래와 같다.
