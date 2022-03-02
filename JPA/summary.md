@@ -608,3 +608,7 @@ cascade 옵션은 대표적으로 persist, remove, 그리고 all이 있다.
 **부모 엔티티와 연관관계가 끊긴 자식 엔티티를 자동으로 삭제하는 기법이다.**
 
 그러므로, 참조되는 곳이 하나일 때만 사용 가능하다. (@OrphanRemoval=true (ex. OneToMany, OneToOne))
+
+***
+
+## 5. 값 
