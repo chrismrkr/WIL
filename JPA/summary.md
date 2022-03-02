@@ -616,4 +616,27 @@ cascade 옵션은 대표적으로 persist, remove, 그리고 all이 있다.
 기본 값 타입에는 int, double과 값은 기본 타입, Integer와 같은 래퍼 클래스, 그리고 String이 있다. 기본 값 타입은 공유되지 않는다.
 
 ### 5.2 임베디드(Embedded) 타입
+여러 클래스(엔티티)에서 공유하는 특성을 모아서 만든 값 타입이다. @Embeddable 애노테이션을 사용한다. 
+```java
+@Embeddable
+public class Address {
+  private String street;
+  private String city;
+  private String state;
+  }
+
+@Entity
+public class Member {
+  ...
+  @Embedded
+  private Address address;
+  /*
+    Member 클래스에 street, city, state가 주입된다.
+  */
+  ...
+  }
+ 
+ + @Embeddable과 @MappedSuperclass의 차이점은?
+ 
+ 위임(has)과 상속(is)의 차이이다. 기능 상 차이는 없지만 JPQL 호출 시 위임의 경우에 쿼리가 더 길어질 수 있다.
 
