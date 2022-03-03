@@ -556,7 +556,7 @@ from Member
 
 만약, Member가 즉시로딩이라면, 조회된 Member의 개수만큼 연관 엔티티를 찾기 위해 아래의 쿼리가 발생한다. 
 
-이처럼, 처음 조회된 수 만큼 새로이 쿼리가 발생하는 것을 N+1 문제라고 한다.
+**이처럼, 처음 조회된 수 만큼 새로이 쿼리가 발생하는 것을 N+1 문제라고 한다.**
 ```SQL
 select * 
 from ORDERS
@@ -763,7 +763,8 @@ ex) Select m.name from Member m
 경로 표현식은 상태 필드(속성), 단일 값 연관 필드(N->1), 그리고 컬렉션 값 연관 필드(1->N) 3가지가 있다. 
 
 + 상태 필드 경로 탐색에 대한 설명은 생략하도록 한다. 단순히, 엔티티의 애트리뷰트르 찾는 것을 담당한다.
-+ 단일 값 연관 필드
+
++ 단일 값 연관 필드(N:1, 1:1)
 
 단일 값 연관 필드는 묵시적 조인이 발생한다. 계속 탐색할 수 있다. 코드로 확인하면 아래와 같다.
 
@@ -787,14 +788,79 @@ ex) Select m.name from Member m
 묵시적 조인보다는 명시적 조인이 예상하지 못한 쿼리를 막을 수 있다. 그러므로, 단일 값 연관 필드보다는 명시적 조인이 더 바람직하다.
 
 
-+ 컬렉션 값 연관 필드
++ 컬렉션 값 연관 필드(1:N, N:N)
+
 
 컬렉션 값 연관 필드는 경로 탐색이 안된다는 것을 잊으면 안된다. 마찬가지로 묵시적 조인이 일어나지만 더 이상의 경로 탐색은 불가능하다.
 
 
-+ **페치 조인(Fetch Join)**
-페치 조인은 SQL에는 없는 개념이다.
+### 6.5 페치 조인(Fetch Join)
+페치 조인은 SQL에는 없는 개념이다. 페치 조인은 SQL 호출 횟수를 줄여 최적화하기 위해 사용되는 기법이다. 예시를 통해 알아보도록 한다.
 
++ 엔티티 페치 조인
 
-  
+아래와 같은 JPQL에서의 페치 조인이 있다고 하자. 
+
+```java
+  void main() {
+    String sql = "select m from Member m join fetch m.team";
+    }
+```
+SQL로 변환되면 아래와 같다.
+```sql
+  SELECT M.*
+  FROM Member M inner join Team T on M.TEAM_ID = T.TEAM_ID
+```
+
+위와 같은 페치 조인을 통해 조인된 Member와 Team이 영속성 컨텍스트에 존재하게 된다.
+
++ 컬렉션 페치 조인
+
+아래와 같은 JPQL이 있다고 하자.
+```java
+  void main() {
+    String sql = "select t from Team t join fetch t.members Where t.name='A' ";
+   }
+```
+위는 SQL로 아래와 같이 번역된다.
+```sql
+  SELECT T.*
+  FROM TEAM T inner join Member M on T.TEAM_ID = M.TEAM_ID 
+  WHERE T.NAME = 'A'
+```
+
+페치 조인 결과, TEAM과 inner join된 Member가 영속성 컨텍스트에 존재하게 된다. 
+
+물론, TEAM과 Member는 (1:N) 관계이므로 Team은 중복되어 영속성 컨텍스트에 존재한다. 이를 막기 위해 DISTINCT 예약어를 사용할 수 있다.
+
++ **일반 조인과 페치 조인의 차이점은?**
+
+아래의 두 JPQL을 비교해보도록 하자.
+```java
+  void main() {
+    String sql1 = "SELECT m FROM Member M INNER JOIN m.team";
+    String sql2 = "SELECT m FROM Member M join fetch m.team";
+    ...
+   }
+```
+
+번역되는 SQL 자체만 비교했을 때, 두 JPQL 쿼리는 차이가 없다. 그러나, 쿼리에 따른 영속성 컨텍스트 상태는 다르다.
+
+Member와 Team 모두 지연로딩이라고 가정하자.
+
+전자의 경우, 영속성 컨텍스트에 Member만 로딩된다. Team은 Join을 위해서만 사용된다.
+
+후자의 경우, 영속성 컨텍스트에 Member와 Team 모두 로딩된다.
+
+그러므로, 페치 조인을 사용하지 않고 Member를 통해 Team을 검색한다면,(ex. member.getTeam())
+
+Team을 검색할 때 마다 추가적인 SQL이 발생하게 된다.
+
+검색된 Member 수 만큼 SQL이 호출되므로 이것을 지연로딩 상황에서의 N+1 문제라고 한다.
+
+물론, 엔티티를 지연로딩이 아닌 즉시로딩으로 바꾼다면 위와 같은 N+1 문제는 발생하지 않는다.
+
+그러나, 지연로딩 상황에서의 N+1 문제만을 피하기 위해 즉시로딩으로 설정하는 것은 바람직하지 않다.
+
+따라서, 엔티티는 지연로딩으로 매핑하고, 필요시 페치 조인을 적절히 사용하도록 한다.
 
