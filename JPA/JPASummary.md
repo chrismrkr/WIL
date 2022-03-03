@@ -706,11 +706,38 @@ SELECT, FROM, WHERE, GROUPBY, HAVING, ORDER BY, JOIN, Aggregate 함수 모두 �
 ```
 
 ### 6.2 프로젝션
-**SELECT절에서 조회할 대상을 지정하는 것을 의미한다.**
+**SELECT절에서 조회할 대상을 지정하는 것을 의미한다. 여러개 지정도 가능하다.**
 
 ex) Select m.name from Member m
 
-
+```java
+  void main() {
+    ...
+    String query = "select m.name, m.age from Member m";
+    
+    // 1. Query 객체로 반환
+    Query result1 = em.createQuery(query);
+    
+    // 2. Obejct[]로 반환
+    List<Object[]> result2 = em.createQuery(query).getResultList();
+    
+    // 3. new 명령어를 통해 새로운 DTO 생성 후 반환
+    List<memberDTO> result3 = new ArrayList<>();
+    for(Object[] o : result2) {
+      result3.add(new memberDTO((String)o[0], (Integer)o[1]);
+      }
+      
+    List<MemberDTO> result4 = em.createQuery("select new mainDir.MEmberDTO(m.name, m.age) from Member m")
+                                    .getResultList();
+                                    
+    }
+    
+    // 4. 페이징 API
+    List<Member> result5 = em.createQuery("select m from Member m ORDER BY m.age DESC", Member.class)
+                                .getFirstResult(10).getMaxResult(20).getResultList();
+               
+      
+```
     
     
     
