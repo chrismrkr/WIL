@@ -746,7 +746,7 @@ ex) Select m.name from Member m
 
 + 내부 조인
 ```java
-  String query = Select m, t from Member m inner join m.team t on t.name = "A"
+  String query = "select m, t from Member m inner join m.team t on t.name = \"A\" ";
 ```
 
 위의 JPQL은 아래의 SQL로 변환된다.
@@ -754,8 +754,44 @@ ex) Select m.name from Member m
 ```sql
   SELECT m.*, t.*
   FROM MEMBER m inner join Team t on m.TEAM_ID = t.TEAM_ID
-  where t.name = "A"
+  WHERE t.name = "A"
 ```
+
+외부 조인 또한 위와 비슷한 방식으로 할 수 있다.
+
+### 6.4 경로 표현식
+경로 표현식은 상태 필드(속성), 단일 값 연관 필드(N->1), 그리고 컬렉션 값 연관 필드(1->N) 3가지가 있다. 
+
++ 상태 필드 경로 탐색에 대한 설명은 생략하도록 한다. 단순히, 엔티티의 애트리뷰트르 찾는 것을 담당한다.
++ 단일 값 연관 필드
+
+단일 값 연관 필드는 묵시적 조인이 발생한다. 계속 탐색할 수 있다. 코드로 확인하면 아래와 같다.
+
+```java
+  String sql = "Select o.member from Orders o;
+```
+
+위의 JPQL은 아래의 SQL로 변환된다.
+
+```sql
+  SELECT m.*
+  FROM orders o inner join Members m on o.member_id = m.member_id
+```
+
+묵시적 조인이 일어난다는 것을 알 수 있다. 만약, JPQL에서 명시적으로 조인하는 쿼리문을 짜면 아래와 같다.
+
+```java
+  String sql = "select m from Member m inner join m.Orders o";
+```
+
+묵시적 조인보다는 명시적 조인이 예상하지 못한 쿼리를 막을 수 있다. 그러므로, 단일 값 연관 필드보다는 명시적 조인이 더 바람직하다.
+
++ 컬렉션 값 연관 필드
+
+컬렉션 값 연관 필드는 경로 탐색이 안된다는 것을 잊으면 안된다.
+
++ **페치 조인(Fetch Join)**
+페치 조인은 SQL에는 없는 개념이다.
 
 
   
