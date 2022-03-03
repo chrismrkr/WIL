@@ -675,3 +675,4 @@ public class Member {
 ## 6. JPQL
 **JPQL이란 SQL을 추상화한 객체지향적 쿼리 언어이다. SQL에서 지원하는 것들을 대부분 지원하여 매우 유사하다.**
 
+
