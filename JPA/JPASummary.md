@@ -675,4 +675,43 @@ public class Member {
 ## 6. JPQL
 **JPQL이란 SQL을 추상화한 객체지향적 쿼리 언어이다. SQL에서 지원하는 것들을 대부분 지원하여 매우 유사하다.**
 
+SELECT, FROM, WHERE, GROUPBY, HAVING, ORDER BY, JOIN, Aggregate 함수 모두 지원한다. UPDATE와 DELETE는 지원하지만 INSERT는 지원하지 않는다.
+
+### 6.1 JPQL의 다양한 사용법
+
+```java
+  void main() {
+    EntityManager em = EntityManagerFactory.createEntityManager();
+    
+    String query1 = "select m From Member m"
+    
+    // 1. TypeQuery<> 객체로 반환
+    TypeQuery<Member> result1 = em.createQuery(query1, Member.class);
+    
+    // 2. Query 객체로 반환
+    Query result2 = em.createQuery(query1);
+    
+    // 3. ArrayList<>로 반환
+    ArrayList<Member> result3 = em.createQuery(query1, Member.class).getResultList();
+    
+    // 4. 객체 반환(결과가 반드시 1개여야 한다. 그렇지 않으면 Exception)
+    Member member = em.createQuery(query1, Member.class, Member.class).getSingleResult();
+     
+    // 5. 파라미터 바인딩
+    String nameParameter = "kim";
+    ArrayList<Member> result4 = em.createQuery("select m from Member m where m.name = :name, Member.class)
+                                    .setParameter("name", nameParameter).getResultList();
+                                    
+    }
+```
+
+### 6.2 프로젝션
+**SELECT절에서 조회할 대상을 지정하는 것을 의미한다.**
+
+ex) Select m.name from Member m
+
+
+    
+    
+    
 
