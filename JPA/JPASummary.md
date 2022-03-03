@@ -756,5 +756,7 @@ ex) Select m.name from Member m
   FROM MEMBER m inner join Team t on m.TEAM_ID = t.TEAM_ID
   where t.name = "A"
 ```
+
+
   
 
