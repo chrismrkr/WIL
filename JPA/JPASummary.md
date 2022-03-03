@@ -677,6 +677,8 @@ public class Member {
 
 SELECT, FROM, WHERE, GROUPBY, HAVING, ORDER BY, JOIN, Aggregate 함수 모두 지원한다. UPDATE와 DELETE는 지원하지만 INSERT는 지원하지 않는다.
 
+서브쿼리 또한 지원하지만, FROM 절에서는 불가능하다.
+
 ### 6.1 JPQL의 다양한 사용법
 
 ```java
@@ -738,7 +740,21 @@ ex) Select m.name from Member m
                
       
 ```
-    
-    
-    
+
+### 6.3 JPQL에서의 조인
+**SQL에서 inner, left outer, right outer, full outer 조인이 있다. 이러한 조인들이 JPQL에서는 어떠한지 알아보도록 한다.**
+
++ 내부 조인
+```java
+  String query = Select m, t from Member m inner join m.team t on t.name = "A"
+```
+
+위의 JPQL은 아래의 SQL로 변환된다.
+
+```sql
+  SELECT m.*, t.*
+  FROM MEMBER m inner join Team t on m.TEAM_ID = t.TEAM_ID
+  where t.name = "A"
+```
+  
 
