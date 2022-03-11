@@ -57,8 +57,8 @@
   public class DiscountPolicyImpl implements DiscountPolicy { ... }
 ```
 
-+ **final?: 변수가 단 한번만 할당 될 수 있음을 의미.**
-+ **static?: 변수가 컴파일 타임에 할당.**
++ **final? 변수가 단 한번만 할당 될 수 있음을 의미.**
++ **static? 변수가 컴파일 타임에 할당.**
 
 여기서 아래의 코드를 확인해보자. 
 
