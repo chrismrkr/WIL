@@ -176,7 +176,7 @@ AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppCo
   @Bean(name="customizedName")
 ```
 
-### 4.1 스프링 빈 조회방법
+#### 4.1 스프링 빈 조회방법
 
 + 전체 조회
 ```java
@@ -221,4 +221,20 @@ MemberService memberSerivce = ac.getBean(memberServiceImpl.class);
 ```
 
 가능하면 사용하지 않는 것이 좋다.
+
+#### 4.2 ApplicationContext의 상속관계
+
+ApplicationContext 상속관계는 아래와 같다.
+
+**AnnotationConfigApplicationContext -> ApplicationContext -> BeanFactory**
+
+앞서 사용한 모든 applicationContext의 기능은 BeanFactory의 기능에 해당된다. 
+
+물론, ApplicationContext는 BeanFactory 뿐만 아니라 여러 인터페이스를 상속 받는다. 아래와 같다.
+
++ MessageSource: 출력되는 언어를 위치 따라서 다르게 만들 수 있음.(ex. 한국->한글, 미국->영어)
++ EnvironmentCapable: 로컬, 개발, 운영 등의 컨테이너를 구별할 수 있도록 한다.
++ ApplicationEventPublisher: 이벤트 발행 및 구독 모델을 편리하게 지원.
++ ResourceLoader: 파일, 외부 등에서의 리소스를 편리하게 조회.
+
 
