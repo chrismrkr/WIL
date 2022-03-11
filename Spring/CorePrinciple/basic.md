@@ -24,7 +24,57 @@
 
 **스프링 기술을 통해 다형성, OCP 그리고 DIP 원칙을 지킬 수 있다. 올바른 객체지향적 설계하는 것이 스프링 프레임워크를 공부하는 목표이다.**
 
+지금부터 회원, 주문, 회원 서비스, 주문 서비스, 할인 정책, 그리고 회원 저장소 6가지 클래스가 있다고 한다.
+
+회원(Member)와 주문(Order)는 엔티티이므로 따로 인터페이스가 필요없지만, 나머지는 필요하다.
+
+```java
+  public interface MemberService { ... }
+  public interface OrderService { ... }
+  public interface MemberRepository { ... }
+  public interface DiscountPolicy { ..}
+```
+
+각 인터페이스는 아래의 클래스(구현체)를 갖는다.
+
+```java
+  public class MemberServiceImpl implements memberService {
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     ...
+  }
+   
+  public class OrderServiceImpl implements orderService {
+     private final DiscountPolicy discountPolicy = new DiscountPolicyImpl();
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     ...
+     
+  }
+  
+  public class MemberRepositoryImpl implements memberRepository {
+     private final HashMap<Long, Member> store = new HashMap<>();
+     ...
+  }
+  
+  public class DiscountPolicyImpl implements discountPolicy { ... }
+```
+
++ **final?: 변수가 단 한번만 할당 될 수 있음을 의미.**
++ **static?: 변수가 컴파일 타임에 할당.**
+
+여기서 아래의 코드를 확인해보자. 
+
+```java
+     private final DiscountPolicy discountPolicy = new DiscountPolicyImpl();
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+```
+
+첫째, 인터페이스(역할)에 의존하는 것이 아닌 클래스(구현)에 의존하고 있다. 그러므로, DIP 원칙에 위배된다.
+
+둘째, 구현 클래스가 바뀐다면 클라이언트 코드도 변경되어야 한다. 이는 OCP 원칙에 위배된다.
+
+그러므로, OCP, DIP 원칙을 지키기 위한 새로운 접근 방식이 필요하다.
 ***
+
 
 
 
