@@ -7,7 +7,7 @@
 + 캡슐화
 + 상속성
 + **다형성**: 역할(인터페이스)와 구현(클래스)를 구분한다는 특성. 오버라이딩과 유사함.
-+ 
+
 ***
 
 ### 1. 올바른 객체지향적 설계란?
@@ -95,6 +95,10 @@
     ...
   }
   
+  /*
+    AppConfig만 수정하면 구현을 바꿀 수 있다.
+  */
+  
   Main() {
     AppCongfig appConfig = new AppConfig();
     MemberService memberService = appConfig.memberService();
@@ -104,6 +108,59 @@
 ```
 
 AppConfig 클래스의 코드를 보면, 인터페이스를 구현한 클래스는 반드시 생성자가 필요하는 것을 알 수 있다.
+
+***
+
++ IoC(Inversion of Control)란?
+
+IoC는 프로그램의 제어의 흐름을 외부에서 담당하는 것을 의미한다. 
+
+예를 들어, AppConfig을 통해 객체 내부에서 제어의 흐름을 관리하지 않게 되었다. 
+
+이처럼, 의존관계를 외부에서 주입해 제어의 흐름을 관리하는 것을 IoC 컨테이너, 또는 DI 컨테이너라고 한다.
+
+
+### 3. OCP, DIP 원칙을 위한 두번째 방법: 스프링 컨테이너 사용
+
+**앞서 구현한 AppConfig 클래스를 스프링 컨테이너로 전환하도록 한다. 코드 몇 줄이면 가능하다.**
+
+```java
+  @Configuration
+  public class AppConfig {
+    ...
+    @Bean
+    public MemberRepository memberRepository() { return new MemberRepositoryImpl(); }
+    @Bean
+    public DiscountPolicy discountPolicy() { return new DisCountPolicyImpl(); }
+    @Bean
+    public OrderService orderService() { return new OrderServiceImpl(memberRepository(), discountPolicy()); }
+    @Bean
+    public MemerService memberService() { return new MemberServiceImpl(memberRepository()); }
+    ...
+  }
+  
+  /*
+    Annotaion(@Configuration, @Bean)이 추가 된 것 말고는 변화한 것이 없다.
+  */
+  
+  Main() {
+    ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+    MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
+    OrderService orderService = applicationContext.getBean("orderService", OrderService.class);
+    ...
+   }
+```
+
+스프링 컨테이너에 AppConfig를 등록한다. 왜냐하면 @Configuration이 지정되었기 때문이다.
+
+AppConfig의 멤버함수들은 스프링 빈으로 등록된다. 마찬가지로 @Bean이 있기 때문이다.
+
+**그렇다면, 순수 자바 클래스의 AppConfig와 스프링 컨테이너에서의 AppConfig는 이 다를까?**
+
+***
+
+
+
 
 
 
