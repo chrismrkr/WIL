@@ -210,7 +210,9 @@ AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppCo
 
 그러므로, 이러한 경우는 빈 이름을 지정해주는 것이 옳다.
 
-HashMap과 getBeansOfType()을 통해 해당 타입의 모든 빈을 가져올 수 있다.
+HashMap과 getBeansOfType()을 통해 해당 타입(인터페이스)의 모든 빈을 가져올 수 있다. 상속관계 조회와 같다.
+
+
 
 + **구체 타입으로 조회**
 
