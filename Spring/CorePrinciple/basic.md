@@ -145,13 +145,18 @@ IoC는 프로그램의 제어의 흐름을 외부에서 담당하는 것을 의�
   
   Main() {
     ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+    // 의존관계 주입,  class를 지정해주지 않으면 클래스의 가장 상위 부모 클래스인 Object 객체로 반환된다.
     MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
-    OrderService orderService = applicationContext.getBean("orderService", OrderService.class);
+    
+    Object orderServiceBean = applicationContext.getBean("orderService");
+    OrderService orderService = (orderService)(orderServiceBean);
+   
+  
     ...
    }
 ```
 
-스프링 컨테이너에 AppConfig를 등록한다. 왜냐하면 @Configuration이 지정되었기 때문이다.
+스프링 컨테이너로 AppConfig를 등록한다. 왜냐하면 @Configuration이 지정되었기 때문이다.
 
 AppConfig의 멤버함수들은 스프링 빈으로 등록된다. 마찬가지로 @Bean이 있기 때문이다.
 
@@ -159,6 +164,61 @@ AppConfig의 멤버함수들은 스프링 빈으로 등록된다. 마찬가지�
 
 ***
 
+### 4. 스프링 컨테이너와 스프링 빈
+
+**스프링 컨테이너와 스프링 빈은 각각 컨테이너 상자와 화물로 비유할 수 있다.**
+
+AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppConfig 클래스 내의 의존관계 주입을 위한 멤버함수를 컨테이너 상자의 화물로 등록하는 것이다.
+
+또한, 스프링 빈(화물)의 이름을 임의로 아래와 같이 지정할 수 있다. 스프링 빈의 이름은 중복될 수 없다.
+
+```java
+  @Bean(name="customizedName")
+```
+
+### 4.1 스프링 빈 조회방법
+
++ 전체 조회
+```java
+  applicationContext ac = new AnnocationConfigApplicationContext(AppConfig.class);
+  
+  String[] beanNames = ac.getBeanDefinitionNames();
+  
+  for(String beanName : beanNames) {
+      Object bean = ac.getBean(beanName);
+      sout("name: " + beanName + ", object: " + bean);
+      
+      //bean.getRole()을 통해 bean이 직접 등록한 것인지 원래 있던 것인지 알 수 있다.
+      }
+```
+
++ 빈 이름으로 조회
+
+```java
+  MemberService memberService = ac.getBean("memberService", memberService.class);
+  assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
+```
+
++ 타입으로만 조회
+
+```java
+  MemberService memberService = ac.getBean(memberService.class);
+  HashMap<String, MemberService> memberSerivces = getBeansOfType(memberService.class);
+```
+
+**동일한 타입(인터페이스를 구현한 클래스)이 2개 이상이라면 에러가 발생한다.**
+
+그러므로, 이러한 경우는 빈 이름을 지정해주는 것이 옳다.
+
+HashMap과 getBeansOfType()을 통해 해당 타입의 모든 빈을 가져올 수 있다.
+
++ 구체 타입으로 조회
+
+```java
+MemberService memberSerivce = ac.getBean(memberServiceImpl.class);
+```
+
+가능하면 사용하지 않는 것이 좋다.
 
 
 
