@@ -51,7 +51,7 @@
      
   }
   
-  public class MemberRepositoryImpl implements <emberRepository {
+  public class MemberRepositoryImpl implements MemberRepository {
      private final HashMap<Long, Member> store = new HashMap<>();
      ...
   }
@@ -79,7 +79,32 @@
 
 ### 2. OCP, DIP 원칙을 위한 첫번째 방법: AppConfig
 
-**구현 클래스의 설정을 담당하는 새로운 클래스 AppConfig를 생성한다.**
+구현 클래스의 설정을 담당하는 새로운 클래스 AppConfig를 생성한다.
+
+**구현을 설정(Configuration)하는 클래스를 따로 생성하여 분리한다는 점에서 의의가 있다.** 
+
+스프링 컨테이너를 사용하는 방법은 아니다.
+
+```java
+  public class AppConfig {
+    ...
+    public MemberRepository memberRepository() { return new MemberRepositoryImpl(); }
+    public DiscountPolicy discountPolicy() { return new DisCountPolicyImpl(); }
+    public OrderService orderService() { return new OrderServiceImpl(memberRepository(), discountPolicy()); }
+    public MemerService memberService() { return new MemberServiceImpl(memberRepository()); }
+    ...
+  }
+  
+  Main() {
+    AppCongfig appConfig = new AppConfig();
+    MemberService memberService = appConfig.memberService();
+    OrderService orderService = appConfig.orderService();
+    ...
+   }
+```
+
+AppConfig 클래스의 코드를 보면, 인터페이스를 구현한 클래스는 반드시 생성자가 필요하는 것을 알 수 있다.
+
 
 
 
