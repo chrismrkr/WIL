@@ -37,24 +37,24 @@
 각 인터페이스는 아래의 클래스(구현체)를 갖는다.
 
 ```java
-  public class MemberServiceImpl implements memberService {
+  public class MemberServiceImpl implements MemberService {
      private final MemberRepository memberRepository = new MemberRepositoryImpl();
      ...
   }
    
-  public class OrderServiceImpl implements orderService {
+  public class OrderServiceImpl implements OrderService {
      private final DiscountPolicy discountPolicy = new DiscountPolicyImpl();
      private final MemberRepository memberRepository = new MemberRepositoryImpl();
      ...
      
   }
   
-  public class MemberRepositoryImpl implements memberRepository {
+  public class MemberRepositoryImpl implements <emberRepository {
      private final HashMap<Long, Member> store = new HashMap<>();
      ...
   }
   
-  public class DiscountPolicyImpl implements discountPolicy { ... }
+  public class DiscountPolicyImpl implements DiscountPolicy { ... }
 ```
 
 + **final?: 변수가 단 한번만 할당 될 수 있음을 의미.**
