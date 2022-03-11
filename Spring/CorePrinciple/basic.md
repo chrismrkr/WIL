@@ -192,14 +192,14 @@ AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppCo
       }
 ```
 
-+ 빈 이름으로 조회
++ **빈 이름으로 조회**
 
 ```java
   MemberService memberService = ac.getBean("memberService", memberService.class);
   assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
 ```
 
-+ 타입으로만 조회
++ **타입으로만 조회**
 
 ```java
   MemberService memberService = ac.getBean(memberService.class);
@@ -212,22 +212,11 @@ AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppCo
 
 HashMap과 getBeansOfType()을 통해 해당 타입의 모든 빈을 가져올 수 있다.
 
-+ 구체 타입으로 조회
++ **구체 타입으로 조회**
 
 ```java
 MemberService memberSerivce = ac.getBean(memberServiceImpl.class);
 ```
 
 가능하면 사용하지 않는 것이 좋다.
-
-
-
-
-
-
-
-
-
-
-
 
