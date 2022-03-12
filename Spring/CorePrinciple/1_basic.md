@@ -301,6 +301,73 @@ Java에서 멤버변수는 스레드간 공유되고, 지역변수는 각 스레
 
 **만약 @Configuration이 없다면, 멤버함수들은 @Bean으로만 등록되어 싱글톤을 보장하지 않게 된다.**
 
+***
+
+### 6. 컴포넌트 스캔과 의존관계 자동 주입
+
+#### 6.1 컴포넌트 스캔
+
+멤버함수에 @Bean을 개발자가 직접 지정하는 것은 실수를 초래할 수 있다. @Bean을 자동으로 등록해주는 것을 **컴포넌트 스캔**이라고 한다.
+
+컴포넌트 스캔을 위해서는 코드를 아래와 같이 변경하면 된다. 
+
+```java 
+
+  @Configuration
+  @ComponentScan
+  public class AutoAppConfig { }
+  
+  ...
+  
+  @Component
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     ...
+  }
+  
+  @Component
+  public class OrderServiceImpl implements OrderService {
+     private final DiscountPolicy discountPolicy = new DiscountPolicyImpl();
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     ...
+     
+  }
+  
+  @Component("...사용자 지정 이름 가능")
+  public class MemberRepositoryImpl implements MemberRepository {
+     private final HashMap<Long, Member> store = new HashMap<>();
+     ...
+  }
+  
+```
+
+@Component가 붙은 클래스를 자동으로 Scan해 스프링 빈으로 등록한다. 
+
+@ComponentScan은 @Component 뿐만 아니라 @Controller, @Repository, @Configuration, @Service가 붙은 것 또한 스프링 빈으로 등록한다.
+
+#### 6.2 의존관계 자동 주입
+
+ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의존관계 주입이 필요하다. 
+
+이를 위해 @Autowired를 사용해 스프링 빈에 등록된 것을 자동으로 생성자에 주입되도록 한다.
+
+```java
+  @Component
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     
+     @Autowired //ac.getBean(MemberRepository.class)와 같다고 볼 수 있다.
+     public MemberServiceImpl(MemberRepository memberRepository) {
+          this.memberRepository = memberRepository;
+        }
+     ...
+  }
+```
+
+@Autowired는 ac.getBean(MemberRepository.class)과 같다고 볼 수 있다.
+
+
+#### 6.3 컴포넌트의 중복 등록과 충돌
 
 
 
