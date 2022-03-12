@@ -366,9 +366,11 @@ ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의�
 
 @Autowired는 ac.getBean(MemberRepository.class)과 같다고 볼 수 있다.
 
+***
 
-#### 6.3 컴포넌트의 중복 등록과 충돌
+### 7. 의존관계 주입
 
+**의존관계 주입시 일반적으로 생성자에 @Autowired를 사용한다.**
 
 
 
