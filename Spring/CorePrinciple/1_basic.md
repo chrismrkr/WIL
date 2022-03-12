@@ -237,4 +237,57 @@ ApplicationContext 상속관계는 아래와 같다.
 + ApplicationEventPublisher: 이벤트 발행 및 구독 모델을 편리하게 지원.
 + ResourceLoader: 파일, 외부 등에서의 리소스를 편리하게 조회.
 
+이러한 ApplicationContext를 상속 받은 클래스가 AnnotaionConfigApplicationContext이다. 
+
+AnnotatinConfigApplicationContext 뿐만 아니라 XML과 같은 다양한 설정 형식을 지원한다. 
+
+스프링 컨테이너는 Java, XML과 같은 형식에 의존하는 것이 아닌 BeanDefinition에 의존하기 때문에 가능하다.
+
+***
+
+### 5. 싱글톤 컨테이너
+
+**OCP, DIP 원칙을 지키기 위한 의존관계 주입을 담당하는 DI 컨테이너에 대해서 알아보았다.**
+
+그러나, 앞선 설계는 클라이언트가 서비스 요청 등을 통해 DI 컨테이너를 필요로 할 때 마다 새로운 컨테이너 객체가 할당되어 메모리가 낭비된다는 문제점이 있다.
+
+이러한 메모리 낭비 문제를 해결하기 위해 등장한 개념이 싱글톤 패턴이다.
+
+싱글톤 패턴은 인스턴스가 하나만 생성되어 클라이언트에게 이를 공유하는 개념이다.
+
+싱글톤 패턴은 클래스 내에서 staic final 키워드를 통해 만들 수 있다.
+
+```java
+  
+  public class MemberServiceImpl implements MemberService {
+      public static final MemberSerivce instance = new MemberServiceImpl();
+      
+      private MemberServiceImpl() { ... } // 생성자 외부 호출을 막음.
+      ...
+      }
+```
+
+static final 키워드를 추가하면 해당 변수는 컴파일 타임에 클래스 자체에 단 한번만 할당된다. 생성자 호출을 막음으로써 싱글톤 패턴을 달성할 수 있다.
+
+
+**사실, 스프링 컨테이너와 스프링 빈 항상 싱글 톤으로 관리되므로 신경쓰지 않아도 된다. 이것이 스프링 컨테이너를 사용할 때의 장점 중 하나이다.**
+
+#### 5.1 싱글톤 컨테이너 사용 시 주의점
+
+**싱글톤 컨테이너는 하나의 인스턴스만 생성해 여러 사용자가 공유하므로 동시성 이슈를 주의해야 한다.**
+
+싱글톤 인스턴스는 항상 무상태(stateless)로 설계해야 한다.
+
++ **무상태(stateless)란?**
+
+
+
+
+
+
+
+
+
+
+
 
