@@ -178,7 +178,7 @@ AppConfig를 @Configuration을 통해 컨테이너 상자로 등록하고, AppCo
 
 #### 4.1 스프링 빈 조회방법
 
-+ 전체 조회
++ 이름 전체 조회
 ```java
   applicationContext ac = new AnnocationConfigApplicationContext(AppConfig.class);
   
