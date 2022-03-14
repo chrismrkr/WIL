@@ -370,8 +370,32 @@ ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의�
 
 ### 7. 의존관계 주입
 
-**의존관계 주입시 일반적으로 생성자에 @Autowired를 사용한다.**
+**의존관계 주입시 일반적으로 생성자에 @Autowired를 사용한다.** 일반적으로 생성자와 @Autowired를 통해 의존관계를 주입하도록 하자.
 
++ 생성자를 통한 의존관계 주입이 좋은 이유는?
+
+1. Setter 또는 일반 멤버함수를 통해 설정한다면, 누군가 실행 중에 변경시킬 여지가 있기 때문에 생성자 주입이 바람직하다.
+
+2. 생성자와 final 키워드를 조합하면 불변 객체로 만들 수 있기 때문에 더 안전하다.
+
+
++ 롬복 라이브러리를 활용한 생성자 의존관계 주입 간략화
+ 
+@RequiredArgsConstructor Annotation을 통해 @Autowired와 생성자를 없앨 수 있다.
+
+final 키워드로 지정된 멤버변수들을 모아 자동으로 생성자를 만들어 의존관계르 주입한다. 코드는 아래와 같다.
+
+```java
+  @Component
+  @RequiredArgsConstructors
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+      // @Autowired와 Constructor를 생략해도 된다.
+     ...
+  }
+```
+
+#### 7.1 동일한 인터페이스를 상속받은 스프링 빈이 2개 이상인 경우
 
 
 
