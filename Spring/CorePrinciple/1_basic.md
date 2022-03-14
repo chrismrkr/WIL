@@ -448,8 +448,6 @@ AutoAppConfig가 @Component Annotation이 붙은 모든 클래스를 스프링 �
 
 멤버변수의 이름을 memoryMemberRepository로 변경해 어떤 구현 클래스를 주입받을 것인지 지정한다.
 
-그러나, 개발자가 오타를 낼 수 있다는 단점이 있다.
-
 
 + **@Qualifier를 통한 매칭**
 
@@ -474,11 +472,35 @@ AutoAppConfig가 @Component Annotation이 붙은 모든 클래스를 스프링 �
          }
      ...
   }
-  
+```
+
   @Qualifier를 통해 의존관계 주입을 위한 별칭을 생성한다. 
   
   물론, 빈 이름 자체를 변경하는 것은 아니다. 참조를 생성하는 것과 유사한 것으로 받아 들일 수 있다.
 
 
++ **인터페이스를 상속받은 모든 스프링 빈(클래스)이 필요하다면?
 
+Map 자료구조를 사용한다.
+
+```java
+
+public class AllMemberRepository {
+    private final Map<String, MemberRepository> repositoryMap;
+    private final List<String> repositories;
+    
+    public AllMemberRepository(Map<String, MemberRepository> repositoryMap, List<String> repositories) {
+        ....
+        }
+  }
+  
+  main() {
+      ApplicationContext ac = new AnnocationConfigApplicationContext(AppConfig.class, AllMemberRepository.class);
+    
+      AllMemberRepository allMemberRepository = ac.getBean(AllMemberRepository.class);
+      
+      ...
+      }
+
+```
 
