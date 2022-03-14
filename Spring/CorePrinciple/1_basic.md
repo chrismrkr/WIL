@@ -383,7 +383,7 @@ ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의�
  
 @RequiredArgsConstructor Annotation을 통해 @Autowired와 생성자를 없앨 수 있다.
 
-final 키워드로 지정된 멤버변수들을 모아 자동으로 생성자를 만들어 의존관계르 주입한다. 코드는 아래와 같다.
+final 키워드로 지정된 멤버변수들을 모아 자동으로 생성자를 만들어 의존관계를 주입한다. 코드는 아래와 같다.
 
 ```java
   @Component
@@ -397,7 +397,87 @@ final 키워드로 지정된 멤버변수들을 모아 자동으로 생성자를
 
 #### 7.1 동일한 인터페이스를 상속받은 스프링 빈이 2개 이상인 경우
 
+아래의 상황을 가정해보자. 
 
+
+```java
+  @ComponentScan
+  @Configuration
+  public class AutoAppConfig { }
+
+  @Component
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memberRepository;
+     
+     @Autowired
+     public MemberServiceImpl(MemberRepository memberRepository) {
+         this.memberRepository = memberRepository;
+         ...
+         }
+     ...
+  }
+  
+  /*
+   MemberRepository를 멤버변수로 갖는 MemberServiceImpl 클래스가 존재한다.
+  그러나, MemberRepository 인터페이스를 상속받은 구현 클래스는 아래와 같다.
+  */
+  
+  @Component
+  public class MemoryMemberRepository implements MemberRepository { ... }
+  
+  @Component
+  public class MySQLMemberRepository implements MemberRepository { ... }
+```
+
+AutoAppConfig가 @Component Annotation이 붙은 모든 클래스를 스프링 빈으로 등록한다.
+
+이때, 필요한 의존관계를 주입한다. 그렇다면 MemberServiceImpl에는 어떤 MemberRepository의 구현 클래스가 주입되어야 할까? 
+
+이런 경우 NoUniqueBeanDefinition 오류가 발생하게 된다. 해결할 수 있는 방법은 아래와 같다.
+
++ **멤버변수의 이름을 통한 매칭**
+
+```java
+  @Component
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memoryMemberRepository;
+     
+     ...
+  }
+```
+
+멤버변수의 이름을 memoryMemberRepository로 변경해 어떤 구현 클래스를 주입받을 것인지 지정한다.
+
+그러나, 개발자가 오타를 낼 수 있다는 단점이 있다.
+
+
++ **@Qualifier를 통한 매칭**
+
+```java
+  @Component
+  @Qualifier("memoryMemberRepository")
+  public class MemoryMemberRepository implements MemberRepository { ... }
+  
+  @Component
+  @Qualifier("mySQLMemberRepository")
+  public class MySQLMemberRepository implements MemberRepository { ... }
+
+
+  @Component
+  public class MemberServiceImpl implements MemberService {
+     private final MemberRepository memberRepository;
+     
+     @Autowired
+     public MemberServiceImpl(@Qualifier("memoryMemberRepository") MemberRepository memberRepository) {
+         this.memberRepository = memberRepository;
+         ...
+         }
+     ...
+  }
+  
+  @Qualifier를 통해 의존관계 주입을 위한 별칭을 생성한다. 
+  
+  물론, 빈 이름 자체를 변경하는 것은 아니다. 참조를 생성하는 것과 유사한 것으로 받아 들일 수 있다.
 
 
 
