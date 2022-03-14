@@ -504,3 +504,15 @@ public class AllMemberRepository {
 
 ```
 
+#### 7.2 자동 빈 등록 vs 수동 빈 등록
+
+@ComponentScan, @Component, @Autowired 등의 Annotation을 통해 자동으로 스프링 빈으로 등록할 수 있었고,
+
+@Configuration, @Bean을 통해 수동으로 스프링 빈으로 등록할 수 있었다. 무엇이 더 좋을까?
+
+실무에서 서비스와 관련된 비즈니스 업무 로직은 자동 빈 등록으로 하고, 데이터베이스 연결과 같은 기술지원과 관련된 로직은 수동 빈 등록으로 한다고 한다.
+
+그렇게 하기 위해서는 AppConfig 클래스를 1개가 아니라 요구에 따라 여러개를 만들어 관리하는 것이 바람직하다.
+
+***
+
