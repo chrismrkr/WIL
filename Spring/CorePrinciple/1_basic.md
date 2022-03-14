@@ -516,3 +516,73 @@ public class AllMemberRepository {
 
 ***
 
+### 8. 빈 생명주기 확인: CallBack
+
+스프링 빈을 애플리케이션에서 사용할 때 반드시 의존관계가 주입되어야 한다. 
+
+또한, 빈 객체는 때로는 데이터베이스와 같은 외부 자원과 연동되어야 하는 경우도 있다.
+
+스프링 빈과 외부 자원을 연결 및 해제하기 위해서는 빈 객체가 의존관계가 주입이 끝나는 시점과 할당 해제되는 시점을 알아야 한다.
+
+이를 위해 등장한 것이 콜백이다.(의존관계 주입 -> 초기화 콜백 -> ... -> 종료 전 콜백 -> 할당 해제)
+
+콜백을 사용하는 방법에 대해서 알아보도록 한다.
+
+#### 8.1 스프링 빈에 초기화 및 소멸 메서드 지정
+
+코드를 통해 확인하도록 한다.
+
+```java
+  @Configuration
+  public class AppConfig {
+    ...
+    @Bean(initMethod="init", destroyMethod="close")
+    public MemberRepository memberRepository() { return new MemberRepositoryImpl(); }
+    
+    ...
+  }
+    
+  public class MemberRepositoryImpl implements MemberRepository {
+      ...
+      public void init() {
+          ... // 초기화 콜백 시 동작하는 로직 
+       }
+      
+      public void close() {
+          ... // 종료 전 콜백 시 동작하는 로직
+      }
+     ...
+  }
+```
+콜백 함수의 이름을 사용자가 임의로 지정할 수 있다.
+
+또한, 스프링 빈이 스프링 코드에 의존하지 않으므로 **외부 라이브러리에도 적용할 수 있다.**
+
+
+#### 8.2 @PostConstruct, @PreDestroy
+
+스프링에서만 사용할 수 있는 애노테이션으로 컴포넌트 스캔과 호환된다.
+
+```java
+  public class MemberRepositoryImpl implements MemberRepository {
+      ...
+      @PostConstruct
+      public void init() {
+          ... // 초기화 콜백 시 동작하는 로직 
+       }
+      
+      @PreDestroy
+      public void close() {
+          ... // 종료 전 콜백 시 동작하는 로직
+      }
+     ...
+  }
+ ```
+ 
+ Annotation만 붙이면 되기 때문에 매우 간단하고 자바 기반이기 때문에 스프링 이외의 컨테이너에서도 동작한다.
+ 
+ 그러나, 외부 라이브러리에서는 동작하지 못한다. 이것이 앞서 빈 메서드 지정과의 차이점이다.
+ 
+ 그러므로, 가능하면 Annotation을 사용하되, 외부 라이브러리를 사용할 때만 빈 메소드를 사용하도록 한다.
+ 
+ ***
