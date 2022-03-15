@@ -682,8 +682,91 @@ public class AllMemberRepository {
 
 그러나, 매 클래스마다 ApplicationContext를 주입받는 것은 스프링 컨테이너에 종속적인 방법은 아니다.
 
-그러므로, ObjectProvider를 사용한다.
 
+ObjectProvider를 사용하는 방법도 있다.
+
+```java
+  @Component
+  public class testClass {
+    
+    private ObjectProvider<PrototypeBean> prototypeBeanProvider;
+    ...
+    
+    public int logic() { 
+        PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
+        prototypeBean.increaseLevel();
+        return prototypeBean.getLevel();
+   }
+```
+
+#### 9.2 웹 스코프
+
+프로토타입 스코프 빈은 싱글 톤 스프링 빈과 달리 인스턴스가 개별적으로 생성되어 클라이언트에게 반환된다.
+
+마찬가지로, 웹 스코프 빈도 싱글톤으로 관리되는 빈이 아니라는 점에서 공통점이 있다. 
+
+하지만, 웹스코프는 종료시점을 정한 후, 그 시점이 지나면 자동으로 소멸된다는 차이점이 있다.
+
+웹 스코프의 종류는 request, session, application, websocket이 있다.
+
+마찬가지로 @Scope("request") Annotation을 통해 지정할 수 있다.
+
+
+```java
+  @Component
+  @Scope("request")
+  public class Logger {
+      private String requestURL, uid;
+      
+      ...
+    }
+    
+  
+  @Controller
+  @ConstructorArgsRequired
+  public class LoggerController {
+  
+    private final LogService logService;
+    private final Logger logger;
+    
+    @RequestMapping("/log")
+    public String checkLog(HttpServletRequest request) {
+        String requestURL = request.getRequestURL().toString();
+        
+        logger.log("...");
+        
+        return "ok";
+      }
+ ```
+ 
+ @Scope("request") Annotation을 통해 지정했어도 앞서 말했듯 프로토타입 스코프 빈과 유사하게 해당 웹 스코프 빈은 요청이 올 때 생성된다. 
+ 
+ 그러므로, 단순히 의존관계만 주입했다고 해서 생성되지 않는다. 똑같이 ObjectProvider를 쓰자.
+ 
+ ```java
+  @Controller
+  @ConstructorArgsRequired
+  public class LoggerController {
+  
+    private final LogService logService;
+    private final ObjectProvider<Logger> loggerObjectProvider;
+    
+    @RequestMapping("/log")
+    public String checkLog(HttpServletRequest request) {
+        Logger logger = loggerObjectProvider.getObject();
+        String requestURL = request.getRequestURL().toString();
+        
+        logger.log("...");
+        
+        return "ok";
+      }
+ ```
+
+**정리하면, 프로토타입 스코프 빈과 웹 스코프 빈는 싱글톤 스타일의 스프링 빈과 달리,**
+
+**사용자가 직접 호출할 때 개별적인 빈 인스턴스를 받게 된다.**
+
+***
 
  
 
