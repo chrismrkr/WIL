@@ -593,5 +593,80 @@ public class AllMemberRepository {
  
  그러나, 호출될 때 마다 공유 인스턴스가 아닌 새로운 객체를 반환 해야할 상황도 있다. 이를 위해서 빈 스코프를 사용한다.
  
+ #### 9.1 프로토타입 스코프
+ 
+ 싱글톤 스코프의 빈과 달리 프로토타입의 스코프의 빈은 조회할 때마다 새로운 객체를 반환한다.
+ 
+ 싱글톤 스코프 빈은 프로그램이 실행되면 AppConfig를 통해 의존관계가 주입된 후, 종료될 때까지 유지된다.
+ 
+ 하지만, 프로토타입 스코프 빈은 ac.getBean()시 의존관계를 주입한 후, 클라이언트에 빈을 반환한다. 그러므로, 프로토타입 스코프 빈에 대한 권한은 클라이언트가 갖게 된다.
+ 
+ 사용하는 방법은 간단하다. @Scope("prototype") Annotation만 추가하면 된다.
+ 
+ ```java
+ @Component
+ @Scope("prototype")
+ public class PrototypeBean {
+    ...
+  }
+```
+
+하지만, 싱글톤 스코프의 빈과 프로토타입 스코프의 빈을 함께 사용해야 할 상황도 있다.
+
+아래와 같이 싱글톤으로 관리되는 스프링 빈에 프로토 타입 스코프 빈이 존재하는 경우를 생각해보자.
+
+```java
+
+ @Component
+ @Scope("prototype")
+ public class PrototypeBean {
+    int level = 0;
+    public void increaseLevel() { level++; }
+    public int getLevel() { return level; }
+    ...
+  }
+  
+  @Component
+  public class testClass {
+    
+    @Autowired
+    private PrototypeBean prototypeBean;
+    ...
+    
+    public int logic() { 
+        prototypeBean.increaseLevel();
+        return prototypeBean.getLevel();
+   }
+    
+   }
+```
+
+그리고, 싱글톤 빈인 PrototypeBean 인스턴스를 아래와 같이 호출한다고 가정하자.
+
+```java
+  void main() {
+      ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+      testClass test1 = ac.getBean(testClass.class);
+      test1.logic();
+      
+      testClass test2 = ac.getBean(testClass.class);
+      test2.logic();
+ ```
+ 
+ 만약, 사용자가 test1과 test2의 prototypeBean.level이 각 1이 되는 것을 기대했다면 그렇지 않다.
+ 
+ 결과는 test1에는 level 1, 그리고 test2에는 level 2가 존재하게 된다. 
+ 
+ 이유는, testClass 자체는 싱글톤으로 관리되기 때문에 App이 실행되는 시점에 의존관계가 주입된다.
+
+의존관계 주입 시 PrototypeBean이 주입되기 때문에, 싱글톤 testClass 내의 PrototypeBean 인스턴스는 testClass 인스턴스가 권한을 갖게 된다.
+
+그러므로, testClass 내의 PrototypeBean은 싱글 톤인 testClass를 통해 공유되어 문제가 발생하게 된다.
+
+이를 해결하기 위한 방법은 아래와 같다.
+
+첫번째 방법은 다소 
+
+
  
 
