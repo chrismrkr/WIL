@@ -638,7 +638,7 @@ public class AllMemberRepository {
         return prototypeBean.getLevel();
    }
     
-   }
+}
 ```
 
 그리고, 싱글톤 빈인 PrototypeBean 인스턴스를 아래와 같이 호출한다고 가정하자.
@@ -663,9 +663,26 @@ public class AllMemberRepository {
 
 그러므로, testClass 내의 PrototypeBean은 싱글 톤인 testClass를 통해 공유되어 문제가 발생하게 된다.
 
-이를 해결하기 위한 방법은 아래와 같다.
+이를 해결하기 위한 방법은 2가지가 있다.
 
-첫번째 방법은 다소 
+```java
+  @Component
+  public class testClass {
+    
+    @Autowired
+    ApplicationContext ac;
+    ...
+    
+    public int logic() { 
+        PrototypeBean prototypeBean = ac.getBean(PrototypeBean.class);
+        prototypeBean.increaseLevel();
+        return prototypeBean.getLevel();
+   }
+```
+
+그러나, 매 클래스마다 ApplicationContext를 주입받는 것은 스프링 컨테이너에 종속적인 방법은 아니다.
+
+그러므로, ObjectProvider를 사용한다.
 
 
  
