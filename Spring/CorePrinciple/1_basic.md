@@ -33,7 +33,7 @@
   public interface MemberService { ... }
   public interface OrderService { ... }
   public interface MemberRepository { ... }
-  public interface DiscountPolicy { ..}
+  public interface DiscountPolicy { ... }
 ```
 
 각 인터페이스는 아래의 클래스(구현체)를 갖는다.
