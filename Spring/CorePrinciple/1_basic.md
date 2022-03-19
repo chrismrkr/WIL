@@ -345,6 +345,8 @@ Java에서 멤버변수는 스레드간 공유되고, 지역변수는 각 스레
 
 @ComponentScan은 @Component 뿐만 아니라 @Controller, @Repository, @Configuration, @Service가 붙은 것 또한 스프링 빈으로 등록한다.
 
+**그러나, DIP, OCP가 위반된 코드이다!!**
+
 #### 6.2 의존관계 자동 주입
 
 ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의존관계 주입이 필요하다. 
