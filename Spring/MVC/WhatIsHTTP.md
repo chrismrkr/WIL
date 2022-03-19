@@ -146,4 +146,29 @@ Location 헤더가 있다면, 그 위치로 자동 이동하도록 함
 
 ### 8. HTTP 헤더
 
++ Content-Type
++ Content-Encoding: message body가 인코딩되었다면 인코딩 방식을 나타냄
++ Content-Language
++ Content-Length
++ Transfer-endcoding: chucke -> 분할 전송
+
++ **쿠키**
+
+HTTP는 무상태 프로토콜이다. 그러나, 로그인 기능 등에서는 상태를 기억해야한다.
+
+이러한 한계를 위해 등장한 개념이 쿠키이다. 서버가 쿠키를 함께 response하면 클라이언트는 받은 쿠키를 저장한다.
+
+그 이후 클라이언트의 모든 request에 쿠키가 자동으로 포함된다.
+
+헤더에 Set-Cookie: ... 를 추가해 사용한다.
+
++ **캐시**
+
+클라이언트가 서버로 큰 용량의 데이터를 여러번 받아올 때 사용할 수 있다.
+
+response 헤더에 cache-control: max-age=60(클라이언트가 해당 메세지를 60초간 캐시로 저장)를 붙여 사용 가능하다.
+
+Last-Modified: date ETag 를 통해서도 더 효율적인 캐싱 가능하다.
+
+
 
