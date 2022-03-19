@@ -354,7 +354,7 @@ ComponentScan을 통해 스프링 빈으로 등록되었다고 하더라도 의�
 ```java
   @Component
   public class MemberServiceImpl implements MemberService {
-     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     private final MemberRepository memberRepository
      
      @Autowired //ac.getBean(MemberRepository.class)와 같다고 볼 수 있다.
      public MemberServiceImpl(MemberRepository memberRepository) {
@@ -389,7 +389,7 @@ final 키워드로 지정된 멤버변수들을 모아 자동으로 생성자를
   @Component
   @RequiredArgsConstructors
   public class MemberServiceImpl implements MemberService {
-     private final MemberRepository memberRepository = new MemberRepositoryImpl();
+     private final MemberRepository memberRepository
       // @Autowired와 Constructor를 생략해도 된다.
      ...
   }
