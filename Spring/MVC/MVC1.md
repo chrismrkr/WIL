@@ -38,5 +38,33 @@
 + Content-Type, Content-Length
 + Character-Encoding
 
-### 1.2 HTTP Request 데이터의 종류
+### 1.2 HTTP Request 데이터 1: GET(쿼리 파라미터 사용)
+
+.../uri?[queryParamter] 형식으로 이루어진 url이다. Http message Body가 없다는 것이 특징이다.
+
+서블릿을 통해 HTTP GET Request를 받아 Response하는 자바 코드는 아래와 같다.
+
+```java
+@WebServlet(name="requestParamServlet", urlPatterns="/request-param")
+public class RequestParamServlet extends HttpServlet {
+  
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+       
+       
+       String name = req.getParameter("username"); // 단일 쿼리 파라미터 조회
+       String[] names = req.getParameters("username") // 여러 파라미터 조회 (ex. username=kim&username=lee)
+       
+       req.getParameterNames().asIterator()
+            .forEachRemaining(paramName -> sout(req.getParamater(paramName)); // 전체 파라미터 조회
+            
+       // 이외에도 start-line, header 정보도 확인할 수 있다.
+       
+       resp.getWriter().write("ok") 
+         
+    }
+}
+       
+```
+
 
