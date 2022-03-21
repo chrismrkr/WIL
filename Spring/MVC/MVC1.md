@@ -72,11 +72,13 @@ public class RequestParamServlet extends HttpServlet {
 
 **messageBody에 내용을 포함해 전송할 때는 반드시 Content-Type을 지정하는 것에 유의하도록 한다.**
 
+그러므로, messageBody의 유무는 Content-Type이 null인지 아닌지로 판단할 수 있다.
+
 HTML FORM의 경우의 Content-Type은 application/x-www-form-urlencoded이다.
 
 ```java
 @WebServlet(name="requestBodyStringServlet", urlPatterns="/request-body-string")
-public class RequestParamServlet extends HttpServlet {
+public class RequestBodyStringServlet extends HttpServlet {
   
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
@@ -88,3 +90,36 @@ public class RequestParamServlet extends HttpServlet {
     }
 }       
 ```
+
+### 1.4 HTTP Request 데이터: POST(Json API Message Body)
+
+Content-Type은 application/json이다. HTTP 통신시 가장 많이 사용되는 방법이다.
+
+```java
+
+@Getter @Setter
+public class Person {
+  private String name;
+  private int age;
+}
+
+
+@WebServlet(name="requestJsonAPIServlet", urlPatterns="/request-body-json")
+public class RequestJsonAPIServlet extends HttpServlet {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+  
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+       
+       ServletInputStream inputStream = req.getInputStream();
+       String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+       
+       Person person = objectMapper.readValue(messageBody, Person.class);
+       
+       resp.getWriter().write("ok");
+    }
+}       
+```
+
+
