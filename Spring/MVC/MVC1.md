@@ -22,13 +22,13 @@
 
 그러므로, 서블릿을 제대로 사용하기 위해서는 HTTP의 start-line, header에 무엇이 있는지 잘 아는 것이 중요하다.
 
-**Request Start-line**
+**Start-line**
 
 + Http Method
 + Request URL/URI
 + QueryParameter(QueryString)
 
-**Request Header**
+**Header**
  
 + Host Ip
 + Port Number
@@ -121,5 +121,9 @@ public class RequestJsonAPIServlet extends HttpServlet {
     }
 }       
 ```
+
+### 1.5 HTTP Response 데이터 1: 단순 텍스트, HTML
+
+
 
 
