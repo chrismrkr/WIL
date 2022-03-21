@@ -124,6 +124,64 @@ public class RequestJsonAPIServlet extends HttpServlet {
 
 ### 1.5 HTTP Response 데이터 1: 단순 텍스트, HTML
 
+마찬가지로 response Content-Type을 명시한다.
 
+```java
+@WebServlet(name="responseHtmlServlet", urlPatterns="/response-html")
+public class ResponseHtmlServlet extends HttpServlet {
 
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+       
+       resp.setContentType("text/html");
+       resp.setCharacterEncoding("utf-8");
+       
+       Printwriter printWriter = resp.getWriter();
+    }
+}       
+```
 
+### 1.6 HTTP Response 데이터 2: JSON API
+
+```java
+@WebServlet(name="responseJsonServlet", urlPatterns="/response-Json")
+public class ResponseJsonServlet extends HttpServlet {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+       
+       resp.setHeader("Content-Type", "application/json");
+       resp.setCharacterEncoding("utf-8");
+       
+       Person person = new Person("kim", 20);
+       
+       String result = objectMapper.writeValueAsString(person);
+       
+       resp.getWriter().write(result);
+    }
+}       
+```
+
+***
+
+## 2. 서블릿, JSP의 단점
+
+### 2.1 서블릿의 단점
+
+서블릿을 통해 Http Request(GET, POST HTML Form, POST Json API)와 Http Response(text/plain, text/html, application/json)를 할 수 있었다.
+
+Http Response(text/html)을 통해 웹 페이지 호출, Html Form 데이터 전송도 할 수 있다.
+
+그러나, HTML 작성하는 것이 불편 복잡할 뿐더러 동적 HTML을 만드는 것은 거의 불가능하다. 
+
+이러한 한계를 극복해서 나온 것이 템플릿 엔진이고, 그 중 하나가 JSP이다.
+
+### 2.2 JSP의 단점
+
+HTML 작성에서의 서블릿의 한계를 극복하기 위해 등장한 템플릿 엔진이 JSP이다. 
+
+그러나, JSP에서는 뷰를 생성하는 HTML 코드부터, 요청 응답과 같은 JAVA 로직까지 같이 섞여 있어서 유지보수 및 가독성이 굉장히 떨어진다.
+
+즉, 뷰(HTML)과 컨트롤러(JAVA 코드)를 분리해야한다. 
