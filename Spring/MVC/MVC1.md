@@ -49,7 +49,7 @@
 public class RequestParamServlet extends HttpServlet {
   
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
        
        
        String name = req.getParameter("username"); // 단일 쿼리 파라미터 조회
@@ -63,8 +63,28 @@ public class RequestParamServlet extends HttpServlet {
        resp.getWriter().write("ok") 
          
     }
-}
-       
+}       
 ```
 
+### 1.3 HTTP Request 데이터 2: POST(HTML FORM)
 
+1.2의 request의 쿼리 파라미터가 messageBody로 전달되고, 메서드는 GET에서 POST로 바뀌었다.
+
+**messageBody에 내용을 포함해 전송할 때는 반드시 Content-Type을 지정하는 것에 유의하도록 한다.**
+
+HTML FORM의 경우의 Content-Type은 application/x-www-form-urlencoded이다.
+
+```java
+@WebServlet(name="requestBodyStringServlet", urlPatterns="/request-body-string")
+public class RequestParamServlet extends HttpServlet {
+  
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+       
+       ServletInputStream inputStream = req.getInputStream();
+       String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+       
+       resp.getWriter().write("ok") 
+    }
+}       
+```
