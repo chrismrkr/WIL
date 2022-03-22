@@ -302,12 +302,11 @@ public class MemberSaveControllerV1 extends ControllerV1 {
 
 ### 3.3 Controller V3: Model 추가
 
-프론트 컨트롤러와 뷰 컨트롤러를 통해 처음에 공통으로 작업해야 할 부분과 뷰로 렌더링해야할 부분을 리팩토링했다. 즉, 컨트롤러와 뷰가 분리되었다.
+프론트 컨트롤러와 뷰 컨트롤러를 통해 처음에 공통으로 작업해야 할 부분과 뷰로 렌더링해야할 부분을 리팩토링했다. 즉, 컨트롤러(C)와 뷰(V)가 분리되었다.
 
 그러나, HTTP 메세지를 직접적으로 받는 곳은 프론트 컨트롤러이다. 프론트 컨트롤러를 제외한 컨트롤러들에서 HttpServlet을 사용해야할 이유가 있을까? 없다.
 
 여기서 등장한 개념이 Model이다. 흐름은 아래와 같다.
-
 
 1. 프론트 컨트롤러에서 HTTP 메세지를 받는다. 그리고 Model이라는 객체를 생성한다.
 
@@ -319,9 +318,77 @@ public class MemberSaveControllerV1 extends ControllerV1 {
 
 5. 그리고 뷰 컨트롤러를 통해 렌더링한다.
 
+코드로 나타내면 아래와 같다.
+
+```java 
+
+public class FrontControllerV3 extends HttpServlet {
+   private Mep<String, ControllerV3> controllerMap = new HashMap<>();
+   
+   ...
+   
+   protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, HttpException {
+       String requestURI = request.getRequestURI();
+       
+       ControllerV3 controller = controllerMap.get(requestURI);
+       
+       Map<String, String> paramMap = getParamMap(requestURI);
+       
+       // request 객체로 필요한 변수들을 paramMap에 넣는다.
+       
+       Model model = controller.process(paramMap);
+       
+       String viewName = model.getViewName();
+       
+       MyView myView = viewResolver(viewName);
+       view.render(model.getModel(), request, response);
+    }
+}
+```
+
 이것이 M(Model), V(View), C(Controller) 아키텍처이다.
        
 ### 3.4 Controller V4: 수정된 Controller V3
 
-Controller V3에서는 컨트롤러의 로직이 끝나면 항상 View를 반환해야 한다. 뷰를 반환해야 한다.
+Controller V3에서는 컨트롤러의 로직이 끝나면 항상 View를 반환해야 한다. 
+
+사실, 컨트롤러 로직을 수행한 후 반환 받아야할 것은 View의 정보를 담은 Model, 그리고 렌더링할 뷰의 논리주소 뿐이다.
+
+Controller V3의 코드를 아래처럼 리팩토링 할 수 있다.
+
+```java 
+
+public class FrontControllerV4 extends HttpServlet {
+   private Mep<String, ControllerV4> controllerMap = new HashMap<>();
+   
+   ...
+   
+   protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, HttpException {
+       String requestURI = request.getRequestURI();
+       
+       ControllerV4 controller = controllerMap.get(requestURI);
+       
+       Map<String, String> paramMap = getParamMap(requestURI);
+       Map<String, Object> model = new HashMap<>();
+       
+       // request 객체로 필요한 변수들을 paramMap에 넣는다.
+      
+       String viewName = controller.process(paramMap, model);
+       
+       MyView myView = viewResolver(viewName);
+       view.render(model.getModel(), request, response);
+    }
+}
+```
+
+### 3.5 Controller V5: 유연한 Front Controller
+
+Controller V4까지 발전시키면서 MVC 아키텍처를 확립할 수 있었다. 
+
+그러나, 프론트 컨트롤러에서는 하나의 종류의 컨트롤러(V1 또는 V2 또는 .. V4)밖에 받을 수 없다는 한계가 존재한다.
+
+실제로 다양한 컨트롤러가 존재할 수 있다. 그러므로, 다양한 종류의 컨트롤러를 쓸 수 있도록 유연하게 리팩토링 하도록 하자.
+
+
+
 
