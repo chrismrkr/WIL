@@ -68,7 +68,7 @@ public class RequestParamServlet extends HttpServlet {
 
 ### 1.3 HTTP Request 데이터 2: POST(HTML FORM)
 
-1.2의 request의 쿼리 파라미터가 messageBody로 전달되고, 메서드는 GET에서 POST로 바뀌었다.
+1.2의 request의 쿼리 파라미터는 messageBody에 저장되고, 메서드는 GET에서 POST로 바뀌었다.
 
 **messageBody에 내용을 포함해 전송할 때는 반드시 Content-Type을 지정하는 것에 유의하도록 한다.**
 
