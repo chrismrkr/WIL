@@ -300,11 +300,28 @@ public class MemberSaveControllerV1 extends ControllerV1 {
 }
 ```
 
-### Controller V3: Model 추가
+### 3.3 Controller V3: Model 추가
 
-프론트 컨트롤러와 뷰 컨트롤러를 통해 처음에 공통으로 작업해야 할 부분과 뷰로 렌더링해야할 부분을 리팩토링했다.
+프론트 컨트롤러와 뷰 컨트롤러를 통해 처음에 공통으로 작업해야 할 부분과 뷰로 렌더링해야할 부분을 리팩토링했다. 즉, 컨트롤러와 뷰가 분리되었다.
+
+그러나, HTTP 메세지를 직접적으로 받는 곳은 프론트 컨트롤러이다. 프론트 컨트롤러를 제외한 컨트롤러들에서 HttpServlet을 사용해야할 이유가 있을까? 없다.
+
+여기서 등장한 개념이 Model이다. 흐름은 아래와 같다.
 
 
+1. 프론트 컨트롤러에서 HTTP 메세지를 받는다. 그리고 Model이라는 객체를 생성한다.
+
+2. Model 객체는 URI와 HTTP 헤더 정보, 쿼리파라미터, 메세지바디 내용을 <String, String> 형태로 저장할 수 있는 Map을 갖는다.
+
+3. HTTP 메세지로부터 받은 정보(URI, HTTP 헤더, 파라미터 등)를 Model 객체에 넣는다. 
+
+4. Model 객체를 파라미터로 다음 컨트롤러에 전달한다. 컨트롤러에서 비즈니스 로직을 처리한 후, View를 반환한다.
+
+5. 그리고 뷰 컨트롤러를 통해 렌더링한다.
+
+이것이 M(Model), V(View), C(Controller) 아키텍처이다.
        
-       
+### 3.4 Controller V4: 수정된 Controller V3
+
+Controller V3에서는 컨트롤러의 로직이 끝나면 항상 View를 반환해야 한다. 뷰를 반환해야 한다.
 
