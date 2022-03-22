@@ -189,3 +189,122 @@ HTML 작성에서의 서블릿의 한계를 극복하기 위해 등장한 템플
 ***
 
 ## 3. MVC 프레임워크
+
+MVC는 각각 M(Model), V(View), C(Controller)를 의미한다. Controller은 Request 받아 비즈니스 로직을 처리한다. 
+
+Controller를 통해 생성한 정보를 담아두는 곳이 Model이다. View에서는 Model을 받아 웹 페이지를 띄우게 된다.
+
+### 3.1 Controller V1: 프론트 컨트롤러
+
+여러 컨트롤러에서 공통으로 처리해야할 부분이 존재할 수 있다. 그러므로, 각 컨트롤러에서 공통으로 처리할 부분을 개별적으로 처리하는 것은 비효율적이다.
+
+**그러므로, 공통 기능을 처리하기 위한 프론트 컨트롤러가 필요하다.**
+
+프론트 컨트롤러는 아래와 같이 서블릿을 통해 구현할 수 있다.
+
+```java
+@WebServlet(name="frontControllerServletV1", urlPatterns="/front/controller/v1/*")
+public class FrontControllerV1 extends HttpServlet {
+   private map<String, ControllerV1> controllerMap = new HashMap<>();
+   
+   public FrontControllerV1() {
+       controller.put("/front-controller/v1/members/new-form", new MemberFormControllerV1());
+       controller.put("/front-controller/v1/members/save", new MemberSaveControllerV1());
+       controller.put("/front-controller/v1/members", new MemberListControllerV1());
+    }
+   
+   @Override
+   public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        
+        ControlleV1 controllerV1 = controllerMap.get(requestURI);
+        controllerV1.service();
+     }
+}
+
+public class MemberFormControllerV1 extends ControllerV1 {
+  
+   @Override
+   public void process(HttpRequestServlet request, HttpResponseServlet Response) throws HttpException, IOException {
+         String viewPath = "/WEB-INF/views/new-form.jsp";
+         RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
+         dispatcher.forward(request, response);
+     }
+}
+ 
+public class MemberSaveControllerV1 extends ControllerV1 {
+
+   private MemberRepository memberRepository = MemberRepository.getInstance();
+ 
+   @Overried
+   public void process(HttpRequestServlet request, HttpResponseServlet Response) throws HttpException, IOException {
+   
+        String username = request.getParameter("name");
+        int age = Integer.parseInt(reqeust.getParameter("age"));
+        
+        memberRepository.save(new Member(username, age));
+        
+         String viewPath = "/WEB-INF/views/save-result.jsp";
+         RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
+         dispatcher.forward(request, response);
+    }   
+}
+```
+
+위의 코드를 확인해보면, 뷰(view)로 렌더링하는 코드가 항상 중복되고 있다.
+
+```java
+String viewPath = "...";
+RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
+dispatcher.forward(request, response);
+```
+
+### 3.2 Controller V2: 뷰 컨트롤러
+
+뷰(View)로 렌더링하는 부분을 따로 컨트롤러로 생성해 공통으로 처리할 수 있도록 만드는 것이 뷰 컨트롤러이다.
+
+```java
+public class MyView {
+    private String viewPath;
+    
+    public MyView(String viewPath) {
+       this.viewPath = viewPath;
+    }
+    
+    public void render(HttpServletRequest request, HttpServletResponse response) throws HttpException, IOException {
+          RequestDispatcher dispatcher = request.getRequestDispatcher(this.viewPath);
+          dispatcher.forward(request, response);
+     }
+}
+
+public interface ControllerV2 {
+   public MyView process(HttpServletRequest request, HttpServletResponse response) throws HttpException, IOException;
+}
+
+...
+
+public class MemberSaveControllerV1 extends ControllerV1 {
+
+   private MemberRepository memberRepository = MemberRepository.getInstance();
+ 
+   @Overried
+   public MyView process(HttpRequestServlet request, HttpResponseServlet Response) throws HttpException, IOException {
+   
+        String username = request.getParameter("name");
+        int age = Integer.parseInt(reqeust.getParameter("age"));
+        
+        memberRepository.save(new Member(username, age));
+        
+         return new MyView("/WEB-INF/views/save-result.jsp");
+    }   
+}
+```
+
+### Controller V3: Model 추가
+
+프론트 컨트롤러와 뷰 컨트롤러를 통해 처음에 공통으로 작업해야 할 부분과 뷰로 렌더링해야할 부분을 리팩토링했다.
+
+
+       
+       
+
