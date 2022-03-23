@@ -427,8 +427,96 @@ public class FrontControllerV5 extends HttpServlet {
 }
 ```
 
+핸들러 어댑터를 통해 다양한 컨트롤러를 받을 수 있으므로 프론트 컨트롤러를 확장해 다양한 컨트롤러를 사용할 수 있다.
+
 ***
 
 
+## 4. 스프링 MVC의 기본 구조
 
-## 4. 스프링 MVC - 구조 
+스프링 MVC 패턴은 앞서 구현한 ControllerV5 패턴과 매우 유사하다.
+
+스프링 MVC에서 사용되는 모듈들은 아래와 같다.
+
++ DisPatcherServlet: 프론트 컨트롤러와 유사한 기능을 한다. 이를 확장해 다양한 핸들러를 사용할 수 있다.
++ HandlerMapping: Request에 맞는 핸들러(컨트롤러)를 찾는다.
++ HandlerAdapter: 핸들러를 실행할 수 있게 하는 어댑터를 찾는다.
++ ModelView: 실행된 핸들러(컨트롤러)의 결과물(Model, ViewName)을 반환하는 객체이다.
++ ViewResolver: 뷰를 반환하는 객체이다.
++ View: 뷰를 실행한다.
+
+### 그러므로, 제공된 MVC 아키텍처 위에서 개발자는 컨트롤러만 만들면 된다.
+
+
+
+스프링 컨테이너는 스프링 빈들을 싱글톤으로 관리하는 인스턴스이다. 그러므로, 컨트롤러 또한 싱글톤 빈으로 등록해서 사용할 수 있다.
+
+컨트롤러를 스프링 빈으로 등록하기 위해 @Controller, @RequestMapping, @PostMapping, @GetMapping 등의 Annotation을 사용한다.
+
+```java
+@Controller
+@RequestMapping("/members")
+public class MemberControllerV2 {
+
+  private MemberRepository memberRepository = new MemberRepository();
+  
+  @RequestMapping("/new-form")
+  public ModelAndView newForm() {
+     return new ModelAndView("new-form");
+    }
+  
+  @RequestMapping("/save")
+  public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
+      String userName = request.getParameter("username");
+      int age = Integer.parseInt(request.getParameter("age"));
+      
+      Member member = new Member(userName, age);
+      memberRepository.save(member);
+      
+      ModelAndView mv = new ModelAndView("save-result");
+      mv.addObject(member);
+      return member;
+    }
+}
+```
+
+이와 같이 Annoation을 통해 스프링 빈으로 ModelView를 반환하는 컨트롤러(핸들러)를 등록할 수 있다. 
+
+물론, 다양한 핸들러 어댑터가 존재하므로 다른 종류의 컨트롤러(핸들러)를 빈으로 등록할 수 있다.
+
+```java
+@Controller
+@RequestMapping("/members")
+public class MemberControllerV3 {
+
+  private MemberRepository memberRepository = new MemberRepository();
+  
+  @GetMapping("/new-form")
+  public String newForm() {
+     return "new-form";
+    }
+  
+  @PostMapping("/save")
+  public String save(@RequestParam("username") String name, @RequestParam("age") int age, Model model) {      
+      Member member = new Member(userName, age);
+      memberRepository.save(member);
+      
+      model.addObject(member);
+      return "/save-result";
+    }
+}
+```
+
+## 5. 스프링 MVC
+
+
+
+
+
+
+
+
+
+
+
+
