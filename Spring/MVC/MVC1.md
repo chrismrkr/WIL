@@ -399,9 +399,32 @@ Controller V4까지 발전시키면서 MVC 아키텍처를 확립할 수 있었�
 3. 뷰로 렌더링한다.
 
 ```java
+@WebServlet(name="frontControllerServletV5, urlPatterns="/front-controller/v5/*")
+public class FrontControllerV5 extends HttpServlet {
 
+   private final Map<String, Object> handlerMappingMap = new HashMap<>();
+   private final ArrayList<HandlerAdapter> handlerAdapter = new ArrayList<>();
+   
+   public FrontControllerV5() {
+      initHandler(); // 필요한 핸들러(컨트롤러) 저장
+      initHandlerAdapter(); // 필요한 핸들러 어댑터 저장
+    }
+   
+   @Override
+   protected void service(HttpServletRequest request, HttpServletResponse response) throws HttpException, IOException {
+      String requestURI = request.getRequestURI();
+      
+      Object handler = handlerMappingMap.get(requestURI);
+      
+      HandlerAdapter handlerAdapter = getHandlerAdapter(handler); // 핸들러에 해당되는 어댑터 찾기
+      
+      Model model = handlerAdpater.handle(request, response, handler); // handler의 다형성과 다운 캐스팅을 통해 해당되는 로직을 찾을 수 있음
+      
+      View view = viewResolver(model.getViewName());
+      view.render(model.getModel(), request, response);
+   }
 
-
+}
 ```
 
 ***
