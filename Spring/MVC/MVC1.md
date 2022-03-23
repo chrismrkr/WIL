@@ -507,12 +507,71 @@ public class MemberControllerV3 {
 }
 ```
 
-## 5. 스프링 MVC
+***
+
+## 5. 스프링 MVC의 기능
+
+### 5.1 Logging을 위한 라이브러리: Slf4j
+
+```java
+ private Logger logger = LoggerFactory.getLogger(getClass());
+ 
+ logger.info("data = {}", data); // 이런 방식으로 사용하자
+ logger.info("data = " + data); // 이렇게 사용하지 말 것, 로그보다 + 연산이 먼저 실행되기 때문이다.
+```
+
+### 5.2 RequestMapping 기본
+
+RequestMapping은 Request로 들어오는 Http 메서드, 경로 변수, 파라미터, MessageBody 등을 매핑해 컨트롤러에 전달하기 위한 Annotation이다.
+
+컨트롤러는 @Controller와 @RestController로 구분된다. 전자는 반환 값이 String이면 뷰 이름으로 인식되어 뷰를 찾아 렌더링된다.
+
+그러나, 후자는 반환 값으로 뷰를 찾는 것이 아니고 HTTP 메세지 바디로 바로 입력되어 response된다.
+
+다양한 경우가 존재할 수 있다. 아래 코드를 통해 살펴보도록 하자.
+
+```java
+@RestController
+@RequestMapping("
+public class MappingController {
+   private Logger log = LoggerFactory.getLogger(getClass());
+   
+   @GetMapping("/hello-basic") 
+   public String helloBasic() {
+      return "helloBasic";
+   }
+   
+   /*
+     경로변수(PathVairable) 사용
+   */
+   @GetMapping("/users/{userId}/orders/{orderId}")
+   public String userOrderPathVariables(@PathVariable String userId, @PathVariable Long orderId) {
+      log.info("userId: {}, orderId: {}", userId, orderId);
+      return "ok";
+   }
+   
+   /* 
+     특정 헤더 조건 매핑: 특정 헤더(헤더 값)을 갖는 request만 매핑된다.
+   */
+   @GetMapping(value="mapping-header", headers="mode=debug")
+   public String mappingHeader() { ... }
+   
+   /*
+     Content-Type 조건 매핑: 특정 Content-Type만 매핑되도록 함.
+   */
+   @PostMapping("/save", consumes={"application/json", ...});
+   public String save() { ... }
+```
+
+### 5.3 Http Request: 헤더 정보 조회
+
+헤더에는 Content-Type, Length, 쿠키 등 다양한 정보들이 들어있다. 이를 확인하는 방법은 아래에 나타난다.
 
 
-
-
-
+   
+   
+      
+   
 
 
 
