@@ -389,6 +389,7 @@ Controller V4까지 발전시키면서 MVC 아키텍처를 확립할 수 있었�
 
 실제로 어떤 상황에서는 V3, 또 다른 상황에서는 V4 컨트롤러가 존재할 수 있다. 다양한 종류의 컨트롤러를 쓸 수 있도록 유연하게 리팩토링 하도록 하자.
 
+다형성을 활용한 리팩토링이다. 이 구조가 실제 스프링 MVC와 유사하다.
 
 0. Http Request가 발생한다.
 
@@ -418,12 +419,11 @@ public class FrontControllerV5 extends HttpServlet {
       
       HandlerAdapter handlerAdapter = getHandlerAdapter(handler); // 핸들러에 해당되는 어댑터 찾기
       
-      Model model = handlerAdpater.handle(request, response, handler); // handler의 다형성과 다운 캐스팅을 통해 해당되는 로직을 찾을 수 있음
+      Model model = handlerAdpater.handle(request, response, handler); 
       
       View view = viewResolver(model.getViewName());
       view.render(model.getModel(), request, response);
    }
-
 }
 ```
 
@@ -431,4 +431,4 @@ public class FrontControllerV5 extends HttpServlet {
 
 
 
-
+## 4. 스프링 MVC - 구조 
