@@ -399,7 +399,7 @@ Controller V4까지 발전시키면서 MVC 아키텍처를 확립할 수 있었�
 3. 뷰로 렌더링한다.
 
 ```java
-@WebServlet(name="frontControllerServletV5, urlPatterns="/front-controller/v5/*")
+@WebServlet(name="frontControllerServletV5", urlPatterns="/front-controller/v5/*")
 public class FrontControllerV5 extends HttpServlet {
 
    private final Map<String, Object> handlerMappingMap = new HashMap<>();
