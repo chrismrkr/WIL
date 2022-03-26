@@ -575,7 +575,7 @@ public class RequestHeaderController {
     @GetMapping("/headers")
     public String headers(HttpServletRequest request, HttpServletResponse response, HttpMethod httpMethod, Locale locale,
                           @RequestHeader MultiValueMap<String, String> headerMap,
-                          @RequestHeader("host") String host,
+                          @RequestHeader(value = "host", required = false) String host,
                           @CookieValue(value = "myCookie", required = false) String cookie
                           ) {
                   ...
@@ -583,9 +583,61 @@ public class RequestHeaderController {
                   }
   }
 ```
-  
 
+### 5.4 Http Request: @RequestParam
 
+@RequestParam Annotation을 통해 요청 파라미터들을 쉽게 받을 수 있다.
 
+또한 @ResponseBody Annotation을 통해 뷰 조회를 무시하고 Http MessageBody에 직접 내용을 입력한다.
+
+```java
+@ResponseBody
+@PostMapping("/request")
+public String requesting(@RequestParam(required=false) String name, @RequestParam(required=faslse) int age) {
+    log.info("name={}, age={}", name, age);
+    return "true";
+  }
+```
+
+required 옵션을 통해 해당 파라미터를 선택적, 또는 필수적으로 받을 수 있다.
+
+null 값을 받을 수 없는 기본 타입(int, char)의 경우에는 defalutValue 옵션을 사용하도록 한다. 그렇지 않으면 에러가 발생할 수 있다.
+
+**Map 형태로 RequestParameter를 받을 수도 있다!**
+
+```java
+@ResponseBody
+@PostMapping("/...")
+public String requesting2(@RequestParam Map<String, object> paramMap) {
+     ...
+  }
+```
+
+### 5.5 Http Request: @ModelAttribute
+
+실제 개발 상황에서 Request 요청으로부터 파라미터(@RequestParam)를 받아 특정 객체에 바인딩한 후 비즈니스 로직을 처리한다.
+
+매번 @RequestParam을 통해 파라미터를 받은 후 객체에 바인딩하는 번거로운 작업을 줄이기 위해서 @ModelAttribute 사용해 자동화할 수 있다.
+
+```java
+@Data
+public class Member {
+   private String name;
+   private int age;
+ }
+
+...
+
+@ResponseBody
+@RequestMapping("/model-attribute")
+public String modelAttribute(@ModelAttribute Member member) {
+     log.info("name={}, age={}", member.getName(), member.getAge());
+     return "true";
+ }
+```
+
+클래스에 @Data Annotation 선언 시, @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 자동 적용된다.
+
+@ModelAttribute는 member 객체의 setter를 호출해 적절한 파라미터를 바인딩한다.
 
 
