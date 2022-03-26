@@ -739,5 +739,31 @@ public String responseviewController(Model model) {
 
 ### 5.10 Http 메세지 컨버터
 
+@RestController를 통해 뷰 리졸버를 호출하지 않고 바로 Http Message를 반환할 수 있다. 
+
+이때, 반환 타입이 String, 객체라면 각 text, Json으로 변환된다.
+
+대표적인 Http 메세지 컨버터는 아래와 같다. request, response에서 모두 사용된다. 오버로딩도 가능하다.
+
++ ByteArrayHttpMessageConverter
++ StringHttpMessageConverter
++ MappingJackson2HttpMessageConverter
 
 
+### 5.11 핸들러 어댑터 구조
+
+핸들러(컨트롤러)를 실행하기 위해서는 핸들러 어댑터가 필요했다. 그러나, 핸들러(컨트롤러)를 생성하면 이에 맞는 어댑터가 자동으로 매핑되었다.
+
+어떤 메커니즘으로 이것이 가능할까? 답은 @RequestMapping Annotation에 있다.
+
+
+핸들러 어댑터는 다양한 종류의 핸들러(컨트롤러)를 실행하기 위해서 필요하다.
+
+각 컨트롤러의 종류마다 서로 다른 파라미터를 받을 수 있다. 
+
+HandlerMethodArgumentResolver를 호출해 핸들러(컨트롤러)가 필요로 하는 파라미터 값을 생성해 바인딩한다.
+
+그러므로, 사용자가 직접 ArgumentResolver의 인터페이스를 확장할 수 있다.
+
+
+***
