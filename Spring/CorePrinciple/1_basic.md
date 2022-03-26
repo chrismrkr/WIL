@@ -220,7 +220,7 @@ HashMap과 getBeansOfType()을 통해 해당 타입(인터페이스)의 모든 �
 MemberService memberSerivce = ac.getBean(memberServiceImpl.class);
 ```
 
-가능하면 사용하지 않는 것이 좋다.
+가능하면 사용하지 않는 것이 좋다. 인터페이스 의존 원칙에 위배되기 때문이다.
 
 #### 4.2 ApplicationContext의 상속관계
 
