@@ -568,11 +568,7 @@ public class MappingController {
 헤더에는 Content-Type, Length, 쿠키 등 다양한 정보들이 들어있다. 이를 확인하는 방법은 아래에 나타난다.
 
 
-   
-   
       
-   
-
 
 
 
