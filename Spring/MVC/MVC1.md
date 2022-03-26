@@ -584,7 +584,7 @@ public class RequestHeaderController {
   }
 ```
 
-### 5.4 Http Request: @RequestParam
+### 5.4 Http Request Parameter: @RequestParam
 
 @RequestParam Annotation을 통해 요청 파라미터들을 쉽게 받을 수 있다.
 
@@ -592,7 +592,7 @@ public class RequestHeaderController {
 
 ```java
 @ResponseBody
-@PostMapping("/request")
+@RequestMapping("/request")
 public String requesting(@RequestParam(required=false) String name, @RequestParam(required=faslse) int age) {
     log.info("name={}, age={}", name, age);
     return "true";
@@ -607,13 +607,13 @@ null 값을 받을 수 없는 기본 타입(int, char)의 경우에는 defalutVa
 
 ```java
 @ResponseBody
-@PostMapping("/...")
+@RequestMapping("/...")
 public String requesting2(@RequestParam Map<String, object> paramMap) {
      ...
   }
 ```
 
-### 5.5 Http Request: @ModelAttribute
+### 5.5 Http Request Parameter: @ModelAttribute
 
 실제 개발 상황에서 Request 요청으로부터 파라미터(@RequestParam)를 받아 특정 객체에 바인딩한 후 비즈니스 로직을 처리한다.
 
@@ -639,5 +639,105 @@ public String modelAttribute(@ModelAttribute Member member) {
 클래스에 @Data Annotation 선언 시, @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 자동 적용된다.
 
 @ModelAttribute는 member 객체의 setter를 호출해 적절한 파라미터를 바인딩한다.
+
+### 5.6 Http Request Message: 단순 텍스트
+
+Request Parameter는 @RequestParam, @ModelAttribute Annotation을 사용해 받을 수 있었다.
+
+그러나, Message Body를 통해 전달을 받을 때는 다른 방법을 사용해야한다.
+
+Message Body를 받을 수 있는 아래의 4가지 방법을 살펴보도록 하자.
+
+```java
+@ResponseBody
+@PostMapping("/...")
+public void messageBody1(HttpServletRequest request, HttpServletResponse response) {
+    ServletInputStream inputStream = request.getInputStream();
+    String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+    
+    log.info("messageBody={}, messageBody");
+    
+    response.getWriter.write("true");
+ }
+ 
+@ResponseBody
+@PostMapping("/...")
+public void messageBody2(InputStream inputStream, Writer responseWriter) {
+    String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+    responseWriter.write("true");
+ }
+ 
+@ResponseBody
+@PostMapping("/...")
+public HttpEntity<String> messageBody3(HttpEntity<String> httpEntity) {
+    String messageBody = httpEntity.getBody();
+    return new HttpEntity<>("true");
+ }
+ 
+@ResponseBody
+@PostMapping("/...")
+public String messageBody4(@RequestBody String messageBody) {
+      log.info("message={}, messageBody);
+      return "true";
+ }
+```
+
+HttpServlet, InputStream, HttpEntity, @RequstBody, 총 4가지 방법으로 messageBody를 받을 수 있었다.
+
+**@RequestBody가 가장 많이 사용되는 방법이다.**
+
+### 5.7 Http Request Message: JSON
+
+Json 형식의 데이터를 조회하는 것이 Http API에서 주로 사용되는 방식이다.
+
+단순 텍스트와 마찬가지로 HttpServletRequest, InputStream, @RequestBody와 ObjectMapper를 사용해 객체에 바인딩해서 사용할 수 있다.
+
+그러나, @ModelAttribute처럼 한번에 Json형식을 객체에 바인딩하는 방법도 존재한다.
+
+```java
+@ResponseBody
+@PostMapping("/...")
+public Member messageBody5(@RequestBody Member member) {
+     log.info("name={}, age={}", member.getName(), member.getAge());
+     return member;
+ }
+```
+
+Http 메세지 컨버터를 통해 다양한 형식의 messageBody를 반환하는 @RestController를 생성할 수 있다.
+
+
+### 5.8 Http Response: 정적 리소스, 뷰 템플릿
+
+컨트롤러의 로직을 실행한 후, 결과적으로 뷰를 호출하는 메커니즘을 다시 생각해보도록 하자.
+
+1. 컨트롤러(핸들러)에 맞는 어댑터를 찾는다.
+
+2. 어댑터를 통해 컨트롤러 로직을 실행한다.
+
+3. 컨트롤러 로직을 마친 후, 필요한 ModelAndView를 반환한다.
+
+4. 해당 ModelAndView를 통해 뷰를 호출하는 뷰 리졸버를 찾아 뷰를 호출한다.
+
+코드를 통해 더 명확하게 파악할 수 있다. model에 필요한 정보를 담아 뷰로 렌더링한다.
+
+```java
+@RequestMapping("/controller")
+public String responseviewController(Model model) {
+     Model.addAttribute("data", "...");
+     return "/response/hello";
+ }
+```
+
+### 5.9 Http Response: Http API
+
+@RestController를 통해 뷰로 렌더링 하지 않고, 메세지를 직접 response할 수 있다.
+
+이 과정은 앞선 내용으로부터 충분히 알 수 있으므로 생략하도록 한다.
+
+추가적으로, ResponseEntity<>를 통해 Http 응답 상태 코드를 설정할 수 있다.
+
+
+### 5.10 Http 메세지 컨버터
+
 
 
