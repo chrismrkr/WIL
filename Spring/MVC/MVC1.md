@@ -532,7 +532,7 @@ RequestMapping은 Request로 들어오는 Http 메서드, 경로 변수, 파라�
 
 ```java
 @RestController
-@RequestMapping("
+@RequestMapping
 public class MappingController {
    private Logger log = LoggerFactory.getLogger(getClass());
    
@@ -567,9 +567,23 @@ public class MappingController {
 
 헤더에는 Content-Type, Length, 쿠키 등 다양한 정보들이 들어있다. 이를 확인하는 방법은 아래에 나타난다.
 
-
-      
-
+```java
+@RestController
+@RequestMapping
+public class RequestHeaderController {
+  
+    @GetMapping("/headers")
+    public String headers(HttpServletRequest request, HttpServletResponse response, HttpMethod httpMethod, Locale locale,
+                          @RequestHeader MultiValueMap<String, String> headerMap,
+                          @RequestHeader("host") String host,
+                          @CookieValue(value = "myCookie", required = false) String cookie
+                          ) {
+                  ...
+                  return "ok";
+                  }
+  }
+```
+  
 
 
 
