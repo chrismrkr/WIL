@@ -49,7 +49,7 @@
 public class RequestParamServlet extends HttpServlet {
   
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        
        
        String name = req.getParameter("username"); // 단일 쿼리 파라미터 조회
@@ -81,7 +81,7 @@ HTML FORM의 경우의 Content-Type은 application/x-www-form-urlencoded이다.
 public class RequestBodyStringServlet extends HttpServlet {
   
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        
        ServletInputStream inputStream = req.getInputStream();
        String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
@@ -110,7 +110,7 @@ public class RequestJsonAPIServlet extends HttpServlet {
     private ObjectMapper objectMapper = new ObjectMapper();
   
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        
        ServletInputStream inputStream = req.getInputStream();
        String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
@@ -131,7 +131,7 @@ public class RequestJsonAPIServlet extends HttpServlet {
 public class ResponseHtmlServlet extends HttpServlet {
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        
        resp.setContentType("text/html");
        resp.setCharacterEncoding("utf-8");
@@ -150,7 +150,7 @@ public class ResponseJsonServlet extends HttpServlet {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throw ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        
        resp.setHeader("Content-Type", "application/json");
        resp.setCharacterEncoding("utf-8");
