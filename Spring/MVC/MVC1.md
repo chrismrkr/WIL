@@ -638,7 +638,7 @@ public String modelAttribute(@ModelAttribute Member member) {
 
 클래스에 @Data Annotation 선언 시, @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 자동 적용된다.
 
-@ModelAttribute는 member 객체의 setter를 호출해 적절한 파라미터를 바인딩한다.
+@ModelAttribute는 member 객체의 **Setter**를 호출해 적절한 파라미터를 바인딩한다.
 
 ### 5.6 Http Request Message: 단순 텍스트
 
