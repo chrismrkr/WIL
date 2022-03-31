@@ -308,15 +308,15 @@ public class MemberSaveControllerV1 extends ControllerV1 {
 
 여기서 등장한 개념이 Model이다. 흐름은 아래와 같다.
 
-1. 프론트 컨트롤러에서 HTTP 메세지를 받는다. 그리고 Model이라는 객체를 생성한다.
+1. 프론트 컨트롤러에서 HTTP 요청을 받고, 요청에 맞는 컨트롤러를 호출한다.
 
-2. Model 객체는 URI와 HTTP 헤더 정보, 쿼리파라미터, 메세지바디 내용을 <String, String> 형태로 저장할 수 있는 Map을 갖는다.
+2. URI와 HTTP 헤더 정보, 쿼리파라미터, 메세지바디 내용을 <String, String> 형태로 저장할 수 있는 파라미터 Map을 생성한다.
 
-3. HTTP 메세지로부터 받은 정보(URI, HTTP 헤더, 파라미터 등)를 Model 객체에 넣는다. 
+3. 파라미터 Map을 컨트롤러에 전달한 후 로직을 실행한다. 이 과정에서 **Model**이 생성되어 반환된다.
 
-4. Model 객체를 파라미터로 다음 컨트롤러에 전달한다. 컨트롤러에서 비즈니스 로직을 처리한 후, View를 반환한다.
+4. Model에는 뷰 렌더링을 위한 정보가 존재한다. 
 
-5. 그리고 뷰 컨트롤러를 통해 렌더링한다.
+5. 그리고 뷰 리졸버를 통해 렌더링한다.
 
 코드로 나타내면 아래와 같다.
 
@@ -350,9 +350,9 @@ public class FrontControllerV3 extends HttpServlet {
        
 ### 3.4 Controller V4: 수정된 Controller V3
 
-Controller V3에서는 컨트롤러의 로직이 끝나면 항상 View를 반환해야 한다. 
+Controller V3에서는 컨트롤러의 로직이 끝나면 항상 Model에 렌더링에 필요한 변수와 논리주소를 반환한다. 
 
-사실, 컨트롤러 로직을 수행한 후 반환 받아야할 것은 View의 정보를 담은 Model, 그리고 렌더링할 뷰의 논리주소 뿐이다.
+그러나, 매번 컨트롤러로부터 Model을 반환 받지 않고 렌더링할 뷰의 논리 주소만 반환받으면 된다.
 
 Controller V3의 코드를 아래처럼 리팩토링 할 수 있다.
 
