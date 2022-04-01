@@ -1,5 +1,5 @@
 
-## HTTP 기본지식: Spring MVC를 이해하기 
+## HTTP 기본지식: Spring MVC를 이해하기 위한 선수지식
 
 
 ### 1. 인터넷 네트워크
