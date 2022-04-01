@@ -61,7 +61,7 @@ button.cancel=Cancel
 + th:text="#{label.item.price}" 방법으로 원래 메세지를 치환한다.
 
 ```HTML
-form action="item.html" th:action th:object="${item}" method="post">
+<form action="item.html" th:action th:object="${item}" method="post">
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
             <input type="text" id="itemName" th:field="*{itemName}" class="form-control" placeholder="이름을 입력하세요">
