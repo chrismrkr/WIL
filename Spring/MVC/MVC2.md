@@ -2,6 +2,8 @@
 
 ## 1. 메세지, 국제화
 
+### 1.1 메세지
+
 화면에 보이는 여러가지 뷰 속에는 공통으로 포함된 메세지가 있을 수 있다. 만약, 공통으로 포함된 메세지를 모두 바꾸고자 한다면 시간낭비가 클 수 있다.
 
 공통으로 포함된 메세지를 한 곳에서 관리하는 기능을 **메세지** 기능이라고 한다.
@@ -91,6 +93,14 @@ button.cancel=Cancel
 
     </form>
 ```
+
+### 1.2 국제화
+
+messages.properties 대신에 messages_en.properties 추가함으로써 자동으로 국제화 기능을 추가할 수 있다.
+
+자동으로 추가되는 이유는 스프링 부트는 AcceptHeaderLocaleResolver를 사용하기 때문이다.
+
+LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLocaleResolver는 
 
 
 
