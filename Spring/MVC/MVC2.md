@@ -100,7 +100,11 @@ messages.properties 대신에 messages_en.properties 추가함으로써 자동�
 
 자동으로 추가되는 이유는 스프링 부트는 AcceptHeaderLocaleResolver를 사용하기 때문이다.
 
-LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLocaleResolver는 
+LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLocaleResolver는 Accept-Language에 기반해 국제화하는 구현체이다.
 
+**LocaleResolver의 구현체를 적절히 변경해 쿠키 기반으로 국제화를 할 수 있다.**
 
+***
+
+## 2. 검증1 - Validation
 
