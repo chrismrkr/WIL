@@ -118,5 +118,92 @@ LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLoca
 
 검증 작업을 하기 이전에 스프링 MVC의 동작 메커니즘을 다시 살펴볼 필요가 있다.
 
-사용자가 특정 웹 페이지에서 Http API를 통해 서버에 Request한다. 서버의 컨트롤러는 Request를 받아
+사용자가 특정 웹 페이지에서 Http API를 통해 서버에 Request한다. 서버의 컨트롤러는 Request를 받아서 검증한다.
+
+검증 후, Request가 정상적이라면 뷰로 렌더링한다.
+
+만약, Request가 정상적이지 않다면 Model에 에러코드(검증 결과)를 담아 원래 웹 페이지로 돌아온 후, 어떤 것이 정상적인지 않은지 알려야 한다.
+
+코드를 통해 확인하도록 한다. 아래의 예시는 상품의 이름, 가격, 그리고 수량을 추가하는 컨트롤러이다.
+
+```java
+  @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 오류 결과를 보관
+        Map<String, String> errors = new HashMap<>();
+
+        // 검증 로직
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            errors.put("itemName", "상품 이름은 필수입니다.");
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            errors.put("price", "가격은 1,000 ~ 1,000,000 까지 허용합니다.");
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) { // quantity 비정상적
+            errors.put("quantity", "수량은 최대 9,999개 까지 허용합니다.");
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (!errors.isEmpty()) {
+            log.info("errors = {}", errors);
+            model.addAttribute("errors", errors);
+            return "validation/v1/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        // 리다이렉트 객체에 저장한다.
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+       
+        
+        return "redirect:/validation/v1/items/{itemId}";
+    }
+```
+
+위의 코드는 검증 로직을 거친 후, 검증에 성공하면 다음 페이지로 redirect하는 컨트롤러이다.
+
+검증 실패 시, errors Map에 내용을 저장한다. 그리고 errors를 Model에 담아서 에러코드와 함께 웹 페이지를 다시 호출한다.
+
+```HTML
+ <!-- 검증 오류 처리 -->
+        <div th:if="${errors?.containsKey('globalError')}">
+          
+            <p class="field-error" th:text="${errors['globalError']}">전체 오류 메세지</p>
+          
+        </div>
+
+        <!-- 검증 오류 처리 -->
+        <div>
+            <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
+            <input type="text" id="itemName" th:field="*{itemName}"
+                   
+                   th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'"
+                   
+                   class="form-control" placeholder="이름을 입력하세요">
+          
+            <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}" >
+              
+                상품명 오류
+            </div>
+        </div>
+```
+
+th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'"
+
+th:if="${errors?.containsKey('itemName')}"
+
+이 두 부분을 통해 Model 안에 있는 에러코드(errors)를 출력할 수 있다.
+
+
 
