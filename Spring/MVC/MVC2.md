@@ -114,7 +114,7 @@ LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLoca
 
 이러한 일련의 작업을 검증이라고 한다.
 
-### 2.1 검증 직접 처리
+### 2.1 검증 처리 - 기본
 
 검증 작업을 하기 이전에 스프링 MVC의 동작 메커니즘을 다시 살펴볼 필요가 있다.
 
@@ -205,5 +205,115 @@ th:if="${errors?.containsKey('itemName')}"
 
 이 두 부분을 통해 Model 안에 있는 에러코드(errors)를 출력할 수 있다.
 
+**그러나, 이와 같은 검증 방법은 아래와 같은 문제점이 있다.**
+
++ 뷰 템플릿에서 중복처리가 많다.
++ 타입 오류는 검증할 수 없다. 
++ 타입 오류가 발생하더라도 클라이언트가 입력한 값을 유지해야한다.
+
+### 2.2 검증 처리 V1
+
+스프링이 제공하는 BindingResult를 통해 기본 검증 처리에서 사용했던 Errors Map을 대체하도록 한다.
+
+BindingResult는 스프링에서 제공하는 검증 오류 보관 객체이다.
+
+```java
+    @PostMapping("/add") -> 오류가 발생하는 경우 사용자가 입력한 내용이 모두 없어진다.
+    public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 오류 결과를 보관
+
+        // 검증 로직 (FieldError: 필드에러, ObjectError: 글로벌 에러)
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다.")); // ctrl+p 옵션
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000까지 허용됩니다.")); // ctrl+p 옵션 확인
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999개 까지 허용됩니다.")); // ctrl+p 옵션 확인
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice)); // ctrl+p 옵션 확인
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+```
+
+Error Map을 사용하는 기본 검증 처리와 크게 달라진 것은 없다. 글로벌 오류와 필드 오류의 차이만 주의하도록 하자.
+
+### 2.3 검증 처리 V2
+
+검증 처리 V1에서 사용했던 BindingResult는 @ModelAttribute 바인딩 시 타입 오류가 있는 경우도 처리할 수 있다.
+
+V1에서는 검증 에러(타입 에러, 비즈니스 로직 에러) 발생 시 사용자가 입력한 내용이 유지되지 않는다.
+
+FieldError 객체의 생성자를 살펴보자
+
+```java
+new FieldError(String objectName, String field, @Nullable Object rejectedValue, boolean bindingFailure, @Nullable String[] codes, 
+                  @Nullable Object[] arguments, @Nullable String defaultMessage);
+    ```
+   
+rejectedValue에 기존에 Item의 값을 추가함으로써 사용자가 입력한 내용을 유지할 수 있다.
 
 
+```java
+    @PostMapping("/add")
+    public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 오류 결과를 보관
+
+        // 검증 로직 (FieldError: 필드에러, ObjectError: 글로벌 에러)
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            bindingResult.addError(new FieldError("item", "itemName",
+                    item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            bindingResult.addError(new FieldError("item", "price",
+                    item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000까지 허용됩니다."));
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity",
+                    item.getQuantity(), false, null, null, "수량은 최대 9,999개 까지 허용됩니다."));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", null, null,"가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice)); // ctrl+p 옵션 확인
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+ ```
