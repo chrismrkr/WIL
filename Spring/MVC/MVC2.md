@@ -108,3 +108,15 @@ LocaleResolver는 Locale을 선택하는 인터페이스이고, AcceptHeaderLoca
 
 ## 2. 검증1 - Validation
 
+검증은 서버에서 Http Request를 받았을 때, Http Request가 정상적인지를 판별하는 작업이다. 
+
+예를 들어, 웹 화면에서 클라이언트가 Integer를 입력해 서버로 Request 한다고 하자. 서버 입장에서는 클라이언트가 특정 범위 내의 Integer만으로 제한해야 할 수 있고, Integer 이외의 다른 타입의 값을 입력하는 것을 막아야한다.
+
+이러한 일련의 작업을 검증이라고 한다.
+
+### 2.1 검증 직접 처리
+
+검증 작업을 하기 이전에 스프링 MVC의 동작 메커니즘을 다시 살펴볼 필요가 있다.
+
+사용자가 특정 웹 페이지에서 Http API를 통해 서버에 Request한다. 서버의 컨트롤러는 Request를 받아
+
