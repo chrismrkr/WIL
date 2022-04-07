@@ -500,6 +500,85 @@ typeMismatch=타입 오류입니다.
 
 ```
 
+### 2.6 검증 처리 V5
+
+컨트롤러에서 검증 처리하는 부분은 실제 정상 로직을 처리하는 부분보다 더욱 많다.
+
+검증 처리 하는 부분을 스프링에서 제공하는 Validator 인터페이스를 구현해 클래스로 만들어 따로 정리하고, 이를 스프링 빈으로 등록해 사용할 수 있다.
+
+```java
+@Component
+public class ItemValidator implements Validator {
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Item.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        // Object: 컨트롤러에서 관리하는 Data, Errors: BindingResult의 부모클래스
+        Item item = (Item) target;
+        BindingResult bindingResult = (BindingResult) errors;
+
+        // 검증 로직 (FieldError: 필드에러, ObjectError: 글로벌 에러)
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            bindingResult.rejectValue("itemName", "required");
+            //errorCode.objectName.field 순서로 쓰면 error.properties에서 찾는다.
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+    }
+}
+```
+
+```
+@Controller
+@RequestMapping("/validation/v2/items")
+@RequiredArgsConstructor
+public class ValidationItemControllerV2 {
+
+    private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+
+    ...
+    
+    @PostMapping("/add")
+    public String addItemV5(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        itemValidator.validate(item, bindingResult);
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+}
+```
+    
+
+
+
 
 
 
