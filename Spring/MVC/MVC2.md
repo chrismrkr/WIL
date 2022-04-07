@@ -270,7 +270,7 @@ FieldError 객체의 생성자를 살펴보자
 ```java
 new FieldError(String objectName, String field, @Nullable Object rejectedValue, boolean bindingFailure, @Nullable String[] codes, 
                   @Nullable Object[] arguments, @Nullable String defaultMessage);
-    ```
+ ```
    
 rejectedValue에 기존에 Item의 값을 추가함으로써 사용자가 입력한 내용을 유지할 수 있다.
 
@@ -317,3 +317,189 @@ rejectedValue에 기존에 Item의 값을 추가함으로써 사용자가 입력
         return "redirect:/validation/v2/items/{itemId}";
     }
  ```
+
+
+### 2.4 검증 처리 V3
+
+검증 처리 V2는 검증 오류 발생 시, 사용자에게 보여주는 오류 메세지를 직접 컨트롤러마다 작성해야한다.
+
+만약 오류 메세지를 바꿔야 한다면, 컨트롤러 자체를 수정해야 한다. 이는 시간이 낭비되는 작업이다.
+
+그러므로, errors 메세지 파일을 생성해서 오류 메세지를 한 곳에서 관리하도록 하자.
+
+```java
+# application.properties
+spring.messages.basename=messages, errors
+
+# errors.properties
+
+required.item.itemName=상품 이름은 필수입니다.
+range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
+max.item.quantity=수량은 최대 {0} 까지 허용합니다.
+totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+```
+
+오류 메세지를 관리하는 errors.properties를 만들고 아래와 같이 컨트롤러를 수정한다.
+
+```java
+    @PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 로직 (FieldError: 필드에러, ObjectError: 글로벌 에러)
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            bindingResult.addError(new FieldError("item", "itemName",
+                    item.getItemName(), false, new String[]{"required.item.itemName"}, null, "null"));
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            bindingResult.addError(new FieldError("item", "price",
+                    item.getPrice(), false, new String[]{"range.item.price"}, new Object[]{1000, 1000000}, null));
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity",
+                    item.getQuantity(), false, new String[]{"max.item.quantity"}, new Object[]{9999}, null));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+```
+
+물론, errors_en.properties 등을 추가하면 오류 메세지를 국제화할 수 있다.
+
+### 2.5 검증 처리 V4
+
+FieldError와 ObjectError 객체를 사용하는 방식을 보면, 다소 번거로운 것이 있다. 
+
+BindingResult가 제공하는 rejectValue()와 reject()를 통해 더 깔끔하게 검증 오류를 다룰 수 있다.
+
+```java
+    @PostMapping("/add")
+    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+        // 검증 로직 (FieldError: 필드에러, ObjectError: 글로벌 에러)
+        if(!StringUtils.hasText(item.getItemName())) { // itemName이 입력안됨
+            bindingResult.rejectValue("itemName", "required");
+            //errorCode.objectName.field 순서로 쓰면 error.properties에서 찾는다.
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) { // price가 이상함
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+```
+
+rejectValue()와 reject()를 사용하면 자동으로 errors.properties에서 에러 메세지를 찾는다. 어떻게 이것이 가능할까?
+
+rejectValue()와 reject()에서 MessageCodesResolver를 사용해서 오류 코드를 생성한다.
+
+rejectValue()와 reject()의 매개변수는 아래와 같다.
+
+```java
+  void rejectValue(@Nullable String field, String errorCode, @Nullable Object[] errorArgs, @Nullable String defaultMessage);
+  void reject(String errorCode, @Nullable Object[] errorArgs, @Nullable String defaultMessage);
+```
+
+MessageCodeResolver는 rejectValue()의 에러 코드를 아래와 같은 방식으로 생성한다.
+
++ errorCode.objectName.field
++ errorCode.field
++ errorCode.java.lang.String
++ errorCode
+
+reject()의 경우는 아래와 같다.
+
++ errorCode.objectName
++ errorCode
+
+에러 메세지를 관리하는 파일(errors.properties)에 해당된 에러 코드가 있다면 그것을 불러온다.
+
+구체적인 에러 코드에서 그렇지 않은 에러 코드 순서로 오류 메세지를 할당한다.
+
+타입을 잘못 입력해 발생하는 오류 또한 error.properties에서 관리할 수 있다.
+
+```java
+
+#==ObjectError==
+#Level1
+totalPriceMin.item=상품의 가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+
+#Level2 - 생략
+totalPriceMin=전체 가격은 {0}원 이상이어야 합니다. 현재 값 = {1}
+
+#==FieldError==
+#Level1
+required.item.itemName=상품 이름은 필수입니다.
+range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
+max.item.quantity=수량은 최대 {0} 까지 허용합니다.
+
+#Level2 - 생략
+
+#Level3
+required.java.lang.String = 필수 문자입니다.
+required.java.lang.Integer = 필수 숫자입니다.
+min.java.lang.String = {0} 이상의 문자를 입력해주세요.
+min.java.lang.Integer = {0} 이상의 숫자를 입력해주세요.
+range.java.lang.String = {0} ~ {1} 까지의 문자를 입력해주세요.
+range.java.lang.Integer = {0} ~ {1} 까지의 숫자를 입력해주세요.
+max.java.lang.String = {0} 까지의 문자를 허용합니다.
+max.java.lang.Integer = {0} 까지의 숫자를 허용합니다.
+
+#Level4
+required = 필수 값 입니다.
+min= {0} 이상이어야 합니다.
+range= {0} ~ {1} 범위를 허용합니다.
+max= {0} 까지 허용합니다.
+
+#추가
+typeMismatch.java.lang.Integer=숫자를 입력해주세요
+typeMismatch=타입 오류입니다.
+
+```
+
+
+
+
