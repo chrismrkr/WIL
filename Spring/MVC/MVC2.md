@@ -603,6 +603,8 @@ public class ValidationItemControllerV2 {
     }  
 ```
 
+***
+
 ## 3. 검증2 - Bean Validation
 
 모든 검증 기능을 매번 BindingResult를 이용해 코드로 작성하는 것은 번거롭다.
