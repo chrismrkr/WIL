@@ -688,3 +688,6 @@ Object 에러는 비즈니스 요구사항에 따라 변화할 수 있으므로 
 ### 3.2 Form 전송 객체 분리 
 
 만약 Item 등록과 Item 수정의 검증 로직이 다르다면, 위와 같은 방식으로 Bean Validation을 적용할 수 없다. 
+
+그러므로, Item 등록 Form과 Item 수정 Form을 분리해야 한다.
+
