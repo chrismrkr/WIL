@@ -666,11 +666,23 @@ Bean Validation의 에러 코드는 자체적으로 디폴트 값이 존재한�
 
 아래와 같은 패턴으로 에러코드가 생성된다. (이전에는 ErrorCode.object.field 순서로 생성되었다.)
 
-@NotNull
-
+**@NotNull**
 + NotNull.object.fieldName
 + NotNull.fieldName
 + NotNull.java.lang.String
 + NotBlank
 
+**@Range**
++ Range.object.fieldName
++ Range.fieldName
++ Range.java.lang.Integer
++ Range
 
+마찬가지로 errors.properties에 에러코드를 추가해 에러 코드를 바꿀 수 있다.
+
+Object 에러는 비즈니스 요구사항에 따라 변화할 수 있으므로 직접 Validation 코드를 작성하는 것이 좋다.
+
+
+### 3.2 Form 전송 객체 분리 
+
+만약 Item 등록과 Item 수정의 검증 로직이 다르다면, 위와 같은 방식으로 Bean Validation을 적용할 수 없다. 
