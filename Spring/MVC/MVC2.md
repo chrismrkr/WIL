@@ -602,3 +602,75 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }  
 ```
+
+## 3. 검증2 - Bean Validation
+
+모든 검증 기능을 매번 BindingResult를 이용해 코드로 작성하는 것은 번거롭다.
+
+모든 프로젝트에 적용할 수 있는 일반화된 검증 로직이 Bean Validation이다.
+
+이전의 검증 로직은 아래와 같다.
+
++ Item은 itemName이 반드시 존재해야 한다.
++ Item의 Price는 1000 ~ 1000000이다.
++ Item의 Quantity는 최대 9999이다.
+
+
+이를 Bean Validation을 통해 간단히 아래와 같이 적용할 수 있다.
+
+
+```java
+@Data // getter, setter 모두 사용
+public class Item {
+
+    @NotNull(groups = UpdateCheck.class)
+    private Long id;
+
+    @NotBlank(message = "공백안됨.", groups = {SaveCheck.class, UpdateCheck.class})
+    private String itemName;
+
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Range(min=1000, max=1000000, groups = {SaveCheck.class, UpdateCheck.class})
+    private Integer price;
+
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Max(value=9999, groups = {SaveCheck.class})
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+
+**물론, 스프링 부트에 implementation 'org.springframework.boot:spring-boot-starter-validation'를 추가 해야한다.**
+
+또한, @Validated Annotation이 적용되어야 한다.
+
+검증 오류 발생 시, 자동으로 BindingResult에 FieldError를 담는다.
+
+@Validated를 통한 검증 메커니즘은 아래와 같다.
+
++ ModelAttribute를 통해 타입 바인딩을 시도한다.
++ 만약, 바인딩에 실패하면 TypeMismatch 에러 코드를 BindingResult에 담는다.
++ 바인딩 성공 시, 자동으로 검증이 시작된다.
+
+### 3.1 Bean Validation 에러 코드 수정
+
+Bean Validation의 에러 코드는 자체적으로 디폴트 값이 존재한다. 이를 변경하려면 어떻게 해야 할까?
+
+아래와 같은 패턴으로 에러코드가 생성된다. (이전에는 ErrorCode.object.field 순서로 생성되었다.)
+
+@NotNull
+
++ NotNull.object.fieldName
++ NotNull.fieldName
++ NotNull.java.lang.String
++ NotBlank
+
+
