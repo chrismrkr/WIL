@@ -691,3 +691,65 @@ Object 에러는 비즈니스 요구사항에 따라 변화할 수 있으므로 
 
 그러므로, Item 등록 Form과 Item 수정 Form을 분리해야 한다.
 
+```java
+    @PostMapping("/add")
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        // "item" 지정 안해주면 Model.addAttribute("itemSaveForm", form)으로 들어감
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v4/addForm";
+        }
+
+        // 성공 로직
+
+        Item item = new Item(form.getItemName(), form.getPrice(), form.getQuantity());
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v4/items/{itemId}";
+    }
+    
+    @PostMapping("/{itemId}/edit")
+    public String editV2(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateForm form, BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes) {
+        // 특정 필드가 아닌 복합 룰 검증
+        if(form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        if(bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v4/editForm";
+        }
+
+        Item itemParam = new Item(form.getItemName(), form.getPrice(), form.getQuantity());
+
+        itemRepository.update(itemId, itemParam);
+        return "redirect:/validation/v4/items/{itemId}";
+    }
+```
+
+@ModelAttribute에 "item"을 지정하지 않으면 model.addAttribute("itemUpdateForm", form)으로 model 객체에 저장된다.
+
+### 3.3 Bean Validation: HTTP 메세지 컨버터
+
+지금까지는 request Body를 포함하는 Http 요청을 검증하는 과정은 없었다.
+
+request Body에 내용이 담긴 Http Request의 검증 로직은 아래와 같다.
+
++ 1. @RequestBody로 메세지를 받을 때, MessageConverter를 통해 객체로 적절히 변환되었는가?
++ 2. 객체로 적절히 변형되었다면, field 또는 globalError가 있는가?
++ 3. 검증 성공!
