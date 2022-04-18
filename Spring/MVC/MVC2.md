@@ -787,3 +787,203 @@ public class ValidationItemApiController {
 
 ## 4. 쿠키와 세션
 
+### 4.1 로그인 처리를 위한 쿠키 사용
+
+HTTP는 기본적으로 stateless하다. 그러나, 로그인 이후에는 stateful한 서비스를 제공해야 한다.
+
+이를 위해서 쿠키를 사용한다. 클라이언트의 로그인 요청 시, 서버는 쿠키를 생성해 클라이언트에게 전달하고 클라이언트는 쿠키를 계속 사용한다.
+
+```java
+    @PostMapping("/login")
+    public String login(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletResponse response) {
+        if(bindingResult.hasErrors()) {
+            log.info("bindingResult={}", bindingResult);
+            return "login/loginForm";
+        }
+
+        Member login = loginService.login(form.getLoginId(), form.getPassword());
+        if(login == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        // 로그인 성공 처리
+        // 클라이언트에게 쿠키를 제공해야함. 시간정보를 주지 않으면 세션쿠키(브라우저 종료시 모두 없어짐)
+        Cookie idCookie = new Cookie("memberId", String.valueOf(login.getId()));
+        response.addCookie(idCookie);
+        return "redirect:/";
+    }
+    
+    
+    @GetMapping("/")
+    public String homeLogin(@CookieValue(name="memberId", required = false) Long memberId, Model model) {
+        if(memberId == null) {
+            return "home";
+        }
+
+        // 쿠키가 있는 사용자
+        log.info("memberId={}", memberId);
+        Member loginMember = memberRepository.findById(memberId);
+
+        if(loginMember == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+    
+```
+
+로그인 시, 쿠키를 생성하고 이후 작업들은 클라이언트가 가진 쿠키를 활용하도록 한다.
+
+그러나, 이와 같은 방식은 쿠키 정보를 누군가 탈취할 수 있고, 쿠키를 클라이언트가 강제로 변경할 수 있다.
+
+### 4.2 로그인 처리를 위한 세션 사용
+
+위의 방식을 개선하기 위해 세션을 사용한다. 세션은 쿠키를 서버에서 관리한다는 점에서 차이가 있다.
+
+```java
+@Component
+public class SessionManager {
+
+    public static final String SESSION_COOKIE_NAME = "mySessionId";
+    private Map<String, Object> sessionStore = new ConcurrentHashMap<>();
+
+    /*
+    세션 생성
+     */
+    public void createSession(Object value, HttpServletResponse response) {
+        // 세션 Id 생성하고, 값을 세션에 저장 -> 서버에서 관리할 수 있도록 함.
+        String sessionId = UUID.randomUUID().toString();
+        sessionStore.put(sessionId, value);
+
+        // 쿠키 생성 후, response에 전달 -> 클라이언트에게 세션쿠키를 전달함.
+        Cookie cookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
+        response.addCookie(cookie);
+    }
+
+    /*
+    세션 조회
+     */
+    public Object getSession(HttpServletRequest request) {
+        Cookie cookie = findCookie(request, SESSION_COOKIE_NAME);
+        if(cookie == null) return null;
+        else return sessionStore.get(cookie.getValue());
+    }
+
+    public Cookie findCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if(cookies == null) return null;
+        return Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(cookieName))
+                .findAny().orElse(null);
+    }
+
+    /*
+    세션 만료
+     */
+    public void expire(HttpServletRequest request) {
+        Cookie cookie = findCookie(request, SESSION_COOKIE_NAME);
+        if(cookie != null) {
+            sessionStore.remove(cookie.getValue());
+        }
+    }
+}
+
+...
+
+/* Controller */
+
+    @PostMapping("/login")
+    public String loginV2(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletResponse response) {
+        if(bindingResult.hasErrors()) {
+            log.info("bindingResult={}", bindingResult);
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        if(loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        // 로그인 성공 처리
+        // 클라이언트에게 쿠키를 제공해야함. 시간정보를 주지 않으면 세션쿠키(브라우저 종료시 모두 없어짐)
+        sessionManager.createSession(loginMember, response);
+        return "redirect:/";
+    }
+```
+
+물론, 세션을 직접 구현하지 않고 서블릿에서 제공하는 **HttpSerssion**을 사용할 수 있다.
+
+세션의 동작 방식은 직접 구현한 것과 크게 다르지 않다.
+
+```java
+    @PostMapping("/login")
+    public String loginV3(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+        if(bindingResult.hasErrors()) {
+            log.info("bindingResult={}", bindingResult);
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        if(loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        // 로그인 성공 처리
+        HttpSession session = request.getSession();
+        
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        /*
+          1. 랜덤 쿠키(Id)를 생성한다.
+          2. session에 <Id, loginMember>를 저장한다.
+          3. session에서 SessionConst.LOGIN_MEMBER를 통해 사용자의 Id를 찾을 수 있다.
+        */
+        return "redirect:/";
+    }
+    
+    @GetMapping("/")
+    public String homeLoginV3(HttpServletRequest request, Model model) {
+
+        // 세션 관리자에 저장된 회원정보 조회
+        HttpSession session = request.getSession(false);
+        if(session == null) { return "home"; }
+
+        Member member = (Member)session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if(member == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+
+```
+
+**세션 클러스터링이란?**
+
+실무에서는 트래픽의 분산처리를 위해 여러 WAS를 사용하게 된다. 이때, WAS 끼리는 session 저장소를 공유할 수 있도록 하는 것을 세션 클러스터링이라고 한다.
+
+물론, JVM의 Heap 공간을 키울 수 있지만, GC 때문에 처리시간이 길어져 장애가 발생할 수 있다.
+
+
+세션에 이미 저장된 것을 찾을 때는 @SessionAttribute Annotation을 사용할 수 있다.
+
+```java
+    @GetMapping("/")
+    public String homeLoginV3Spring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member, Model model) {
+        if(member == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+```
+
+***
+
+
+
