@@ -777,5 +777,13 @@ public class ValidationItemApiController {
 
 **@ModelAttribute와 @ResponseBody 차이점은?**
 
-@ModelAttribute는 HTTP request Parameter를 
+@ModelAttribute는 HTTP request Parameter를 필드 개별로 바인딩하고,
+
+@ResponseBody는 Http MessageBody의 json 메세지를 객체에 바인딩하는 것이다. 그러므로, 후자의 경우 바인딩에 실패하면 컨트롤러가 아예 호출되지 않는다.
+
+컨트롤러가 호출되지 않으므로, 검증 처리도 불가능하다.
+
+***
+
+## 4. 쿠키와 세션
 
