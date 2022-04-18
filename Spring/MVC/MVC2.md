@@ -752,4 +752,30 @@ request Body에 내용이 담긴 Http Request의 검증 로직은 아래와 같�
 
 + 1. @RequestBody로 메세지를 받을 때, MessageConverter를 통해 객체로 적절히 변환되었는가?
 + 2. 객체로 적절히 변형되었다면, field 또는 globalError가 있는가?
-+ 3. 검증 성공!
++ 3. 검증 성공
+
+```java
+@RestController
+@RequestMapping("/validation/api/items")
+public class ValidationItemApiController {
+
+    @PostMapping("/add")
+    public Object addItem(@RequestBody @Validated ItemSaveForm form, BindingResult bindingResult) {
+        log.info("API 컨트롤러 호출");
+        if(bindingResult.hasErrors()) {
+            log.info("검증 오류 발생", bindingResult);
+            return bindingResult.getAllErrors();
+        }
+
+        log.info("API 컨트롤러 성공");
+        return form;
+    }
+}
+```
+
+1번의 오류의 경우, 아예 Json Body가 ItemSaveForm 객체로 변환되는 것에 실패되었으므로 컨트롤러 자체가 호출되지 않는다.
+
+**@ModelAttribute와 @ResponseBody 차이점은?**
+
+@ModelAttribute는 HTTP request Parameter를 
+
