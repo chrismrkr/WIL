@@ -1031,23 +1031,34 @@ public class LogFilter implements filter {
   
   /* 초기화, 종료 메서드는 기본적으로 구현되어있지만, 추가로 커스터마이징 할 수 있다. */
   
-  @Override 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+ @Override 
+ public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
       HttpRequestServlet httpRequest = (HttpServletRequest) request;
       String requestURI = httpRequest.getURI();
       
       String uuid = UUID.randomUUID().toString();
-      
-      
-  
-  }
-
+      try {
+          log.info("REQUEST [{}][{}]", uuid, requestURI);
+          chain.doFilter(request, response);
+      } catch (Exception e) {
+          throw e;
+      } finally {
+            log.info("RESPONSE [{}][{}]", uuid, requestURI);
+      }    
+   }
 }
 
-
-
-
-
+@Configuration
+public class WebConfig {
+    @Bean
+    public FilterRegistrationBean logFilter() {
+        FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+        filterFilterRegistrationBean.setFilter(new LogFilter());
+        filterFilterRegistrationBean.setOrder(1);
+        filterFilterRegistrationBean.addUrlPatterns("/*");
+        return filterFilterRegistrationBean;
+    }
+ }
 
 ```
 
