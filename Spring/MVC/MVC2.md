@@ -1008,5 +1008,50 @@ server.servlet.session.timeout=60 // 60초로 바꾼다.
 
 ***
 
+## 5. 필터와 인터셉터
+
+지금까지 설계한 예제는 외부에서 직접 URL 링크로 로그인이 필요한 뷰로 접근할 수 있었다.
+
+권한이 없는 사용자가 외부 링크를 통해 접근하는 것을 막는 **서블릿 필터** 기능이 필요하다.
+
+스프링에서 제공하는 Filter 인터페이스를 이용해 필터 기능을 구현할 수 있다. Filter 인터페이스를 구현한 객체는 싱글톤 객체로 생성된다.
+
+### 5.1 간단한 로그인 로그 체크
+
+필터의 구현 및 동작 방법을 이해하기 위해서 로그를 체크하는 간단한 필터를 생성하도록 하자.
+
+```java
+
+@Slfj4
+public class LogFilter implements filter {
+  @Override
+  public void init(...) { ... }
+  @Override 
+  public void destroy() { ... }
+  
+  /* 초기화, 종료 메서드는 기본적으로 구현되어있지만, 추가로 커스터마이징 할 수 있다. */
+  
+  @Override 
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+      HttpRequestServlet httpRequest = (HttpServletRequest) request;
+      String requestURI = httpRequest.getURI();
+      
+      String uuid = UUID.randomUUID().toString();
+      
+      
+  
+  }
+
+}
+
+
+
+
+
+
+```
+
+
+
 
 
