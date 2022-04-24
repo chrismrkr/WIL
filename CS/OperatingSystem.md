@@ -104,8 +104,37 @@ def consume():
 5. count=4이므로 소비자는 생산자를 깨우지 않는다.
 6. 소비자가 buffer를 모두 소비하면 sleep() 상태로 전환한다.
 
-이와 같은 상태를 **DeadLock**이라고 한다. 이를 해결하기 위해 세마포어를 사용한다.
+이와 같은 상태를 **DeadLock**이라고 한다. 이를 해결하기 위해 세마포어와 뮤텍스를 사용한다.
 
-**Semaphores**
+**Semaphores & Mutex**
+
+Semaphores와 Mutex 모두 Atomic action을 위해서 존재한다.
+
+두가지 모두 공유변수에 접근하는 것을 제어하고 동기화를 위한 변수이다.
+
++ Semaphores(세마포어): 공유자원의 상태를 나타내는 카운터 변수이다. 0과 1 뿐만 아니라 더 큰 변수도 저장할 수 있다. 0 또는 임계치에 다다르면 접근하지 못하도록 한다.
+
++ Mutex(뮤텍스): Critical Region에서 스레드들의 RunTime이 겹치지 않도록 하는 변수이다. lock을 건 프로세스(스레드)만이 그것을 unlock할 수 있다.
+
+전자는 카운팅 세마포어, 후자를 이진 세마포어라고 하기도 한다. 
 
 
+### 1.4 스케줄링 알고리즘
+
+프로세스 스케줄링은 프로세스 생성, 프로세스 종료, 프로세스 block, interrupt가 발생했을 때 일어난다.
+
+물론, preemptive 알고리즘(퀀텀 내 다른 프로세스로 스케줄링, Interactive System에서 사용됨)인 경우 clock interrupt가 발생할 때 스케줄링이 일어난다.
+
+#### 1.4.1 Non Preemptive 스케줄링
+
++ FIFO: 선입선출, 가장 기본이 되는 스케줄링 방식(이것보다는 성능이 높아야 의미있는 스케줄링 알고리즘이다.)
++ SJF(Shortest Job First): 가장 적게 걸리는 프로세스부터 처리. 중간에 Process fork가 있다면 최적의 알고리즘이 아니다.
++ SRTN(Shortest Remaining Time Next): 남은 시간이 가장 적은 프로세스 부터 처리. 최적의 방법이지만 실제로는 남은 시간을 알 수 없다.
+
+#### 1.4.2 Preemptive 스케줄링
+
++ Round-Robin: 모든 프로세스를 번갈아가면서 퀀텀만큼 작동시킨다. 퀀텀을 얼마로 할 것인지가 중요하다.
++ Priority Scheduling: 우선순위가 높은 프로세스부터 처리한다. starvation이 있을 수 있지만, 오래 기다리는 것의 우선순위를 높임으로써 해결할 수 있다.
++ Lottery Scheduling: n개의 티켓을 할당하고 뽑힌 ticket을 갖는 프로세스마다 일정 CPU Time 할당. 프로세스간 ticket 교환 가능. (highly responsive)
+
+***
