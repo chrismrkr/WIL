@@ -1,7 +1,12 @@
 # 스프링 MVC 1
 
-**스프링 웹 MVC를 공부하는 이유는 바람직한 WAS(Web Application Server)를 만들기 위함이다.** 
+**스프링 웹 MVC를 공부하는 이유는 WAS(Web Application Server)를 효율적으로 개발하기 위함이다.** 
 
+### 내용 정리용 핵심 질문
+
+
+***
+***
 
 ## 1. 서블릿
 
