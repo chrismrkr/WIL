@@ -42,6 +42,7 @@
 + Accepted-Language
 + Content-Type, Content-Length
 + Character-Encoding
++ keep-alive
 
 ### 1.2 HTTP Request 데이터 1: GET(쿼리 파라미터 사용)
 
