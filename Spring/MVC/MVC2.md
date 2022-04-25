@@ -1016,14 +1016,14 @@ server.servlet.session.timeout=60 // 60초로 바꾼다.
 
 스프링에서 제공하는 Filter 인터페이스를 이용해 필터 기능을 구현할 수 있다. Filter 인터페이스를 구현한 객체는 싱글톤 객체로 생성된다.
 
-### 5.1 간단한 로그인 로그 체크
+### 5.1 필터를 이용한 로그 체크
 
 필터의 구현 및 동작 방법을 이해하기 위해서 로그를 체크하는 간단한 필터를 생성하도록 하자.
 
 ```java
 
 @Slfj4
-public class LogFilter implements filter {
+public class LogFilter implements Filter {
   @Override
   public void init(...) { ... }
   @Override 
@@ -1059,9 +1059,178 @@ public class WebConfig {
         return filterFilterRegistrationBean;
     }
  }
+```
+
+필터는 Http 요청 -> WAS -> 필터 -> 서블릿-> 컨트롤러 흐름으로 동작한다.
+
+### 5.2 필터를 이용한 로그인 인증 체크
+
+마찬가지로 Filter를 구현한다.
+
+```java
+public class LoginCheckFilter implements Filter {
+
+    private static final String[] whileList = {"/", "/members/add", "/login", "/logout", "/css/*"};
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestURI = httpRequest.getRequestURI();
+
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        try {
+            log.info("인증 체크 필터 시작{}", requestURI);
+
+            if(isLoginCheckPath(requestURI)) {
+                log.info("인증 체크 로직 실행 {}", requestURI);
+                HttpSession session = httpRequest.getSession(false);
+                if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+                    log.info("미인증 사용자 요청 {}", request);
+                    // 로그인으로 redirect
+                    httpResponse.sendRedirect("/login?redirectURL=" + requestURI);
+                    return;
+                }
+            }
+
+            chain.doFilter(request, response);
+        }
+        catch (Exception e) {
+            throw e; // 예외 로깅 가능 하지만, 톰켓까지 예외를 보내야한다.
+        } finally {
+            log.info("인증 체크 필터 종료 {}", requestURI);
+        }
+     }
+     /*
+     화이트 리스트의 경우 인증 체크를 안하는 메서드
+      */
+    private boolean isLoginCheckPath(String requestURI) {
+        return !PatternMatchUtils.simpleMatch(whileList, requestURI);
+        // 화이트 리스트에 없다 -> 로그인 체크를 해야한다.
+    }
+}
+
+class WebConfig implements WebMvcConfigurer {
+    ...
+    @Bean
+    public FilterRegistrationBean loginCheckFilter() {
+        FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+        filterFilterRegistrationBean.setFilter(new LoginCheckFilter());
+        filterFilterRegistrationBean.setOrder(2);
+        filterFilterRegistrationBean.addUrlPatterns("/*");
+        return filterFilterRegistrationBean;
+    }
+}
 
 ```
 
+### 5.3 인터셉터를 이용한 로그 및 인증 체크
+
+스프링에서 제공하는 인터셉터를 통해 위와 동일한 기능을 구현할 수 있다.
+
+필터와 달리 스프링 인터셉터의 흐름은, Http 요청 -> WAS -> 서블릿 -> 필터 -> 컨트롤러 순서로 동작한다.
+
+그러므로, 서블릿 이전에 필터링을 해야하는 것이 아니라면 스프링 필터 기능을 사용하는 것이 바람직하다.
+
+스프링 인터셉터가 MVC 패턴에서 동작하는 과정은 아래와 같다.
+
+1. HTTP Request
+2. Dispatcher에서 prehandler를 호출한다. 
+3. HTTP Request에 맞는 핸들러 어댑터와 핸들러를 호출한 후, ModelAndView를 반환한다.
+4. posthandler를 호출한다
+5. 뷰로 렌더링 한 후, afterCompletion을 호출해 인터셉터를 종료한다.
+
+만약, HTTP Request에서 예외가 발생하면 preHandler와 afterCompletion만 호출한다.
+
+스프링 인터셉터를 구현하기 위해서는 HandlerInterceptor 인터페이스를 구현하면 된다. 마찬가지로 인터페이스를 구현하면 싱글톤 객체로 관리된다.
+
+@RequestMapping을 활용한다면 handler에는 HandlerMethod가 넘어오고, 정적 리소스를 호출하면 ResourceHttpRequestHandler가 넘어온다.
+
+로그 체크와 인증 기능을 담당하는 스프링 인터셉터는 아래와 같다.
+
+
+```java
+public class LogInterceptor implements HandlerInterceptor {
+
+    public final static String LOG_ID = "logId";
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String requestURI = request.getRequestURI();
+        String uuid = UUID.randomUUID().toString();
+
+        request.setAttribute(LOG_ID, uuid);
+
+        // @RequestMapping: HandlerMethod
+        // 정적 리소스: ResourceHttpRequestHandler
+
+        if(handler instanceof HandlerMethod) {
+            HandlerMethod hm = (HandlerMethod) handler; // 호출할 컨트롤러 메서드의 모든 정보가 포함되어있다.
+        }
+
+        log.info("REQUEST [{}][{}][{}]", uuid, requestURI, handler);
+
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        log.info("postHanlder [{}]", modelAndView);
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        String requestURI = request.getRequestURI();
+        String logId = (String) request.getAttribute(LOG_ID);
+        log.info("RESPONSE [{}][{}][{}]", logId, requestURI, handler);
+
+        if(ex != null) { // 예외가 있다면?
+            log.error("afterCompletion error!!", ex);
+        }
+    }
+}
+
+...
+
+public class LoginCheckInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String requestURI = request.getRequestURI();
+
+        log.info("인증 체크 인터셉터 실행 {}", requestURI);
+
+        try {
+            HttpSession session = request.getSession();
+            if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+                log.info("미인증 사용자 요청");
+                response.sendRedirect("/login?redirectURL="+requestURI);
+                // whiteList Check는 WebConfig에 등록 시 설정한다.
+                return false;
+            }
+        } catch (Exception e) {
+
+        }
+        return true;
+    }
+}
+
+public class WebConfig implements WebMvcConfigurer {
+    ...
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/error");
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/members/add", "/login", "/logout", "/css/**", "/*.icon", "/error");
+    }
+}
+```
+
+***
 
 
 
