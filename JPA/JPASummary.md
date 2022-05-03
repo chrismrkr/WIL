@@ -366,6 +366,11 @@ public class Book extends Item {
     
  ```
  
+ **@MappedSuperClass와 @Embeddable의 차이점은?**
+ @MappedSuperClass는 Entity로 클래스를 관리하는 방법이고, @Embeddable은 Value로 클래스를 관리하는 방법이다.
+ 
+ 전자는 상속을 통해서 사용되고, 후자는 위임을 통해 사용되는 방식이다.
+ 
  ### 3.6 복합 키 
  **복합 키란 2개 이상의 애트리뷰트로 이루어진 기본 키를 의미한다.**
  
