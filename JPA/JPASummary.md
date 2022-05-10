@@ -862,7 +862,7 @@ SQL로 변환되면 아래와 같다.
 
 물론, TEAM과 Member는 (1:N) 관계이므로 Team은 중복되어 영속성 컨텍스트에 존재한다. 이를 막기 위해 DISTINCT 예약어를 사용할 수 있다.
 
-+ **중요! 일반 조인과 페치 조인의 차이점은?**
++ 일반 조인과 페치 조인의 차이점은?**
 
 아래의 두 JPQL을 비교해보도록 하자.
 ```java
@@ -881,16 +881,21 @@ Member와 Team 모두 지연로딩이라고 가정하자.
 
 후자의 경우, 영속성 컨텍스트에 Member와 Team 모두 로딩된다.
 
-그러므로, 페치 조인을 사용하지 않고 Member를 통해 Team을 검색한다면,(ex. member.getTeam())
+### 6.6 N+1 문제와 해결 방법은?
 
-Team을 검색할 때 마다 추가적인 SQL이 발생하게 된다.
++ 즉시로딩에서의 N+1 문제: select m.team from Member m과 같은 JPQL을 발생시키고, team이 즉시로딩이라면 조회되는 member 수 만큼 team에 대한 쿼리가 발생한다. 이를 즉시로딩에서의 N+1 문제라고 한다. 이는 지연로딩을 통해 막을 수 있다.
 
-검색된 Member 수 만큼 SQL이 호출되므로 이것을 지연로딩 상황에서의 N+1 문제라고 한다.
++ 지연로딩에서의 N+1 문제: select m from Member m JPQL 발생 시, 지연로딩이라면 Member에 대한 쿼리만 발생한다. 그러나, 모든 Member에 대해서 아래와 같은 JPQL을 실행했다고 하자.
+```java
+List<Member> members = memberService.findAll(); // 지연로딩으로 모든 Member 조회 (쿼리 1번)
+for(Member member : members) {
+  System.out.println(member.getOrders().size()); // 매 member 마다 Order 조회 쿼리 발생(쿼리 N번)  
+}
+```
+그러므로, 지연로딩에서도 N+1 문제가 발생할 수 있다!
 
-물론, 엔티티를 지연로딩이 아닌 즉시로딩으로 바꾼다면 위와 같은 N+1 문제는 발생하지 않는다.
-
-그러나, 지연로딩 상황에서의 N+1 문제만을 피하기 위해 즉시로딩으로 설정하는 것은 바람직하지 않다.
-
-따라서, 엔티티는 지연로딩으로 매핑하고, 필요시 페치 조인을 적절히 사용하도록 한다.
+**해결방법**
++ 1. 페치 조인을 사용한다.
++ 2. BatchSize를 사용한다. (한번 쿼리시 BatchSize만큼 in)
 
 ***
