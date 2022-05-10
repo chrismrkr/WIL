@@ -8,7 +8,7 @@
 + IoC의 개념, 등장배경, 그리고 Spring에서 IoC의 개념이 어떻게 녹아있는가?
 + 싱글톤 객체란?
 + @Configuration, @Bean과 @Component, @ComponentScan의 각각 동작 방식은 무엇인가?
-+ @Autowired와 Lombok 라이브러리의 @RequiredArgsConstructors의 동작 방식은?
++ @Autowired 필드, 생성자, 수정자에 따라 어떻게 동작할까?(순환참조문제) Lombok 라이브러리의 @RequiredArgsConstructors는?
 + 만약 동일한 인터페이스를 구현한 클래스가 2개 이상이고 이들이 스프링 빈으로 등록되어 있다면, 이를 구별하여 주입하는 방법은 무엇인가?
 + 싱글톤 객체의 생성 시점과 소멸 시점을 관리할 수 있는 방법은?
 + 프로토 타입 스코프 빈이란? 싱글톤 객체에서 프로타 타입 스코프 빈을 사용 때 나타날 수 있는 문제점과 해결방법은?
