@@ -816,7 +816,11 @@ ex) Select m.name from Member m
 
 
 ### 6.5 페치 조인(Fetch Join)
-페치 조인은 SQL에는 없는 개념이다. 페치 조인은 SQL 호출 횟수를 줄여 최적화하기 위해 사용되는 기법이다. 예시를 통해 알아보도록 한다.
+페치 조인은 SQL에는 없는 개념이다. 페치 조인은 SQL 호출 횟수를 줄여 최적화하기 위해 사용되는 기법이다. 
+
+연관된 엔티티나 컬렉션을 같이 조회하는 기능이다.
+
+예시를 통해 알아보도록 한다.
 
 + 엔티티 페치 조인
 
@@ -854,12 +858,12 @@ SQL로 변환되면 아래와 같다.
 
 물론, TEAM과 Member는 (1:N) 관계이므로 Team은 중복되어 영속성 컨텍스트에 존재한다. 이를 막기 위해 DISTINCT 예약어를 사용할 수 있다.
 
-+ **일반 조인과 페치 조인의 차이점은?**
++ **중요! 일반 조인과 페치 조인의 차이점은?**
 
 아래의 두 JPQL을 비교해보도록 하자.
 ```java
   void main() {
-    String sql1 = "SELECT m FROM Member M INNER JOIN m.team";
+    String sql1 = "SELECT m FROM Member M inner join m.team";
     String sql2 = "SELECT m FROM Member M join fetch m.team";
     ...
    }
@@ -884,6 +888,5 @@ Team을 검색할 때 마다 추가적인 SQL이 발생하게 된다.
 그러나, 지연로딩 상황에서의 N+1 문제만을 피하기 위해 즉시로딩으로 설정하는 것은 바람직하지 않다.
 
 따라서, 엔티티는 지연로딩으로 매핑하고, 필요시 페치 조인을 적절히 사용하도록 한다.
-
 
 ***
