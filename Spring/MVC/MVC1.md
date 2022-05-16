@@ -627,7 +627,7 @@ public String requesting2(@RequestParam Map<String, object> paramMap) {
 
 매번 @RequestParam을 통해 파라미터를 받은 후 객체에 바인딩하는 번거로운 작업을 줄이기 위해서 @ModelAttribute 사용해 자동화할 수 있다.
 
-@ModelAttribute를 통해 바인딩하면 자동으로 Model에 객체가 포함된다.
+즉, Model에 담긴 attribute를 가져오기 위해 @ModelAttribute를 사용할 수 있다.
 
 ```java
 @Data
