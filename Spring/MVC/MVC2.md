@@ -1158,7 +1158,7 @@ class WebConfig implements WebMvcConfigurer {
 ```java
 public class LogInterceptor implements HandlerInterceptor {
 
-    public final static String LOG_ID = "logId";
+    private final static String LOG_ID = "logId";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
