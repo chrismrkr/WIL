@@ -61,14 +61,14 @@ public class RequestParamServlet extends HttpServlet {
        
        
        String name = req.getParameter("username"); // 단일 쿼리 파라미터 조회
-       String[] names = req.getParameters("username") // 여러 파라미터 조회 (ex. username=kim&username=lee)
+       String[] names = req.getParameters("username"); // 여러 파라미터 조회 (ex. username=kim&username=lee)
        
        req.getParameterNames().asIterator()
             .forEachRemaining(paramName -> sout(req.getParamater(paramName)); // 전체 파라미터 조회
             
        // 이외에도 start-line, header 정보도 확인할 수 있다.
        
-       resp.getWriter().write("ok") 
+       resp.getWriter().write("ok");
          
     }
 }       
@@ -94,7 +94,7 @@ public class RequestBodyStringServlet extends HttpServlet {
        ServletInputStream inputStream = req.getInputStream();
        String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
        
-       resp.getWriter().write("ok") 
+       resp.getWriter().write("ok");
     }
 }       
 ```
