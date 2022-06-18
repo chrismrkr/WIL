@@ -881,7 +881,7 @@ Member와 Team 모두 지연로딩이라고 가정하자.
 
 후자의 경우, 영속성 컨텍스트에 Member와 Team 모두 로딩된다.
 
-### 6.6 N+1 문제와 해결 방법은?
+### 6.6 N+1 문제란?
 
 + 즉시로딩에서의 N+1 문제: select m.team from Member m과 같은 JPQL을 발생시키고, team이 즉시로딩이라면 조회되는 member 수 만큼 team에 대한 쿼리가 발생한다. 이를 즉시로딩에서의 N+1 문제라고 한다. 이는 지연로딩을 통해 막을 수 있다.
 
@@ -892,10 +892,19 @@ for(Member member : members) {
   System.out.println(member.getOrders().size()); // 매 member 마다 Order 조회 쿼리 발생(쿼리 N번)  
 }
 ```
-그러므로, 지연로딩에서도 N+1 문제가 발생할 수 있다!
+그러므로, 지연로딩에서도 N+1 문제가 발생한다.
 
-**해결방법**
-+ 1. 페치 조인을 사용한다.
-+ 2. BatchSize를 사용한다. (한번 쿼리시 BatchSize만큼 in)
+
+### 6.7 N+1 문제 해결방법
+
++ **@XToOne에서의 N+1 문제 해결방법**
+
+ 간단하게 Fetch Join을 이용해서 해결할 수 있다.
+ 
+ 
++ **@OneToMany에서의 N+1 문제 해결방법**
+
+
+
 
 ***
