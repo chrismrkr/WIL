@@ -48,6 +48,10 @@ DB에 매핑되는 칼럼명을 지정한다.
 
 관계집합을 한쪽 엔티티로 합한다.
 
+### @JsonIgnore
+
+Json으로 변환할 때, 해당 Annotation이 적용된 필드는 제외한다.
+
 ### @Transactional(중요)
 
 트랜잭션이란 일련의 read, write 작업이다.
