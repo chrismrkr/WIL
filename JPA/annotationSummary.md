@@ -60,6 +60,8 @@ DB에 매핑되는 칼럼명을 지정한다.
 
 가장 확실한 격리수준을 확보하기 위한 방법은 직렬화 스케줄링 방식이다. (Shared Lock, Exclusive Lock) <비관적 락>
 
+물론, DeadLock 한계점을 해결하기 위해서 타임아웃을 지정해야 한다.
+
 그러나, 이는 동시성 처리 성능이 낮으므로 일반적으로 데이터베이스는 Read Committed 방식을 적용한다.
 
 Read Committed에서 Non-Repeatable Read를 방지하기 위해 **낙관적 락**을 활용한다.
