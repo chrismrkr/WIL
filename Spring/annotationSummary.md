@@ -104,9 +104,9 @@ HTTP GET 요청의 쿼리 파라미터 또는 FORM 형태의 데이터를 처리
 
 ### @RequestBody
 
-HTTP 요청의 Message Body를 처리에 객체에 바인딩하기 위해 사용한다.
+HTTP 요청의 Message Body를 처리 객체로 변환하기 위해 사용한다. 
 
-생성자를 통해 객체를 생성하고 바인딩을 위해 Getter 또는 Setter를 사용한다. 그러므로, 가급적 Getter를 이용한 바인딩을 사용하도록 한다.
+HTTP 메세지 컨버터를 통해 변환한 후, 기본 생성자를 통해 객체를 생성하고 필드명 인식을 위해 Getter 또는 Setter를 사용한다. (Getter 사용하자.)
 
 
 ### @ResponseBody
