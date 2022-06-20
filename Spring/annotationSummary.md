@@ -79,14 +79,38 @@ RestApi 형식으로 반환하기 위한 컨트롤러를 지정한다.
 
 ### @PathVariable
 
+URL에 포함된 Variable을 매개변수로 가져오기 위해 사용한다.
 
+```java
+public void func(@PathVariable("id") Long id, ...) { ... }
+```
+
+### @RequestParam
+
+HTTP GET 요청에서 쿼리 파라미터를 매개변수로 받기 위해서 사용한다.
+
+ex. URL: .../url?name="hello"&age=10
+
+```java
+@GetMapping("/url")
+public void func(@RequestParam("name") String name, @RequestParam("age") int age ) { ... }
+```
 
 ### @ModelAttribute
 
+HTTP GET 요청의 쿼리 파라미터 또는 FORM 형태의 데이터를 처리해 객체로 바인딩하기 위해 사용된다.
 
+객체에 파라미터를 바인딩하기 위해 생성자, 또는 Setter를 사용할 수 있다.
 
 ### @RequestBody
 
+HTTP 요청의 Message Body를 처리에 객체에 바인딩하기 위해 사용한다.
+
+바인딩을 위해 Getter 또는 Setter를 사용한다. 그러므로, 가급적 Getter를 이용한 바인딩을 사용하도록 한다.
 
 
 ### @ResponseBody
+
+HTTP BODY 내용을 HTTP 메세지 컨버터를 통해 JSON 형식 등으로 변환해 리턴하도록 만든다.
+
+HTTP 메세지 컨버터는 바이트 스트림, 문자열, Json 등으로 변환해 리턴할 수 있도록 한다.
