@@ -59,23 +59,23 @@
 
 ### @Controller
 
-
+View로 매핑하기 위한 컨트롤러를 지정한다.
 
 ### @RestController
 
-
+RestApi 형식으로 반환하기 위한 컨트롤러를 지정한다.
 
 ### @GetMapping
 
-
+특정 URL의 HTTP GET 요청을 처리하는 메소드를 지정한다. 
 
 ### @PostMapping
 
-
+특정 URL의 HTTP POST 요청을 처리하는 메소드를 지정한다. 
 
 ### @PutMapping
 
-
+특정 URL의 HTTP PUT 요청을 처리하는 메소드를 지정한다. 
 
 ### @PathVariable
 
