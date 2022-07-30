@@ -601,7 +601,7 @@ public class RequestHeaderController {
 ```java
 @ResponseBody
 @RequestMapping("/request")
-public String requesting(@RequestParam(required=false) String name, @RequestParam(required=faslse) int age) {
+public String requesting(@RequestParam(required=false) String name, @RequestParam(required=false) int age) {
     log.info("name={}, age={}", name, age);
     return "true";
   }
