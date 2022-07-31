@@ -260,7 +260,6 @@ public class ThreadLocalLogTrace implements LogTrace {
 구현된 로그 추적기의 Controller, Service 등을 다시 점검하자.
 
 ```java
-
 @RestController
 @RequiredArgsConstructor
 public class OrderControllerV3 {
@@ -319,3 +318,33 @@ public class OrderServiceV3 {
 
 + 변하는 코드: 비즈니스 로직
 + 변하지 않는 코드: 로그 추적
+
+변하지 않는 코드(로그 추적)를 템플릿으로 만들고, 변하는 코드(비즈니스 로직)는 오버라이드해서 사용하도록 한다. 
+
+```java
+public abstract class AbstractTemplate<T> {
+    private final LogTrace trace;
+
+    public AbstractTemplate(LogTrace trace) {
+        this.trace = trace;
+    }
+
+    public T execute(String message) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin(message);
+
+            // 로직 호출
+            T result = call();
+
+            trace.end(status);
+            return result;
+        } catch (Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
+
+    protected abstract T call();
+}
+```
