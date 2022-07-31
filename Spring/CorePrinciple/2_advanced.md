@@ -152,13 +152,12 @@ public class OrderControllerV3 {
 
 **이를 해결하기 위해 등장한 것이 스레드 로컬(ThreadLocal)이다.**
 
-***
 
 #### 1.2 스레드 로컬을 통한 로그 추적기 구현
 
 위와 크게 달라질 것은 없다. LogTrace를 스레드 로컬로 만들어 싱글톤 빈으로 등록하면 된다.
 
-'''java
+```java
 @Slf4j
 public class ThreadLocalLogTrace implements LogTrace {
     private static final String START_PREFIX = "-->";
@@ -253,3 +252,7 @@ public class ThreadLocalLogTrace implements LogTrace {
 여기서 두번째 클라이언트가 WAS에 접근해 스레드 A를 사용하게 된다면, traceHolder가 해제되지 않았으므로 의도하지 않은 Action이 발생할 수 있다!
 
 **그러므로, 스레드를 해제할 때 반드시 스레드 로컬 필드변수를 remove() 해야한다.**
+
+***
+
+
