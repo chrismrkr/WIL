@@ -257,7 +257,7 @@ public class ThreadLocalLogTrace implements LogTrace {
 
 ### 2. 템플릿 메서드 패턴
 
-구현된 로그 추적기의 Controller를 다시 점검하자.
+구현된 로그 추적기의 Controller, Service 등을 다시 점검하자.
 
 ```java
 
@@ -286,4 +286,31 @@ public class OrderControllerV3 {
     }
 }
 
+
+@Service
+@RequiredArgsConstructor
+public class OrderServiceV3 {
+    private final OrderRepositoryV3 orderRepository;
+    private final LogTrace trace;
+
+    public void orderItem(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin( "orderService.orderItem()");
+            orderRepository.save(itemId);
+            trace.end(status);
+        }
+        catch(Exception e) {
+            trace.exception(status, e);
+            throw e; // 예외를 다시 던져야함, 아니면 정상흐름으로 동작해버린다.
+        }
+
+    }
+}
 ```
+
+로그를 추적하는 코드가 계속해서 반복한다는 것을 알 수 있다.
+
+만약 로그를 추적하는 코드를 변경하라는 요구사항이 발생하면, 모든 클래스의 코드를 수정해야한다.
+
+이는 유지보수를 매우 어렵게 만든다. 그러므로, 다른 방법이 필요하다. 여기서 등장한 것이 **템플릿 메소드 패턴**이다.
