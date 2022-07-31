@@ -71,7 +71,7 @@ public class FieldLogTrace implements LogTrace {
     private static final String COMPLETE_PREFIX = "<--";
     private static final String EX_PREFIX = "<X-";
 
-    private TraceId traceIdHolder; // traceId를 동기화, 동시성 이슈 발생(어떻게 해결할 것인가?)
+    private TraceId traceIdHolder; // traceId를 동기화, 동시성 이슈 발생
 
     @Override
     public TraceStatus begin(String message) {
@@ -155,3 +155,101 @@ public class OrderControllerV3 {
 ***
 
 #### 1.2 스레드 로컬을 통한 로그 추적기 구현
+
+위와 크게 달라질 것은 없다. LogTrace를 스레드 로컬로 만들어 싱글톤 빈으로 등록하면 된다.
+
+'''java
+@Slf4j
+public class ThreadLocalLogTrace implements LogTrace {
+    private static final String START_PREFIX = "-->";
+    private static final String COMPLETE_PREFIX = "<--";
+    private static final String EX_PREFIX = "<X-";
+
+    private ThreadLocal<TraceId> traceIdHolder = new ThreadLocal<>(); // 동시성 이슈 해결
+
+    @Override
+    public TraceStatus begin(String message) {
+        syncTraceId();
+        TraceId traceId = traceIdHolder.get();
+        Long startTimeMs = System.currentTimeMillis();
+
+        log.info("[{}] {}{}", traceId.getId(), addSpace(START_PREFIX, traceId.getLevel()), message);
+
+        return new TraceStatus(traceId, startTimeMs, message);
+    }
+
+    private void syncTraceId() {
+        TraceId traceId = traceIdHolder.get();
+        if(traceId == null) {
+            traceIdHolder.set(new TraceId());
+        }
+        else {
+            traceIdHolder.set(traceId.createNextId());
+        }
+    }
+
+    @Override
+    public void end(TraceStatus status) {
+        complete(status, null);
+    }
+
+    @Override
+    public void exception(TraceStatus status, Exception e) {
+        complete(status, e);
+    }
+
+
+    private void complete(TraceStatus status, Exception e) {
+        Long stopTimeMs = System.currentTimeMillis();
+        long resultTimeMs = stopTimeMs - status.getStartTimeMs();
+        TraceId traceId = status.getTraceId();
+        if (e == null) {
+            log.info("[{}] {}{} time={}ms", traceId.getId(),
+                    addSpace(COMPLETE_PREFIX, traceId.getLevel()), status.getMessage(),
+                    resultTimeMs);
+        } else {
+            log.info("[{}] {}{} time={}ms ex={}", traceId.getId(),
+                    addSpace(EX_PREFIX, traceId.getLevel()), status.getMessage(), resultTimeMs,
+                    e.toString());
+        }
+
+        releaseTraceId();
+    }
+
+    private void releaseTraceId() {
+        TraceId traceId = traceIdHolder.get();
+        if(traceId.isFirstLevel()) {
+            /*
+             * 중요! 스레드 종료 시, 반드시 스레드 로컬 필드 변수를 제거해야 한다
+             */
+            traceIdHolder.remove(); // destroy
+        }
+        else {
+            traceIdHolder.set(traceId.createPreviousId());
+        }
+    }
+
+    private static String addSpace(String prefix, int level) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            sb.append( (i == level - 1) ? "|" + prefix : "| ");
+        }
+        return sb.toString();
+    }
+}
+
+```
+
+스레드 로컬로 생성한다면, 두 스레드가 동시에 접근하더라도 서로 다른 TraceHolder를 가질 수 있다.
+
+그러나, 스레드 로컬을 사용할 때 주의할 점이 한가지 있다.
+
+가령, WAS의 스레드 풀에 3개의 스레드(A, B, C)가 존재한다고 가정하자.
+
+첫번째 클라이언트가 WAS에 접근해 스레드 A를 사용하게 된다. 여기서 스레드 A는 하나의 traceHolder를 갖는다.
+
+첫번째 클라이언트가 WAS 접근을 끝내고 스레드 A의 traceHolder를 제거하지 않았다면, 스레드 A의 traceHolder는 해제되지 않고 여전히 남게 된다.
+
+여기서 두번째 클라이언트가 WAS에 접근해 스레드 A를 사용하게 된다면, traceHolder가 해제되지 않았으므로 의도하지 않은 Action이 발생할 수 있다!
+
+**그러므로, 스레드를 해제할 때 반드시 스레드 로컬 필드변수를 remove() 해야한다.**
