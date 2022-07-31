@@ -347,4 +347,36 @@ public abstract class AbstractTemplate<T> {
 
     protected abstract T call();
 }
+
+
+@RestController
+@RequiredArgsConstructor
+public class OrderControllerV4 {
+
+    private final OrderServiceV4 orderService;
+    private final LogTrace trace;
+
+    @GetMapping("/v4/request")
+    public String request(@RequestParam String itemId) {
+
+        // 익명 내부 클래스 사용
+        AbstractTemplate<String> template = new AbstractTemplate<String>(trace) {
+            @Override
+            protected String call() {
+                orderService.orderItem(itemId);
+                return "ok";
+            }
+        };
+        
+        return template.execute("orderController.request()");
+    }
+}
 ```
+
+이제 로그 추적에 대한 요구사항이 바뀌더라도 유연하게 대응할 수 있는 코드가 되었다.
+
+또한, 로그 추적과 비즈니스 로직을 분리했다는 점에서 객체지향의 단일책임원칙도 지킬 수 있었다.
+
+하지만, 템플릿 메소드 패턴은 상속을 이용하므로 상속의 단점을 그대로 갖고 있다. 
+
+(부모 클래스에 강하게 의존한다는 단점이 있다.) 
