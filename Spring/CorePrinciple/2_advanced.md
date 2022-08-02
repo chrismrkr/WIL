@@ -396,6 +396,38 @@ public class OrderControllerV4 {
 아래 코드를 보면 더 명확하게 이해할 수 있다.
 
 ```java
+@Slf4j
+public class ContextV1 {
+    private Strategy strategy;
 
+    public ContextV1(Strategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void execute() {
+        long startTime = System.currentTimeMillis();
+
+        // 비즈니스 로직 실행
+        strategy.call();
+        // 비즈니스 로직 종료
+
+        long endTime = System.currentTimeMillis();
+        long resultTime = endTime - startTime;
+        log.info("resultTime={}", resultTime);
+    }
+}
+
+public interface Strategy {
+    void call();
+}
+
+
+@Slf4j
+public class StrategyLogic1 implements Strategy{
+    @Override
+    public void call() {
+        log.info("비즈니스 로직 1 실행");
+    }
+}
 
 ```
