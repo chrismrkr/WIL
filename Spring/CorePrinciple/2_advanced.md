@@ -466,3 +466,78 @@ context.execute() => strategy.call()
 스프링에서 등장하는 XxxTemplate은 대부분 콜백 패턴으로 만들어졌다고 볼 수 있다.
 
 마지막으로 로그 추적기를 아래와 같이 템플릿 콜백 패턴으로 변경할 수 있다.
+
+
+```java
+@RestController
+public class OrderControllerV5 {
+
+    private final OrderServiceV5 orderService;
+    private final TraceTemplate template;
+
+    @Autowired
+    public OrderControllerV5(OrderServiceV5 orderService, LogTrace trace) {
+        this.orderService = orderService;
+        this.template = new TraceTemplate(trace);
+    }
+
+    @GetMapping("/v5/request")
+    public String request(@RequestParam String itemId) {
+        return template.execute("orderController.request()", new TraceCallBack<>() {
+            @Override
+            public String call() {
+                orderService.orderItem(itemId);
+                return "ok";
+            }
+        });
+    }
+}
+
+@Service
+public class OrderServiceV5 {
+    private final OrderRepositoryV5 orderRepository;
+    private final TraceTemplate template;
+
+    @Autowired
+    public OrderServiceV5(OrderRepositoryV5 orderRepository, LogTrace trace) {
+        this.orderRepository = orderRepository;
+        this.template = new TraceTemplate(trace);
+    }
+
+    public void orderItem(String itemId) {
+        template.execute("orderService.orderItem()", () -> {
+            orderRepository.save(itemId);
+            return null;
+        });
+
+    }
+}
+
+@Repository
+public class OrderRepositoryV5 {
+
+    private final TraceTemplate template;
+
+    public OrderRepositoryV5(LogTrace trace) {
+        this.template = new TraceTemplate(trace);
+    }
+
+    public void save(String itemId) {
+        template.execute("orderRepository.save()", () -> {
+            if(itemId.equals("ex")) {
+                throw new IllegalStateException("예외 발생!");
+            }
+            sleep(1000);
+            return null;
+        });
+    }
+
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
