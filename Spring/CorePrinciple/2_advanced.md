@@ -459,8 +459,10 @@ public class ContextV2 {
 
 만약, 코드를 실행하게 된다면 아래와 같은 로직으로 흐르게 된다.
 
-context.execute() -> strategy.call() 
+context.execute() => strategy.call() 
 
-이처럼 다른 코드를 인수로 넘기는 방식을 **콜백(CallBack)** 이라고 한다.
+이처럼, 다른 코드를 인수로 넘기는 방식을 **콜백(CallBack)** 이라고 한다.
 
+스프링에서 등장하는 XxxTemplate은 대부분 콜백 패턴으로 만들어졌다고 볼 수 있다.
 
+마지막으로 로그 추적기를 아래와 같이 템플릿 콜백 패턴으로 변경할 수 있다.
