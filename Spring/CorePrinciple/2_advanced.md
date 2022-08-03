@@ -461,6 +461,6 @@ public class ContextV2 {
 
 context.execute() -> strategy.call() 
 
-이처럼 다른 코드를 인수로 넘기는 방식을 **콜백(CallBack)**이라고 한다.
+이처럼 다른 코드를 인수로 넘기는 방식을 **콜백(CallBack)** 이라고 한다.
 
 
