@@ -431,3 +431,6 @@ public class StrategyLogic1 implements Strategy{
 }
 
 ```
+***
+### 4. 템플릿 콜백 패턴
+
