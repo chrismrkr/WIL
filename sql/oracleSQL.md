@@ -18,3 +18,18 @@ WHERE JOB NOT IN ('SALESMAN', 'MANAGER') AND
 ORDER BY 4 DESC, 2;
 ```
 + NULL과의 연산 결과는 항상 0 이므로 NVL을 사용하도록 한다.
+
+***
+
+### Q2
+
+**ename의 앞 두 글자만 출력하고 나머지는 마스킹하시오.**
+```sql
+SELECT  ename,
+        rpad(substr(ename, 1, 2), length(ename), '*')
+FROM    emp;
+```
+
++ substr(col, startIdx, number)
++ length(col)
++ rpad(substr(ename, 1, 2), length(ename), '*'): legnth만큼 왼쪽에 substr을 붙이고 오른쪽 나머지에 '*' Pad를 붙인다.
