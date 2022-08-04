@@ -85,4 +85,35 @@ GROUP BY department_id
 
 ***
 
-### 
+### Q6
+
+1. 부서별, 직무별 인건비 현황을 조회하시오. 
+```sql
+SELECT department_id,
+       job_id,
+       sum(wage)
+FROM ( SELECT nvl(department_id, 999) "DEPARTMENT_ID",
+              job_id,
+              sal + NVL(sal, 0) * commision_pct "WAGE"
+       FROM EMPLOYEES )
+GROUP BY department_id, job_id
+```
+
+2. 위의 결과에서 부서별, 업무별 인건비 합과 순위를 구하시오
+```sql
+SELECT department_id,
+       job_id,
+       sum(wage),
+       sum(sum(wage)) over(partition by department_id),
+       sum(sum(wage)) over(partition by job_id),
+       rank() over(order by sum(wage) partition by department_id),
+       rank() over(order by sum(wage) partition by job_id)
+FROM ( SELECT nvl(department_id, 999) "DEPARTMENT_ID",
+              job_id,
+              sal + NVL(sal, 0) * commision_pct "WAGE"
+       FROM EMPLOYEES )
+GROUP BY department_id, job_id
+```
+
++ rank() over(partition by ... order by ...)
++ sum() over(partition by ...)
