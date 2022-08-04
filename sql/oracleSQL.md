@@ -17,3 +17,4 @@ WHERE JOB NOT IN ('SALESMAN', 'MANAGER') AND
       (sal < 1000 OR sal >= 1600)
 ORDER BY 4 DESC, 2;
 ```
++ NULL과의 연산 결과는 항상 0 이므로 NVL을 사용하도록 한다.
