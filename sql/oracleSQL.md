@@ -65,3 +65,18 @@ FROM    emp;
 + to_number: 문자 타입을 숫자로 변환함
 
 **숫자 <-> 문자 <-> 날짜**
+
+### Q5
+부서별 입사인원 현황을 분기별로 조회하십시오. 단, 결과 칼럼이 분기별로 나오도록 구성하십시오.
+
+```sql
+SELECT  deprtment_id,
+        SUM(CASE WHEN to_char(hiredate, 'Q') = '1' THEN 1 ELSE 0 END) "Q1",
+        SUM(CASE WHEN to_char(hiredate, 'Q') = '2' THEN 1 ELSE 0 END) "Q2",
+        SUM(CASE WHEN to_char(hiredate, 'Q') = '3' THEN 1 ELSE 0 END) "Q3",
+        SUM(CASE WHEN to_char(hiredate, 'Q') = '4' THEN 1 ELSE 0 END) "Q4",
+FROM    emp;
+GROUP BY department_id
+```
+
++ CASE WHEN THEN ELSE END 구문을 익히자. **2차원 배열**로 나타낼 때 많이 사용된다.
