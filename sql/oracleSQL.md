@@ -30,6 +30,38 @@ SELECT  ename,
 FROM    emp;
 ```
 
-+ substr(col, startIdx, number)
++ substr(col, startIdx, number), -가 붙으면 뒤에서 부터 기준을 잡음.
++ instr(col, '..'): 문자열 내에 특정 문자열이 어느 위치에 있는지 찾음
++ replace: 문자열 내 특정 부분을 다른 것으로 대체함
 + length(col)
 + rpad(substr(ename, 1, 2), length(ename), '*'): legnth만큼 왼쪽에 substr을 붙이고 오른쪽 나머지에 '*' Pad를 붙인다.
+
+***
+
+### Q3
+
+```sql
+ SELECT length('  abcde  '),
+        length(trim('  abcde  ')),
+        length(trim(leading from '  abcde   ')),
+        length(trim(trailing from '  abcde   '))
+ FROM dual;
+```
++ trim: 공백을 제거함
++ ltrim: 왼쪽 공백을 모두 제거함
++ rtrim: 오른쪽 공백을 모두 제거함
+
+***
+
+### 숫자 함수 및 날짜 함수
+
++ ROUND: 반올림
++ TRUNC: 버림
++ CEIL: 올림
++ SYSDATE: 현재 날짜
++ ADD_MONTHS, ADD_YEAR: 월, 연을 더함
++ to_char(date, 'form'): Date 타입을 'form' 형태로 문자열을 가져옴
++ to_date(Str, 'form'): Literal 타입을 'form' 형태의 Date로 만듬
++ to_number: 문자 타입을 숫자로 변환함
+
+**숫자 <-> 문자 <-> 날짜**
