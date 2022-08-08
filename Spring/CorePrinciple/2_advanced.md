@@ -629,3 +629,68 @@ public class ProxyPatternClient { /* 클라이언트 */
 
 데코레이터 패턴은 접근을 제어하는 것이 아닌 **부가 기능을 제공**하기 위해 사용한다.
 
+```java
+
+public interface Component {
+    String operation();
+}
+
+@Slf4j
+public class RealComponent implements Component {
+    @Override
+    public String operation() {
+        log.info("RealComponent 실행");
+        return "data";
+    }
+}
+ 
+@Slf4j
+public class MessageDecorator implements Component{
+    public Component component;
+
+    public MessageDecorator(Component component) {
+        this.component = component;
+    }
+    @Override
+    public String operation() {
+        log.info("MessageDecorator 실행");
+        String operation = component.operation();
+        String decoResult = "****" + operation + "****";
+        log.info("MessageDecorator 꾸미기 적용 전 ={}, 후 {}", operation, decoResult);
+        return null;
+    }
+}
+
+
+@Slf4j
+public class DecoratorPatternClient {
+    private Component component;
+
+    public DecoratorPatternClient(Component component) {
+        this.component = component;
+    }
+
+    public void execute() {
+        String result = component.operation();
+        log.info("reuslt={}", result);
+    }
+}    
+
+ ...
+ @Test
+ void decorator1() {
+        RealComponent realComponent = new RealComponent();
+        MessageDecorator messageDecorator = new MessageDecorator(realComponent);
+        DecoratorPatternClient decoratorPatternClient = new DecoratorPatternClient(messageDecorator);
+        decoratorPatternClient.execute();;
+ }
+    
+...
+```
+
+Componet들이 연쇄적으로 연결된 패턴인 것을 확인할 수 있다.
+
+
+#### 5.3 로그 추적기 적용
+
+지금까지 익혔던 프록시, 데코레이터 패턴을 로그 추적기에 도입해보도록 하자.
