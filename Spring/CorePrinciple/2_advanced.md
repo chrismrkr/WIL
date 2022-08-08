@@ -548,7 +548,84 @@ public class OrderRepositoryV5 {
 
 로그 추적과 같은 부가적인 기능을 추가하고자 한다면, 템플릿 메서드 패턴에서는 결국 클라이언트 코드를 조금이라도 변경해야 하는 문제점이 있다. 
 
-만약, 클라이언트 코드가 많다면, 부가 기능을 추가하는 것 또한 불필요한 작업이 될 수 있다.
+만약, 클라이언트 코드가 많다면, 부가 기능을 추가하는 것 또한 불필요한 작업이 될 수 있다. 
 
-그러므로, 새로운 디자인 패턴이 필요하다.
+이를 개선하기 위해 새로운 패턴에 대해서 고민할 필요가 있다.
+
+#### 5.1 프록시 패턴
+
+프록시 패턴은 클라이언트가 Main Server에 **접근하는 것을 제어**하기 위해 사용되는 패턴이다.
+
+프록시와 서버가 있고, 둘은 동일한 인터페이스를 구현하고 있다고 가정하자.
+
+클라이언트는 인터페이스에 의존하므로, 요청 시 프록시로부터 응답을 받는지 아니면 서버로부터 응답을 받는지 구별하지 않아도 된다.
+
+특정 조건에는 프록시로부터 응답을 받고 그렇지 않은 경우는 서버로부터 응답을 받는다. 아래 코드를 통해 확인할 수 있다.
+
+```java
+public interface Subject { /* 인터페이스 */
+    String operation();
+}
+
+@Slf4j
+public class CacheProxy implements Subject { /* 프록시 서버 */
+    private Subject target;
+    private String cacheValue;
+
+    public CacheProxy(Subject target) {
+        this.target = target;
+    }
+    
+    @Override
+    public String operation() {
+        log.info("프록시 호출");
+        if(cacheValue == null) {
+            cacheValue = target.operation();
+        }
+        return cacheValue;
+    }
+}
+
+@Slf4j
+public class RealSubject implements Subject { /* 메인 서버 */
+    @Override
+    public String operation() {
+        log.info("실제 객체 호출");
+        sleep(1000);
+        return "data";
+    }
+
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+public class ProxyPatternClient { /* 클라이언트 */
+    private Subject subject;
+
+    public ProxyPatternClient(Subject subject) {
+        this.subject = subject;
+    }
+
+    public void execute() {
+        subject.operation();
+    }
+}
+
+```
+
+코드를 해석하면 프록시 서버의 target Value가 유효하거나 그렇지 않은 경우에 따라 클라이언트가 응답을 받는 곳은 다르다.
+
+그러나, Proxy와 Main Server 모두 동일한 인터페이스를 구현하고 있으므로 클라이언트는 신경쓰지 않아도 된다. 
+
+
+#### 5.2 데코레이터 패턴
+
+데코레이터 패턴은 프록시 패턴과 유사하지만 기능적으로 다르다.
+
+데코레이터 패턴은 접근을 제어하는 것이 아닌 **부가 기능을 제공**하기 위해 사용한다.
 
