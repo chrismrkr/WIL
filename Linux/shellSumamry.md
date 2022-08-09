@@ -66,4 +66,10 @@ find ./ -type d -exec "ls" "-l" ";"
 
 ### 1.9 Redirection
 
+stdin, stdout, stderr를 콘솔이나 파일로 redirect하기 위해 사용된다. (<, >, >> 사용)
 
+아래의 예를 통해서 확인하도록 하자
+
+```shell
+
+```
