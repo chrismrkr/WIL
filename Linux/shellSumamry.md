@@ -79,3 +79,6 @@ cat notexist.txt 2>>file
 + 첫번째는 stdout 결과를 file에 저장한다. file에 내용이 있다면 덮어쓴다.
 + 두번째는 stdout 결과를 file에 추가한다. file에 내용이 있어도 덮어쓰지 않는다.
 + 세번째는 stderr 결과를 file에 추가한다.
+
+
+
