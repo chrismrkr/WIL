@@ -694,3 +694,74 @@ Componet들이 연쇄적으로 연결된 패턴인 것을 확인할 수 있다.
 #### 5.3 로그 추적기 적용
 
 지금까지 익혔던 프록시, 데코레이터 패턴을 로그 추적기에 도입해보도록 하자.
+
+프록시를 로그 추적기, 메인을 비즈니스 로직이라고 생각하면 수월하다. 둘은 모두 동일한 인터페이스를 구현하고 있다.
+
+아래 코드를 확인하자.
+
+```java
+@RequiredArgsConstructor
+public class OrderControllerInterfaceProxy implements OrderControllerV1 {
+    private final OrderControllerV1 target;
+    private final LogTrace logTrace;
+
+    @Override
+    public String request(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = logTrace.begin("OrderController.request()");
+            String result = target.request(itemId);
+            logTrace.end(status);
+            return result;
+
+        } catch(Exception e) {
+            logTrace.exception(status, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public String noLog() {
+        return target.noLog();
+    }
+}
+
+@RequiredArgsConstructor
+public class OrderServiceInterfaceProxy implements OrderServiceV1 {
+    private final OrderServiceV1 target;
+    private final LogTrace logTrace;
+    @Override
+    public void orderItem(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = logTrace.begin("OrderService.orderItem()");
+            target.orderItem(itemId);
+            logTrace.end(status);
+
+        } catch(Exception e) {
+            logTrace.exception(status, e);
+            throw e;
+        }
+    }
+}
+
+
+@RequiredArgsConstructor
+public class OrderRepositoryInterfaceProxy implements OrderRepositoryV1 {
+    private final OrderRepositoryV1 target;
+    private final LogTrace logTrace;
+    @Override
+    public void save(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = logTrace.begin("OrderRepository.request()");
+            target.save(itemId);
+            logTrace.end(status);
+
+        } catch(Exception e) {
+            logTrace.exception(status, e);
+            throw e;
+        }
+    }
+}
+```
