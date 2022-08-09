@@ -683,9 +683,9 @@ public class DecoratorPatternClient {
         MessageDecorator messageDecorator = new MessageDecorator(realComponent);
         DecoratorPatternClient decoratorPatternClient = new DecoratorPatternClient(messageDecorator);
         decoratorPatternClient.execute();;
- }
-    
+ } 
 ...
+
 ```
 
 Componet들이 연쇄적으로 연결된 패턴인 것을 확인할 수 있다.
@@ -696,6 +696,8 @@ Componet들이 연쇄적으로 연결된 패턴인 것을 확인할 수 있다.
 지금까지 익혔던 프록시, 데코레이터 패턴을 로그 추적기에 도입해보도록 하자.
 
 프록시를 로그 추적기, 메인을 비즈니스 로직이라고 생각하면 수월하다. 둘은 모두 동일한 인터페이스를 구현하고 있다.
+
+특징은 주요 비즈니스 로직을 담은 컨트롤러, 서비스, 리포지토리는 스프링 빈으로 관리되지 않고 프록시가 스프링 빈으로 관리된다는 점이다.
 
 아래 코드를 확인하자.
 
@@ -790,3 +792,7 @@ public class InterfaceProxyConfig {
     }
 }
 ```
+
+소스코드와 환경설정 코드를 확인하면, GET /v1/request HTTP 요청시 발생하는 흐름은 아래와 같다.
+
+HTTP 요청 -> 프록시 컨트롤러(로그 추적) -> 컨트롤러 -> 프록시 서비스(로그 추적) -> 서비스 -> 프록시 리포지토리(로그 추적) -> 리포지토리
