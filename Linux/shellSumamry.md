@@ -73,4 +73,9 @@ stdin, stdout, stderr를 콘솔이나 파일로 redirect하기 위해 사용된�
 ```shell
 ls -la > file
 ls -la >> file
+cat notexist.txt 2>>file
 ```
+
++ 첫번째는 stdout 결과를 file에 저장한다. file에 내용이 있다면 덮어쓴다.
++ 두번째는 stdout 결과를 file에 추가한다. file에 내용이 있어도 덮어쓰지 않는다.
++ 세번째는 stderr 결과를 file에 추가한다.
