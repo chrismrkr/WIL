@@ -618,7 +618,7 @@ public class ProxyPatternClient { /* 클라이언트 */
 
 
 
-publc class ProxyPatterntest {
+public class ProxyPatterntest {
 
     @Test
     void test() {
