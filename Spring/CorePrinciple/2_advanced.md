@@ -957,7 +957,6 @@ public class OrderRepositoryConcreteProxy extends OrderRepositoryV2 {
 
 @Configuration
 public class ConcreteProxyConfig {
-
     @Bean
     public OrderControllerV2 orderControllerV2(LogTrace logTrace) {
         OrderControllerV2 orderControllerV2 = new OrderControllerV2(orderServiceV2(logTrace));
@@ -977,5 +976,19 @@ public class ConcreteProxyConfig {
     }
 }
 ```
+
+**정리**
+
+인터페이스를 활용한 방법은 항상 무작정 인터페이스를 생성해야 한다는 단점이 있다.
+
+또한, 클래스 상속을 이용한 방법은 클래스가 N개라면 프록시 클래스를 N개 생성해야 한다는 단점이 있다.
+
+이를 개선 할 수 있는 방법이 필요하다.
+
+
+***
+
+### 6. 
+
 
 
