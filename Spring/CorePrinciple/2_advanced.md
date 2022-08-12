@@ -985,7 +985,15 @@ public class ConcreteProxyConfig {
 
 이를 개선 할 수 있는 방법이 필요하다.
 
+예를 들어, 아래와 같이 코드를 작성 할 수 있으면 이 문제를 해결할 수 있다.
 
+```python
+
+로그_호출1()
+비즈니스_로직() # -> 이 부분에 controller.logic(), service.logic(), repository.logic()을 추상화한다.
+로그_호출2()
+
+```
 ***
 
 ### 6. 
