@@ -820,9 +820,162 @@ HTTP 요청 -> 프록시 컨트롤러(로그 추적) -> 컨트롤러 -> 프록�
 구체 클래스 기반 프록시를 로그 추적기에 적용해보도록 하자.
 
 ```java
+@Slf4j
+@RequestMapping
+@ResponseBody
+public class OrderControllerV2 {
+    private final OrderServiceV2 orderService;
+
+    public OrderControllerV2(OrderServiceV2 orderService) {
+        this.orderService = orderService;
+    }
+
+    @GetMapping("/v2/request")
+    public String request(@RequestParam(name="itemId") String itemId) {
+        orderService.orderItem(itemId);
+        return "ok";
+    }
+
+    @GetMapping("/v2/no-log")
+    public String noLog() {
+        return "ok";
+    }
+}
+
+public class OrderServiceV2 {
+    private final OrderRepositoryV2 orderRepository;
+
+    public OrderServiceV2(OrderRepositoryV2 orderRepositoryV2) {
+        this.orderRepository = orderRepositoryV2;
+    }
+
+    public void orderItem(String itemId) {
+        orderRepository.save(itemId);
+    }
+}
+
+public class OrderRepositoryV2 {
+    public void save(String itemId) {
+        if(itemId.equals("ex")) {
+            throw new IllegalStateException("예외 발생!");
+        }
+        sleep(1000);
+    }
+
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
 
 
+/* ------------------------------------------------------------------------- */
 
+
+public class OrderControllerConcreteProxy extends OrderControllerV2 {
+    private final OrderControllerV2 controller;
+    private final LogTrace trace;
+
+    public OrderControllerConcreteProxy(OrderControllerV2 controller, LogTrace trace) {
+        super(null);
+        this.controller = controller;
+        this.trace = trace;
+    }
+
+    @Override
+    public String request(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin("OrderController.save()");
+            String request = controller.request(itemId);
+            trace.end(status);
+            return request;
+        } catch(Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public String noLog() {
+        return "ok";
+    }
+}
+
+
+public class OrderServiceConcreteProxy extends OrderServiceV2 {
+
+    private final OrderServiceV2 service;
+    private final LogTrace trace;
+    public OrderServiceConcreteProxy(OrderServiceV2 service, LogTrace trace) {
+        super(null);
+        this.service = service;
+        this.trace = trace;
+    }
+
+    @Override
+    public void orderItem(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin("OrderService.orderItem()");
+            service.orderItem(itemId);
+            trace.end(status);
+        } catch(Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
+}
+
+public class OrderRepositoryConcreteProxy extends OrderRepositoryV2 {
+    private final OrderRepositoryV2 repository;
+    private final LogTrace trace;
+
+    public OrderRepositoryConcreteProxy(OrderRepositoryV2 repository, LogTrace trace) {
+        this.repository = repository;
+        this.trace = trace;
+    }
+
+    @Override
+    public void save(String itemId) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin("OrderRepository.save()");
+            repository.save(itemId);
+            trace.end(status);
+        } catch(Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
+}
+
+/* ------------------------------------------------------------------------------------------ */
+
+@Configuration
+public class ConcreteProxyConfig {
+
+    @Bean
+    public OrderControllerV2 orderControllerV2(LogTrace logTrace) {
+        OrderControllerV2 orderControllerV2 = new OrderControllerV2(orderServiceV2(logTrace));
+        return new OrderControllerConcreteProxy(orderControllerV2, logTrace);
+    }
+
+    @Bean
+    public OrderServiceV2 orderServiceV2(LogTrace logTrace) {
+        OrderServiceV2 orderServiceV2 = new OrderServiceV2(orderRepositoryV2(logTrace));
+        return new OrderServiceConcreteProxy(orderServiceV2, logTrace);
+    }
+
+    @Bean
+    public OrderRepositoryV2 orderRepositoryV2(LogTrace logTrace) {
+        OrderRepositoryV2 orderRepositoryV2 = new OrderRepositoryV2();
+        return new OrderRepositoryConcreteProxy(orderRepositoryV2, logTrace);
+    }
+}
 ```
 
 
