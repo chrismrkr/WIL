@@ -616,6 +616,20 @@ public class ProxyPatternClient { /* 클라이언트 */
     }
 }
 
+
+
+publc class ProxyPatterntest {
+
+    @Test
+    void test() {
+        Subject cacheProxy = new CacheProxy(new RealSubject());
+        ProxyPatternClient client = new ProxyPatternClient(cacheProxy);
+        client.execute();
+    }
+
+}
+
+
 ```
 
 코드를 해석하면 프록시 서버의 target Value가 유효하거나 그렇지 않은 경우에 따라 클라이언트가 응답을 받는 곳은 다르다.
