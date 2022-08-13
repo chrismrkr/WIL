@@ -996,7 +996,7 @@ public class ConcreteProxyConfig {
 ```
 ***
 
-### 6. 
+### 6. 동적 프록시 기술
 
 
 
