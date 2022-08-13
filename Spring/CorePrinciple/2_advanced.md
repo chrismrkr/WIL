@@ -1052,9 +1052,38 @@ public class Hello {
 
 리플렉션 대신, 자바 언어에서 제공하는 JDK 동적 프록시 기술을 이용할 수 있다.
 
+아래와 같은 인터페이스와 클래스가 있다고 하자.
+
+```java
+public interface AInterface {
+    String call();
+}
+
+@Slf4j
+public class AImpl implements AInterface {
+    @Override
+    public String call() {
+        log.info("A 호출");
+        return "A";
+    }
+}
+
+public interface BInterface {
+    String call();
+}
+
+@Slf4j
+public class BImpl implements BInterface{
+    @Override
+    public String call() {
+        log.info("B 호출");
+        return "B";
+    }
+}
+
+```
 
 
 
 
-
-### 6.3 InvocateHandler 로그 추적기 적용
+#### 6.3 InvocateHandler 로그 추적기 적용
