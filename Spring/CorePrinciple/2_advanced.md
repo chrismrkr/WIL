@@ -1094,12 +1094,22 @@ public class InvocationHandlerImpl implements InvocationHandler {
         this.target = target;
     }
     
-    
-
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Object result = method.invoke(target, method);
+        return result;
+    }
 }
 
+@Slf4j
+public class JDKDynamicProxy {
 
-
+    @Test
+    void test() {
+    
+    
+    }
+}
 ```
 
 
