@@ -1102,17 +1102,52 @@ public class InvocationHandlerImpl implements InvocationHandler {
 }
 
 @Slf4j
-public class JDKDynamicProxy {
+public class JDKDynamicProxyTest {
 
     @Test
-    void test() {
+    void testA() {
+        AInterface targetA = new AImpl();
+        InvocationHanlder handlerA = new InvocationHandlerImpl(targetA);
+        AInterface proxyA = (AInterface) Proxy.newProxyInstance(AInterface.class.getClassLoader(), 
+                                                                new Class[]{AInterface.class},
+                                                                handlerA);
+        proxyA.call();                                         
+    }
     
-    
+    @Test
+    void testB() {
+        BInterface targetB = new BImpl();
+        InvocationHanlder handlerB = new InvocationHandlerImpl(targetB);
+        BInterface proxyB = (BInterface) Proxy.newProxyInstance(BInterface.class.getClassLoader(), 
+                                                                new Class[]{BInterface.class},
+                                                                handlerB);
+        proxyB.call();                                         
     }
 }
 ```
 
+AImpl.call()이 호출되는 과정은 아래와 같다.
 
++ 1. 동적 프록시를 적용할 핸들러를 만든다. -> new InvocationHandlerImpl(targetA)
++ 2. 핸들러를 주입해 동적 프록시를 생성한다.
++ 3. 동적 프록시를 통해 call()을 호출한다.
 
+다소 생소하지만, 동적 프록시를 생성해 호출하는 패턴에 익숙해지도록 하자.
 
 #### 6.3 InvocateHandler 로그 추적기 적용
+
+동적 프록시를 통해 5장 끝에서 제시한 해결방안을 구체화할 수 있다.
+
+```python
+로그_호출1()
+비즈니스_로직() # -> 이 부분을 동적 프록시를 통해 호출하도록 만들 수 있다!
+로그_호출2()
+
+```
+
+아래의 코드는 로그 추적기에 동적 프록시를 적용한 코드이다.
+
+```java
+
+
+```
