@@ -998,5 +998,54 @@ public class ConcreteProxyConfig {
 
 ### 6. 동적 프록시 기술
 
+5장의 마지막 부분에서 제시한 방법으로 문제를 해결할 수 있다. 이를 동적 프록시 기술이라고 한다.
+
+#### 6.1 리플렉션
+
+자바의 리플렉션부터 살펴보자. 리플렉션은 런타임에 클래스나 메소드의 정보를 바인딩하는 기술을 의미한다.
+
+```java
+public class Hello {
+   public String callA() {
+       log.info("callA");
+       return "A";
+   }
+
+   public String callB() {
+       log.info("callB");
+       return "B";
+   }
+}
+```
+
+만약 위와 같은 클래스가 있다고 하자. 만약, Hello 클래스의 메소드를 런타임에 동적으로 실행하려면 아래와 같이 할 수 있다.
+
+```java
+    private void dynamicCall(Method method, Object target) throws Exception {
+        log.info("start");
+        Object result = method.invoke(target);
+        log.info("end");
+    }
+
+    void reflection2() throws Exception {
+        Class classHello = Class.forName("hello.proxy.jdkdynamic.ReflectionTest$Hello");
+
+        Hello target = new Hello();
+
+        // callA 메서드 정보
+        Method methodCallA = classHello.getMethod("callA");
+        dynamicCall(methodCallA, target);
+
+        // callB 메서드 정보
+        Method methodCallB = classHello.getMethod("callB");
+        dynamicCall(methodCallB, target);
+    }
+```
 
 
+
+#### 6.2 JDK 동적 프록시: InvocateHandler 인터페이스
+
+
+
+### 6.3 InvocateHandler 로그 추적기 적용
