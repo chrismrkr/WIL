@@ -1048,7 +1048,7 @@ public class Hello {
 
 이는 프로그램할 때 큰 어려움을 초래할 수 있다. 
 
-#### 6.2 JDK 동적 프록시: InvocateHandler 인터페이스
+#### 6.2 JDK 동적 프록시: InvocationHandler 인터페이스
 
 리플렉션 대신, 자바 언어에서 제공하는 JDK 동적 프록시 기술을 이용할 수 있다.
 
@@ -1080,6 +1080,25 @@ public class BImpl implements BInterface{
         return "B";
     }
 }
+```
+
+각 클래스의 call()을 동적 프록시를 통해 호출할 수 있도록 테스트 코드를 아래와 같이 작성할 수 있다.
+
+```java
+@Slf4j
+public class InvocationHandlerImpl implements InvocationHandler {
+    
+    private final Object target;
+    
+    public InvocationHandlerImpl(Object target) {
+        this.target = target;
+    }
+    
+    
+
+}
+
+
 
 ```
 
