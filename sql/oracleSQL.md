@@ -106,8 +106,8 @@ SELECT department_id,
        sum(wage),
        sum(sum(wage)) over(partition by department_id),
        sum(sum(wage)) over(partition by job_id),
-       rank() over(order by sum(wage) partition by department_id),
-       rank() over(order by sum(wage) partition by job_id)
+       rank() over(partition by department_id order by sum(wage)),
+       rank() over(partition by job_id order by sum(wage))
 FROM ( SELECT nvl(department_id, 999) "DEPARTMENT_ID",
               job_id,
               sal + NVL(sal, 0) * commision_pct "WAGE"
