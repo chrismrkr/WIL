@@ -1225,3 +1225,30 @@ public class DynamicProxyFilterConfig {
 잘 해결했다. 그러나, target은 모두 인터페이스가 존재해야 한다. 
 
 즉, Controller, Service, 그리고 Repository 모두 인터페이스가 필요하다.
+
+CGLIB 오픈 소스를 이용하면 인터페이스 없이 구체 클래스만을 통해서 동적 프록시를 생성할 수 있다.
+
+```java
+@Slf4j
+public class CglibTest {
+    @Test
+    void cglib() {
+        ConcreteService target = new ConcreteService();
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(ConcreteService.class);
+        enhancer.setCallback(new TimeMethodInterceptor(target));
+        ConcreteService proxy = (ConcreteService) enhancer.create();
+
+        log.info("targetClass={}", target.getClass());
+        log.info("proxyClass={}", proxy.getClass());
+        proxy.call();
+    }
+}
+```
+
+InvocationHanlder와 CGLIB 모두 단점이 있다. 다음 장에서 이를 해결할 수 있는 스프링 프록시 팩토리에 대해서 알아보도록 한다.
+
+***
+
+### 7. 스프링에서 지원하는 프록시
