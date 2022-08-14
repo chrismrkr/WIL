@@ -1221,3 +1221,7 @@ public class DynamicProxyFilterConfig {
 }
 
 ```
+
+잘 해결했다. 그러나, target은 모두 인터페이스가 존재해야 한다. 
+
+즉, Controller, Service, 그리고 Repository 모두 인터페이스가 필요하다.
