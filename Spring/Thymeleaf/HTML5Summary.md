@@ -30,3 +30,55 @@
 
 브라우저는 속성을 통해 화면을 구성한다.
 
++ \<p id=".."> ... \<\p>: 특정 태그를 지칭할 때 사용한다.
++ \<p title="title 속성의 문자열">title 속성\</p>: 태그에 마우스를 올릴 때 표시할 문자열을 지정한다.
++ \<p class = "c1">c1 클래스 적용\</p>: 스타일 시트 속성을 태그에 적용한다
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>주요 속성들</title>
+    <style>
+      .c1 {
+          color : red;
+          background-color : black;
+      }
+    </style>
+</head>
+<body>
+  <p class = "c1">c1 클래스 적용</p>
+</body>
+</html>
+```
++ \<p style="color:red; background-color=black">문자열1\</p>: 스타일 시트 속성을 태그에 적용할 수 있는 다른 방법이다.
++ \<p align="..."> ... \</p>: ... 문자열을 left, center, 또는 right으로 정렬(align)한다.
+
+
+## 4. 문자열 꾸미기
+
++ \<b> ... \</b>: 굵게 
++ \<i> ... \</i>: 이탤릭
++ \<ins> ... \</ins>: 밑줄
++ \<del> ... \</del>: 삭제 문자열
++ <del>\<strike> ... \</del>: 삭제 문자열(HTML5에서는 지원하지 않음)</strike>
++ \<sup> ... \</sup>: 윗 첨자
++ \<sub> ... \</sub>: 아랫 첨자
++ \<small> ... \</small>: 작은 문자열
++ \<em> ... \</em>: 문자열 강조
++ \<mark> ... \</mark>: 표시 문자열     
++ \<strong> ... \</strong>: 강하게 표시하기
++ \<abbr> ... \</abbr>: 약어
++ \<p>\<dfn>특별한 문자열\</dfn>\</p>
++ \<blockquote>인용구\</blockquote>
++ \<p><q>인용구\</q>\</p>
++ \<cite>텍스트 인용구\</cite>
++ \<code> .. \</code>: 프로그램 코드
++ \<kbd> .. \</kdb>: 키보드 문자열
++ \<var> .. \</var>: 태그 안에서 변수를 작성할 때 사용
++ \<samp> .. \</samp>: 프로그램 코드에서 출력문
++ \<address> .. \</address>: 주소
+
++ \<div> ... \</div>: **HTML 문서 내에서의 영역**을 만들 때 사용한다.
++ \<span> ... \</span>: **문자열 내부의 영역**을 만들 때 사용한다.
+
