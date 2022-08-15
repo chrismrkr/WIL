@@ -57,6 +57,8 @@
 
 ## 4. 문자열 꾸미기
 
+외울 필요는 없고 문서 작성 시 참고하도록 하자.
+
 + \<b> ... \</b>: 굵게 
 + \<i> ... \</i>: 이탤릭
 + \<ins> ... \</ins>: 밑줄
@@ -81,4 +83,26 @@
 
 + \<div> ... \</div>: **HTML 문서 내에서의 영역**을 만들 때 사용한다.
 + \<span> ... \</span>: **문자열 내부의 영역**을 만들 때 사용한다.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>영역</title>
+<style>
+  .c1 {
+      color : red;
+      background-color : black;
+  }
+</style>
+</head>
+<body>
+  동해물과 백두산이 <div>마르고 닳도록</div> 하느님이 보우하사 우리나라 만세
+
+  <hr/>
+
+  동해물과 백두산이 <span class="c1">마르고 닳도록</span> 하느님이 보우하사 우리나라 만세
+</body>
+</html>
+```
 
