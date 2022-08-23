@@ -115,3 +115,50 @@
 브라우저, OS, 디바이스에 따라 필요한 메타 태그가 모두 다르다. 
 
 \<meta ... />로 작성된다. 다양한 것이 많으므로 필요할 때 구글링해서 쓰도록 하자.
+
+
+## 6. 이미지
+
+이미지 태그를 통해 HTML 화면에 이미지를 보여줄 수 있다.
+
++ \<src> ... \</src>: 이미지 파일 경로를 입력한다. width, height, border, align 옵션을 사용할 수 있다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image</title>
+</head>
+<body>
+    <img src="meme.jpg"/>
+    <hr/>
+
+    <img src="noexist.jpg" alt="존재하지 않는 이미지입니다."/>
+    <hr/>
+
+    <img src="meme.jpg" width="100" height="100"/>
+    <hr/>
+
+    <img src="meme.jpg" border="3"/>
+    <hr/>
+
+    <img src="meme.jpg" align="right"/>
+</body>
+</html>
+```
+
+
+## 7. 테이블
+
+HTML 문서에서 표를 만들 때 사용하는 태그이다.
+
+과거에는 전체 화면을 만들기 위해 사용하기도 했지만 이제는 순수하게 표를 만들 때만 사용한다.
+
+
+## 8. 리스트
+
+HTML 문서에서 리스트를 만들 때 사용하는 태그이다. 테이블을 생성하는 것과 유사하다.
+
+리스트는 주로 탭, 그리고 메뉴 등을 만들 때 사용한다.
+
