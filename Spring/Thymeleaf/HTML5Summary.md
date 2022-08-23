@@ -155,6 +155,129 @@ HTML 문서에서 표를 만들 때 사용하는 태그이다.
 
 과거에는 전체 화면을 만들기 위해 사용하기도 했지만 이제는 순수하게 표를 만들 때만 사용한다.
 
++ \<table> ... \</table>
++ \<tr> ... \</tr>
++ \<td> ... \</td>: colspan, rowspan 옵션을 사용할 수 있다.
+
+위와 같은 구조로 사용한다. 아래의 html 코드를 참고하자.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Table1</title>
+</head>
+<body>
+  <table border="1" style="width:200px">
+    <tr>
+      <td>1-1</td>
+      <td>1-2</td>
+      <td>1-3</td>
+    </tr>
+
+    <tr>
+      <td>2-1</td>
+      <td>2-2</td>
+      <td>2-3</td>
+    </tr>
+
+    <tr>
+      <td>3-1</td>
+      <td>3-2</td>
+    </tr>
+  </table>
+
+  <hr/>
+
+  <table border="1" style="width:200px">
+    <tr>
+      <th>칸1</th>
+      <th>칸2</th>
+    </tr>
+    <tr>
+      <td>1-1</td>
+      <td>2-1</td>
+    </tr>
+  </table>
+
+  <hr/>
+
+  <table border="1" style="width:200px" cellpadding="20" cellspacing="20"> <!-- padding 내부, spacing 외부-->
+    <tr>
+      <th>칸1</th>
+      <th>칸2</th>
+      <th>칸3</th>
+    </tr>
+    <tr>
+      <td>1-1</td>
+      <td>1-2</td>
+      <td>1-3</td>
+    </tr>
+    <tr>
+      <td>2-1</td>
+      <td>2-2</td>
+      <td>2-3</td>
+    </tr>
+  </table>
+
+  <hr/>
+
+  <table border="1" style="width:200px">
+    <tr>
+      <th>칸1</th>
+      <th>칸2</th>
+      <th>칸3</th>
+    </tr>
+    <tr>
+      <td>1-1</td>
+      <td>1-2</td>
+      <td>1-3</td>
+    </tr>
+    <tr>
+      <td colspan="2">2-1</td>
+      <td rowspan="2">2-2</td>
+    </tr>
+
+    <tr>
+      <td>3-1</td>
+      <td>3-2</td>
+    </tr>
+  </table>
+
+  <hr/>
+
+  <table border="1" style="width:200px">
+    <caption>table Title</caption>
+    <thead>
+      <tr>
+        <th>칸1</th>
+        <th>칸2</th>
+        <th>칸3</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+      <tr>
+        <td>1-1</td>
+        <td>1-2</td>
+        <td>1-3</td>
+      </tr>
+      <tr>
+        <td>2-1</td>
+        <td>2-2</td>
+        <td>2-3</td>
+      </tr>
+    <tfoot>
+      <tr>
+        <td colspan="3">footer</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</body>
+</html>
+```
+
 
 ## 8. 리스트
 
