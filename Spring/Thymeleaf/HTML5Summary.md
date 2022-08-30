@@ -285,10 +285,70 @@ HTML 문서에서 리스트를 만들 때 사용하는 태그이다. 테이블�
 
 리스트는 주로 탭, 그리고 메뉴 등을 만들 때 사용한다.
 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ul 태그의 type</title>
+</head>
+<body>
+  <ul type="circle">
+    <li>항목1</li>
+    <li>항목2</li>
+    <li>항목3</li>
+  </ul>
+
+  <hr/>
+
+  <ul type="disc">
+    <li>항목1</li>
+    <li>항목2</li>
+    <li>항목3</li>
+  </ul>
+
+  <hr/>
+  <ul type="square">
+    <li>항목1</li>
+    <li>항목2</li>
+    <li>항목3</li>
+  </ul>
+
+</body>
+</html>
+```
 
 ## 9. 링크
 
 클릭시 사용자가 다른 링크로 들어가 서버로부터 웹 페이지를 받을 수 있도록 한다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>link1</title>
+</head>
+<body>
+    </hr>
+    <a href="page1.html" target="_self">_self</a> <!-- 현재 창에서 page1.html로 리다이렉션 -->
+    </hr>
+    <a href="page1.html" target="_blank">_blank</a> <!-- 새로운 창으로 page1.html을 띄움 -->
+    <a href="#a1">a1으로 스크롤</a>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    <p id="a1">p태그 부분입니다.</p>
+</body>
+</html>
+```
 
 ## 10. 프레임
 
@@ -297,3 +357,60 @@ HTML 문서 안에 다른 HTML 문서를 포함하고 싶을 때 사용하는 �
 즉, HTML 문서를 함수화해서 사용하는 것과 유사하다.
 
 물론, 서버 쪽의 기능을 사용할 수 있지만 HTML 기능 중 iframe을 통해 사용할 수 있다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>frame1</title>
+</head>
+<body>
+  <h1>frame1.html입니다</h1>
+  <hr/>
+  <iframe src="page1.html"></iframe> <!-- page1.html을 해당 부분에 넣는다. -->
+  <hr/>
+  <h1>frame1.html입니다.</h1>
+</body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>page1</title>
+</head>
+<body>
+  <h1>page1.html입니다.</h1>
+</body>
+</html>
+```
+
+## 11. form
+
+HTML에서는 필요한 데이터를 사용자로부터 입력받을 수 있다. HTML은 입력받기 위한 화면요소만을 제공한다.
+
+데이터를 입력받은 후, 처리하는 것은 서버쪽 코드에서 담당한다.
+
+HTML에서 입력받을 수 있는 요소들이 무엇이 있는지 알아보도록 하자.
+(button, reset, submit)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>form2</title>
+</head>
+<body>
+  <form action="result.html" method="get">
+    <input type="text" name="a1" value="aaaa"><br/> <!-- method가 get인 경우는 쿼리 파라미터로 전달함. post인 경우는 body에 담아서 전달함. -->
+    <input type="text" name="a2" value="bbbb" placeholder="여기는 디폴트가 bbbb에요"><br/> 
+    <input type="text" name="a3" placeholder="여기는 최대 5글자만 가능해요" maxlength="5" style="width:500px"><br/>
+    <button type="submit">확인</button>
+  </form>
+</body>
+</html>
+```
