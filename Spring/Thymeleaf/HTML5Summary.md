@@ -410,6 +410,11 @@ HTML에서 입력받을 수 있는 요소들이 무엇이 있는지 알아보도
     <input type="text" name="a2" value="bbbb" placeholder="여기는 디폴트가 bbbb에요"><br/> 
     <input type="text" name="a3" placeholder="여기는 최대 5글자만 가능해요" maxlength="5" style="width:500px"><br/>
     <button type="submit">확인</button>
+    <!-- 아래와 같은 방식으로도 버튼을 생성할 수 있다. type="reset"은 입력창을 디폴트 값으로 초기화한다.
+    <input type="reset" value="reset type"/>
+    <input type="submit" value="submit value"/>
+    -->
+    
   </form>
 </body>
 </html>
