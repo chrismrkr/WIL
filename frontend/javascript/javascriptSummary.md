@@ -146,6 +146,17 @@ list.foreach( { ... } );
 
 하지만, JAVA의 다형성, 추상성 등의 객체지향적 특성과 비교했을 때 객체지향 언어라고 부르기 어렵다.
 
+최초의 자바스크립트는 객체(Object) 개념만 존재했다. Object는 아래와 같이 선언할 수 있다.
+
+```javascript
+var car = {
+  name: "G90",
+  price: 100
+  introduce: function() { console.log(this.name, this.price); 
+  };
+```
+
+그렇다면, 상속성은 어떻게 해결할 수 있었을까? __protype__을 이용했다.
 
 
 
