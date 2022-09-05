@@ -22,7 +22,7 @@ setTimeOut(()=>console.log('async call'), 2000);
 console.log('standard call')
 ```
 
-비록 순서는 asyn call, standard call이지만, 실제 결과는 standard call, async call 순서로 출력된다. 
+순서는 asyn call, standard call이지만, 실제로는 standard call, async call로 출력된다. 
 
 동작과정을 살펴보자.
 
