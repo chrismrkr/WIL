@@ -142,7 +142,7 @@ list.foreach( { ... } );
 
 ## 9. 객체와 클래스
 
-자바스크립트는 객체지향 언어라고 부르기 어려웠다. 물론, 지금은 클래스의 개념이 등장했고, 인터페이스의 개념이 typescript에서 등장했다.
+자바스크립트는 완벽히 객체지향 언어라고 부르기 어려웠다. 물론, 지금은 클래스의 개념이 등장했고, 인터페이스의 개념이 typescript에서 등장했다.
 
 하지만, JAVA의 다형성, 추상성 등의 객체지향적 특성과 비교했을 때 객체지향 언어라고 부르기 어렵다.
 
@@ -156,11 +156,69 @@ var car = {
   };
 ```
 
-그렇다면, 상속성은 어떻게 해결할 수 있었을까? __protype__을 이용했다.
+그렇다면, 상속성은 어떻게 해결할 수 있었을까? __proto__을 이용했다.
 
+```javascript
+car.__proto__ = vehicle
+```
 
+그래도 결과적으로 ES6+에서 클래스의 개념을 도입했다. 아래와 같은 형식으로 선언할 수 있다.
 
+```javascript
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+  
+  // Getter
+  get area() {
+    return this.calcArea();
+  }
+  
+  // Method
+  calcArea() {
+    return this.height * this.width;
+  }
+}
 
+const square = new Rectangle(10, 10);
+```
 
+## 10. 함수
 
+자바스크립트는 함수형 프로그래밍 언어의 특성이 짙다. **왜냐하면, 함수를 값으로써 사용할 수 있는 1급 객체 취급을 할 수 있기 때문이다.** 
+
+함수를 1급 객체로 사용할 수 있다는 특징은 CallBack 패턴으로 프로그래밍을 할 수 있도록 만들었다.
+
+이를 통해 함수형 프로그래밍의 특성을 잘 살릴 수 있었다.
+
+### 10.1 일반함수
+
+아래와 같은 형식으로 선언한다. 재사용이 가능하다.
+
+```javascript
+function func1() { ... };
+const func = func1();
+```
+
+### 10.2 익명함수
+
+아래와 같은 형식으로 선언한다. 재사용이 불가능하지만 함수 자체가 메모리를 차지하지 않는다는 장점이 있다.
+
+```javascript
+const func = function() { ... };
+```
+
+### 10.3 람다함수(화살표함수)
+
+익명함수와 기능은 같다. 아래와 같이 표현해 선언할 수 있다.
+
+```javascript
+const func = () => ...;
+```
+
+## 11. Callback 함수
+
+함수의 1급 객체 특성을 가장 잘 활용할 수 있는 함수형 프로그래밍의 패턴이다.
 
