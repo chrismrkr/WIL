@@ -146,6 +146,8 @@ list.foreach( { ... } );
 
 하지만, JAVA의 다형성, 추상성 등의 객체지향적 특성과 비교했을 때 객체지향 언어라고 부르기 어렵다.
 
+### 9.1 선언 방식
+
 최초의 자바스크립트는 객체(Object) 개념만 존재했다. Object는 아래와 같이 선언할 수 있다.
 
 ```javascript
@@ -156,13 +158,13 @@ var car = {
   };
 ```
 
-그렇다면, 상속성은 어떻게 해결할 수 있었을까? __proto__을 이용했다.
+그렇다면, 상속성은 어떻게 해결할 수 있었을까? 처음에는 __proto__을 이용했다. 
 
 ```javascript
 car.__proto__ = vehicle
 ```
 
-그래도 결과적으로 ES6+에서 클래스의 개념을 도입했다. 아래와 같은 형식으로 선언할 수 있다.
+그래도 결과적으로 ES6에서 클래스의 개념을 도입했다. 아래와 같은 형식으로 선언할 수 있다.
 
 ```javascript
 class Rectangle {
@@ -176,6 +178,14 @@ class Rectangle {
     return this.calcArea();
   }
   
+  get height() {
+    return this._height;
+  }
+  
+  get width() {
+    return this._width;
+  }
+  
   // Method
   calcArea() {
     return this.height * this.width;
@@ -184,6 +194,22 @@ class Rectangle {
 
 const square = new Rectangle(10, 10);
 ```
+
+필드 변수의 getter를 생성할 때는 this.\_필드변수 와 같은 형식으로 선언해야 한다.
+
+필드 변수를 this 객체를 통해 불러올 때, 묵시적으로 getter가 호출되므로 순환참조 문제가 발생할 수 있다.
+
+### 9.2 ES6+에서 추가된 기능
+
++ public 필드, private 필드 선언
+
+private 필드는 #const field = ... 와 같은 방식으로 선언할 수 있다.
+
++ class 상속
+
+Object에 대한 상속은 \_\_proto\_\_로 할 수 있었다. class는 Java와 동일하게 extend를 사용하면 된다.
+
+멤버함수 오버라이딩도 당연히 가능하다.
 
 ## 10. 함수
 
