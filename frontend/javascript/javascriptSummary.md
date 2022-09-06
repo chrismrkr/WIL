@@ -251,3 +251,31 @@ const func = () => ...;
 
 ## 12. 싱글톤 패턴
  
+싱글톤 패턴이란 특정 기능을 위해서 하나의 객체만을 생성해 사용하는 패턴을 의미한다. 
+
+Java에서는 static 변수 또는 스프링 빈으로 등록해 사용하는 방법이 있다.
+
+### 12.1 ES5에서 클로저를 활용한 구현
+
+```javascript
+const Singleton = (function() {
+    let instance;
+
+    function setInstance() {
+        instance = {
+            id : 1,
+            name : "hello"
+        };
+    }
+
+    return {
+        getInstance() {
+            if(!instance) {
+                setInstance();
+            }
+            return instance;
+        }
+    }
+})();
+```
+
