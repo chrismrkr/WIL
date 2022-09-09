@@ -380,7 +380,17 @@ Callback 함수는 비동기처리를 위해 사용된다. 비동기처리(CallB
 
 ### 11.1 Promise 객체
 
-Callback 함수 자체를 일급 객체화한다. 
+Promise 객체는 Callback 함수 자체를 1급 객체화 했다는 점에서 장점이 있다.
+
+Promise 객체는 아래와 같은 형식으로 선언할 수 있다.
+
+```javascript
+let Promise = new Promise(function(resolve, reject) {
+                ...
+              });
+```
+
+
 
 
 ## 12. 싱글톤 패턴
