@@ -380,7 +380,7 @@ Callback 함수는 비동기처리를 위해 사용된다. 비동기처리(CallB
 
 ### 11.1 Promise 객체
 
-Callback 함수 자체를 
+Callback 함수 자체를 일급 객체화한다. 
 
 
 ## 12. 싱글톤 패턴
