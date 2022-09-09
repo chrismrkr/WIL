@@ -353,6 +353,22 @@ outerFunc() 함수 내의 지역변수 x를 선언한 후, 내부적으로 inner
 
 #### 10.4.2 정보의 은닉
 
+클래스의 필드의 접근자인 private과 public과 같은 기능을 수행할 수 있도록 만들 수 있다.
+
+count를 증가시키고 감소하는 함수르 만들도록 하자. 이때, 현재 count가 얼마인지 필드에 직접 접근할 수 없어야 한다.
+
+```javascript
+function counter() {
+    let Count = 0;
+    this.increase = function () {
+        return ++Count;
+    }
+
+    this.decrease = function() {
+        return --Count;
+    }
+};
+```
 
 ## 11. Callback 함수
 
