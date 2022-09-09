@@ -244,9 +244,114 @@ const func = function() { ... };
 const func = () => ...;
 ```
 
-### 10.4 클로저 함수
+### 10.4 클로저(Closure) 패턴
 
-클로저 함수는 함수 내의 정보(변수)를 은닉화한다는 것이 장점이다.
+자바스크립트와 같은 합수형 프로그래밍 언어에서 중요하게 등장하는 개념이다.
+
+아래의 코드를 예시로 살펴보자.
+
+```javascript
+function outerFunc() {
+    let x = 10;
+    let innerFunc = function() {
+        console.log(x);
+    }
+    innerFunc();
+}
+
+outerFunc();
+```
+
+outerFunc() 함수 내의 지역변수 x를 선언한 후, 내부적으로 innerFunc()를 정의한 후 outerFunc의 변수 x를 사용하고 있다. 
+
+클로저의 정의는,
+
+**A closure is the combination of a function and the lexical environment within which that function was declared.**
+
+클로저는 정의할 함수의 lexical environment와 정의하는 함수의 조합이다. 라는 뜻이다.
+
+여기서 정의하는 함수는 내부함수 innerFunc()를 의미하고, lexical environment는 outerFunc()를 의미한다.
+
+위의 코드를 참고하면 어느정도 납득할 수 있다. 그렇다면 클로저는 어떻게 사용될까?
+
+
+#### 10.4.1 상태기억
+
+버튼을 클릭하는 횟수만큼 화면에 클릭 회수를 출력하는 화면을 만든다고 가정하자.
+
+그렇다면, 이전에 몇번 클릭되었는지에 대한 정보를 기억해야 한다. (상태기억 필요)
+
+아래의 코드를 확인하고, 결과가 어떻게 될지 예상해보자.
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>지역 변수를 사용한 Counting</h1>
+
+<button id="increase">+</button>
+<p id="count">0</p>
+<script>
+  var increaseBtn = document.getElementById('increase');
+  var count = document.getElementById('count');
+
+  function increase() {
+    // 카운트 상태를 유지하기 위한 지역 변수
+    var counter = 0;
+    return ++counter;
+  }
+
+  increaseBtn.onclick = function () {
+    count.innerHTML = increase();
+  };
+  
+</script>
+</body>
+</html>
+```
+
+결과는 클릭을 여러 번해도 항상 1이 표시된다. 왜냐하면, increase() 함수 내에서만 counter가 유효하기 때문이다. 
+
+물론, 전역 변수를 이용해서도 원하는 기능을 구현할 수 있지만 바람직하지 않다.
+
+클로저를 이용해 코드를 수정하도록 하자.
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>지역 변수를 사용한 Counting</h1>
+
+<button id="increase">+</button>
+<p id="count">0</p>
+<script>
+  var increaseBtn = document.getElementById('increase');
+  var count = document.getElementById('count');
+
+  let countFunc = (function() {
+    // 카운트 상태를 유지하기 위한 지역 변수
+    var counter = 0;
+    return {
+      increase() {
+        counter++;
+        return counter;
+      }
+    }
+  })();
+
+  increaseBtn.onclick = function () {
+    count.innerHTML = countFunc.increase();
+  };
+</script>
+</body>
+</html>
+```
+
+이처럼, 렉시컬 환경을 공유하는 클로저를 만들어 사용한다면, 의도치 않은 변경을 방지할 수 있으므로 바람직한 프로그래밍이 된다. 
+
+#### 10.4.2 정보의 은닉
 
 
 ## 11. Callback 함수
@@ -283,4 +388,3 @@ const Singleton = (function() {
     }
 })();
 ```
-
