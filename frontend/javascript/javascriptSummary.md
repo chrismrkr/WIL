@@ -390,6 +390,16 @@ let Promise = new Promise(function(resolve, reject) {
               });
 ```
 
+Promise 객체는 resolve 또는 reject 함수 실행 시, 항상 Promise 객체를 반환한다.
+
+반환되는 Promise 객체는 3가지 상태(대기, 이행, 거부)를 갖는다.
+
+대기 상태란 Callback Queue에 저장된 상태를 의미한다.
+
+Callback Queue에서 pop되어 실행되면, 이행 또는 거부 상태가 된다.
+
+이행 상태의 경우 resolve 함수를 실행하고, 거부 상태의 경우 reject 함수를 실행한다.
+
 
 
 
