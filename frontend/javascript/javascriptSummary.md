@@ -394,11 +394,59 @@ Promise 객체는 resolve 또는 reject 함수 실행 시, 항상 Promise 객체
 
 반환되는 Promise 객체는 3가지 상태(대기, 이행, 거부)를 갖는다.
 
-대기 상태란 Callback Queue에 저장된 상태를 의미한다.
+대기 상태란 Callback Queue에 저장된 상태를 의미한다. 
 
 Callback Queue에서 pop되어 실행되면, 이행 또는 거부 상태가 된다.
 
-이행 상태의 경우 resolve 함수를 실행하고, 거부 상태의 경우 reject 함수를 실행한다.
+이행 상태의 경우 resolve 함수를 then을 통해 실행하고, 거부 상태의 경우 reject 함수를 catch를 통해 실행한다.
+
+
+then과 catch 모두 새로운 Promise 객체를 반환하므로, 다음 비동기 처리를 진행할 수 있다.
+
+즉, then과 catch의 매개 변수와 반환 값은 모두 Promise 객체이다.
+
+(catch는 Promise 객체 chain에 대해서 한번만 적용하면 거부 상태를 잡아낼 수 있다.)
+
+번외로 finally는 이행, 거절 상태와 관계없이 Promise 객체가 반환될 때 마다 항상 실행되도록 만들 수 있다.
+
+아래의 코드를 확인하며 Promise 패턴에 익숙해지도록 하자.
+
+```javascript
+
+// 1. Promise 처리
+
+const firstPromise = new Promise(function(resolve, reject) {
+    resolve("success");
+    reject("error")
+})
+
+const tmp1 = firstPromise.then(function(value) {
+    console.log(value);
+})
+
+// 2. Promise Chaining 처리
+// n초 씩 기다린 후, 특정 텍스트를 출력하는 비동기처리 코드를 작성하시오.
+
+function time(sec) {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve("I'm waited");
+        }, sec*1000);
+    });
+};
+
+time(0.5).then(function(value){
+    console.log(value);
+    return time(0.5);
+}).then(function(value) {
+    console.log(value);
+    return time(0.5);
+});
+
+
+```
+
+
 
 
 
