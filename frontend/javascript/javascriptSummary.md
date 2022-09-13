@@ -446,8 +446,10 @@ time(0.5).then(function(value){
 
 ```
 
+### 11.2 Promise All
 
 
+### 11.3 async, await
 
 
 
