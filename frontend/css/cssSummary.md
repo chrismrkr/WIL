@@ -6,9 +6,11 @@ CSS를 적용하는 방법은 외부, 내부, 인라인 스타일 시트 3가지
 
 주로 외부 스타일 시트 방식을 사용한다. 가급적 이 방식을 채택하도록 하자.
 
-```css
+```html
 /* 외부 스타일 시트 방식 */
-<link rel="stylesheet" type="text/css" href="mystyle.css">
+<head>
+  <link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
 ```
 
 ## 1. 기본적인 적용 방법
