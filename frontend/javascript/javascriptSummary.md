@@ -457,8 +457,24 @@ Promise 객체를 이용해 비동기처리를 실시한다고 가정하자.
 
 또한, 계속해서 Promise 객체를 사용해야 한다는 문제가 있다. 그래서 등장한 것이 async, await이다.
 
-REST API를 호출해서 
+postId를 요청 파라미터로 GET REST API를 호출해서 name을 가져오는 예시를 보자. 
 
+fetch는 항상 Promise 객체로 반환한다.
+
+```javascript
+function fetchAuthorName(postId) {
+  return fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+    .then((response) => response.json())
+    .then((post) => post.userId)
+    .then((userId) => {
+      return fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
+        .then((response) => response.json())
+        .then((user) => user.name);
+    });
+}
+
+fetchAuthorName(1).then((name) => console.log("name:", name));
+```
 
 
 ## 12. 싱글톤 패턴
