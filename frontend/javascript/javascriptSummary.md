@@ -390,20 +390,21 @@ let Promise = new Promise(function(resolve, reject) {
               });
 ```
 
-Promise 객체는 resolve 또는 reject 함수 실행 시, 항상 Promise 객체를 반환한다.
+Promise 객체는 크게 2가지 특징이 있다.
 
-반환되는 Promise 객체는 3가지 상태(대기, 이행, 거부)를 갖는다.
-
-대기 상태란 Callback Queue에 저장된 상태를 의미한다. 
-
-Callback Queue에서 pop되어 실행되면, 이행 또는 거부 상태가 된다.
++ State: Pending, fulfilled(resolve), rejected(reject)
 
 이행 상태의 경우 resolve 함수를 then을 통해 실행하고, 거부 상태의 경우 reject 함수를 catch를 통해 실행한다.
 
++ Producer, Consumer:
 
-then과 catch 모두 새로운 Promise 객체를 반환하므로, 다음 비동기 처리를 진행할 수 있다.
+new Promise((resolve, reject) => { ... } ) 를 통해 Promise 객체를 Produce한다.
 
-즉, then과 catch의 매개 변수와 반환 값은 모두 Promise 객체이다.
+그리고 then, catch, finally절에서 produce한 Promise를 Consume한다.
+
+**then에서는 Promise 객체를 반환하거나, 값을 바로 사용할 수 있다.** 
+
+**물론, Promise 객체를 매개변수로 전달받더라도 값으로 자동으로 값으로 꺼내서 사용할 수 있다.**
 
 (catch는 Promise 객체 chain에 대해서 한번만 적용하면 거부 상태를 잡아낼 수 있다.)
 
@@ -413,37 +414,37 @@ then과 catch 모두 새로운 Promise 객체를 반환하므로, 다음 비동�
 
 ```javascript
 
-// 1. Promise 처리
+// ex1. 숫자 1을 x2 => x3 => -1 => 콘솔 출력하는 비동기 코드를 작성하자
+// 1. create producer
+const producer = new Promise((resolve, reject) => {
+        resolve(1);
+       };
 
-const firstPromise = new Promise(function(resolve, reject) {
-    resolve("success");
-    reject("error")
-})
+// 2. consume
+produce.then(num => num*2).then(num => num*3).then(num => num-1).then(console.log(num));
 
-const tmp1 = firstPromise.then(function(value) {
-    console.log(value);
-})
-
-// 2. Promise Chaining 처리
-// n초 씩 기다린 후, 특정 텍스트를 출력하는 비동기처리 코드를 작성하시오.
-
-function time(sec) {
-    return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-            resolve("I'm waited");
-        }, sec*1000);
-    });
-};
-
-time(0.5).then(function(value){
-    console.log(value);
-    return time(0.5);
-}).then(function(value) {
-    console.log(value);
-    return time(0.5);
+// ex1을 아래와 같이도 작성할 수 있다. 람다식이 익숙하지 않다면 아래가 더 편할 수 있다.
+const fetchNumber = new Promise((resolve, reject) => {
+    setTimeout(resolve(1), 1000);
 });
 
-
+fetchNumber
+.then(function(num) {
+    return new Promise((resolve, reject) => {
+        resolve(num*2);
+    });
+})
+.then(function(num) {
+    return new Promise((resolve, reject) => {
+        resolve(num*3);
+    })
+})
+.then(function(num) {
+    return new Promise((resolve, reject) => {
+        resolve(num-1)
+    })
+})
+.then(num => console.log(num));
 ```
 
 ### 11.2 Promise All
