@@ -27,7 +27,7 @@ Active Directory(이하 AD)란 MS가 윈도우 환경에서 사용하기 위해 
 
 ## 2. Object
 
-Object는 도메인 내의 사용자(User)와 컴퓨터을 지칭한다.
+Object는 도메인 내의 사용자(User)와 컴퓨터을이 사용하는 개체이다.
 
 그러므로, Object를 관리한다는 것은 사용자 계정을 관리하거나, 컴퓨터를 관리한다는 것과 같은 의미이다.
 
@@ -40,11 +40,15 @@ Object는 도메인 내의 사용자(User)와 컴퓨터을 지칭한다.
 
 Type은 Distribution과 Security 그룹이 존재한다.
 
+Distribution은 이메일 배포 목적으로 사용한다.
+
+Security는 특정 Object에 대한 접근 권한, 또는 사용 권한을 부여하는 group이다.
+
 #### 2. Scope
 
-+ 1. Univeral: 같은 도메인 트리나 포레스트에 존재하는 모든 그룹 및 Object를 포함할 수 있다. 
-+ 2. Global: 같은 도메인에 존재하는 모든 Group 및 Object를 포함할 수 있다.
-+ 3. Domain Local: Server 도메인의 다른 Group과 Object를 포함할 수 있다.
++ 1. Univeral: 같은 도메인 트리나 포레스트에 존재하는 모든 그룹을 포함할 수 있다. **동일 포리스트 자원에 대해서 모두 접근 권한을 부여할 수 있다.**
++ 2. Global: 같은 도메인에 존재하는 모든 Group을 포함할 수 있다. **동일 포리스트 자원에 대해서 모두 접근 권한을 부여할 수 있다.**
++ 3. Domain Local: 같은 도메인과 동일 포리스트의의 다른 Group을 포함할 수 있다. **로컬 자원에 대해서만 접근 권한을 부여할 수 있다.** 
 
 ***
 
@@ -56,6 +60,8 @@ OU란 Object를 하나로 묶어 관리하기 위한 개념이다.
 
 
 ### Group vs OU
+
+전자는 사용자를 묶는 개념이고, 후자는 Object를 묶는 개념이다.
 
 ***
 
