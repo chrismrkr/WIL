@@ -328,4 +328,37 @@ input 이외의 다양한 태그를 제시한다.
 
 #### 3.4.1 여러줄을 한번에 입력받는 태그
 
-\<textarea>라는 입력 태그가 있다. 
+\<textarea>라는 입력 태그가 있다. \<input> 태그와 달리 여러 줄을 한번에 입력받기 위한 태그이다.
+
+rows 속성을 통해 입력받을 줄을 설정하고, cols 속성을 통해 몇글자를 입력받을지 결정한다. cols의 단위는 바이트이다.
+
+#### 3.4.2 드롭다운 목록을 만드는 태그
+
+아래와 같은 HTML 태그를 통해 드롭다운 목록을 만들 수 있다.
+
+```html
+<select>
+  <option value="값1" selected>내용1</option>
+  <option value="값2">내용2</option>
+</select>
+```
+
+value 속성은 드롭박스로 선택되었을 때, 서버 프로그램으로 전달되는 값이다.
+
+selected 속성은 드롭박스에 기본적으로 어떤 것이 선택되었는지 만들도록 하는 속성이다.
+
+#### 3.4.3 데이터 목록을 만들어주는 \<datalist>, \<option> 태그
+
+필드에 값을 직접 입력하지 않고 미리 저장된 값을 목록에서 불러오기 위해 사용하는 기능이다.
+
+```html
+<label for="prod2">포장 여부</label>
+<input type="text" id="prod2" list="pack">
+<datalist id="pack>
+              <option value="package">선물포장</option>
+              <option value="no_package">선물포장 안함</option>
+</datalist>
+```
+
+***
+***
