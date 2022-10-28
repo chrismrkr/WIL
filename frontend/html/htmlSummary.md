@@ -256,7 +256,7 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 
 #### 3.1.3 폼 요소를 그룹으로 묶는 태그
 
-\<fieldset> 태그를 통해 하나의 폼을 여러개로 나누어 표현할 수 있다.
+\<fieldset> 태그를 통해 하나의 폼을 여러개로 나누어 **표현**할 수 있다.
 
 \<legend> 태그를 통해 \<fieldset> 태그로 묶인 그룹의 제목을 지정할 수 있다. 입력 방식은 아래와 같다.
 
@@ -264,9 +264,12 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 <form action="...">
   <fieldset>
     <legend>상품 선택</legend>
+    <label for="item_id">상품</label>
+    <input type="text" id="item_id">
   </fieldset>
   <fieldset>
     <legend>그룹 이름</legend>
+    ...
   </fieldset>
 </form>
 ```
@@ -280,6 +283,8 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 <input type="text" id="user_id">
 ```
 
+입력 폼을 작성할 때는 이런식으로 만들자.
+
 ***
 
 ### 3.2 사용자 입력을 위한 input 태그
@@ -291,3 +296,36 @@ type 속성을 이용해서 어떻게, 무엇을 input으로 받을지를 결정
 
 ***
 
+### 3.3 input 태그의 주요 속성
+
+\<input> 태그는 여러개의 type 속성이 있고, 그 이외에 주요한 속성을 알아보도록 한다. 
+
+#### 3.3.1 autofocus
+
+페이지가 불릴 때, 자동으로 해당 input으로 커서를 이동하도록 한다. 
+
+```html
+<input type="text" autofocus>
+```
+
+#### 3.3.2 placeholder
+
+힌트를 표시해주는 속성이다. 
+
+#### 3.3.3 readonly
+
+input 필드를 읽기 전용으로 만들어 사용자는 입력할 수 없다.(왜 있는걸까..)
+
+#### 3.3.4 required 
+
+필수 입력 값을 지정한다. 입력하지 않으면 브라우저가 자체적으로 오류를 띄운다.
+
+****
+
+### 3.4 폼에서 사용하는 여러가지 태그
+
+input 이외의 다양한 태그를 제시한다.
+
+#### 3.4.1 여러줄을 한번에 입력받는 태그
+
+\<textarea>라는 입력 태그가 있다. 
