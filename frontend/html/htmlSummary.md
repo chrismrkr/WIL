@@ -279,3 +279,15 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 <label for="user_id">아이디</label>
 <input type="text" id="user_id">
 ```
+
+***
+
+### 3.2 사용자 입력을 위한 input 태그
+
+사용자에게 입력을 받을 때, \<input> 태그를 사용한다.
+
+type 속성을 이용해서 어떻게, 무엇을 input으로 받을지를 결정한다. 다양한 type이 있으므로 필요할 때마다 찾아서 쓰도록 하자.
+
+
+***
+
