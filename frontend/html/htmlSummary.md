@@ -238,9 +238,37 @@ HTML 코드의 가독성을 높이기 위해 사용된다.
 
 ### 3.1 폼 삽입하기
 
+#### 3.1.1 기본양식
+
 폼을 생성하는 양식은 아래와 같다.
 
 ```html
 <form [속성="속성값"]>여러 폼 요소</form>
 ```
 
+태그의 속성은 method, action, name, target이 있다. 주로 사용하는 것은 method와 action이다.
+
+method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS 서버 프로그램을 실행시킨다.
+
+##### 3.1.2 자동 완성 속성
+
+폼에 autocomplete 속성을 통해 자동완성 기능을 통제할 수 있다.
+
+#### 3.1.3 폼 요소를 그룹으로 묶는 태그
+
+\<fieldset> 태그를 통해 하나의 폼을 여러개로 나누어 표현할 수 있다.
+
+\<legend> 태그를 통해 \<fieldset> 태그로 묶인 그룹의 제목을 지정할 수 있다. 입력 방식은 아래와 같다.
+
+```html
+<form action="...">
+  <fieldset>
+    <legend>상품 선택</legend>
+  </fieldset>
+  <fieldset>
+    <legend>그룹 이름</legend>
+  </fieldset>
+</form>
+```
+
+#### 3.1.4 폼 요소에 레이블을 붙이는 태그
