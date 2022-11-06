@@ -166,3 +166,45 @@ px 또는 pt로 크기를 조절할 수 있다.
   color: <색상>;
 ```
 
+색상을 표현하는 방법은 16진수, hsl(hsla), 영문, rgb(rgba) 4가지가 있다.
+
+#### 2.3.2 텍스트 정렬 속성
+
+아래의 방법으로 텍스트를 정렬할 수 있다.
+
+```css
+  text-align: [start | end | center | justify];
+```
+
+#### 2.3.3 줄 간격 조정 속성
+
+아래의 방법으로 줄 간격을 조정할 수 있다. 일반적으로 font-size 속성에 맞추어 조정한다.
+
+```css
+  line-height: [px | ..%];
+```
+
+#### 2.3.4 text decoration
+
+텍스트에 밑줄을 긋거나 취소선을 표시하는 속성이다.
+
+```css
+  text-decoration: [none | underline | overline | linethrough ];
+```
+
+#### 2.3.5 대소문자 변환 속성
+
+아래의 방법으로 영문자의 대소문자를 조정할 수 있다.
+
+```css
+  text-transform: [capitalize | uppercase | lowercase];
+```
+
+***
+
+### 2.4 목록 스타일
+
+
+***
+
+### 2.5 표 스타일
