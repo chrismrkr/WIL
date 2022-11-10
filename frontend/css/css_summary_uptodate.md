@@ -548,9 +548,28 @@ a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a
 + :link; 방문하지 않은 링크에 스타일 적용
 + :visited; 방문한 링크에 스타일 적용
 + :hover; 마우스 포인터를 올려놓으면 스타일 적용
-+ :active; 웹 요소를 활성화 했을 때 스타일 적용
++ :active; 웹 요소를 활성화 했을 때 스타일 적용(ex. 클릭)
 + :focus; 웹 요소에 초점이 맞추어져 있을 때 스타일 적용
 
 **link -> visited -> hover -> active 순서로 적용하지 않으면 제대로 작동하지 않음에 주의하자!**
 (LoVe HAte로 외우자)
 
+#### 5.3.2 요소 상태에 따른 가상 클래스
+
+요소의 상태에 따라 스타일을 달리 적용할 수 있다.
+
+```html
+<style>
+  #intro:target {
+    color: #fff;
+  }
+</style>
+
+<ul>
+  <li><a href=#intro>Anchor</a></li>
+</ul>
+
+<div id=#intro>
+  ...
+</div>
+```
