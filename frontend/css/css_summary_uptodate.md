@@ -363,4 +363,3 @@ top, right, bottom, left 속성은 마찬가지로 픽셀(px)로 조정하면 �
 + absolute: relative 속성을 사용한 가장 가까운 부모를 기준으로 위치를 조정한다.
 + fixed: 브라우저 창을 기준으로 위치를 고정함.
 
-
