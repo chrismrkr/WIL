@@ -363,3 +363,79 @@ top, right, bottom, left 속성은 마찬가지로 픽셀(px)로 조정하면 �
 + absolute: relative 속성을 사용한 가장 가까운 부모를 기준으로 위치를 조정한다.
 + fixed: 브라우저 창을 기준으로 위치를 고정함.
 
+***
+***
+
+## 4. 이미지와 그라데이션 효과로 배경 꾸미기
+
+웹 페이지의 배경화면을 꾸미는 것에 대해서 배워보도록 한다.
+
+### 4.1 배경색 배경범위 지정
+
+배경색은 background-color 속성을 이용해서 적용하면 된다.
+
+배경범위는 background-clip 속성을 이용해서 적용하면 된다. 배경범위는 3가지가 있다.
+
++ border-box: 외곽 테두리까지 적용
++ padding-box: 패딩 범위까지 적용
++ content-box: 패딩을 제외한 컨텐츠 영역에만 적용
+
+***
+
+### 4.2 배경 이미지 지정하기
+
+배경 이미지를 불러오고, 배경 이미지를 반복하거나 위치를 조정하는 등 여러 속성이 있다. 하나씩 살펴보도록 하자.
+
+#### 4.2.1 background-image: 배경 이미지 삽입
+```css
+background-image: url(...);
+```
+
+#### 4.2.2 background-repeat: 배경 이미지 반복
+
+```css
+background-repeat: repeat; /* repeat, repeat-x, repeat-y 존재 */
+```
+#### 4.2.3 background-position: 배경 이미지 위치 조절
+
+이미지의 수평 또는 수직 위치를 지정한다. 
+
+left(top), center, right(bottom), <백분율>, <길이 값>으로 지정할 수 있다.
+```css
+background-position: <수평위치> <수직위치>;
+```
+
+#### 4.2.4 background-origin: 배경 이미지 적용 범위 조정
+
+centent-box, border-box, padding-box 총 3가지가 있다.
+
+#### 4.2.5 background-attachment: 배경 이미지 고정
+
+scroll, fixed 두가지 속성이 있다. 전자는 이미지가 함께 스크롤되고, 후자는 이미지는 고정된다.
+
+#### 4.2.6 background-size: 배경 이미지 크기 조절
+
+배경 이미지가 필요보다 작거나 클 경우 조절할 수 있다.
+
+auto, contain, cover, <크기>, <백분율> 총 5가지 방법이 있다.
+
+contain은 요소 안에 배경 이미지가 다 들어오도록 하고, cover는 배경 이미지로 요소를 모두 덮도록 한다.
+
+***
+
+### 4.3 그라데이션 효과로 배경 꾸미기
+
+...
+
+***
+***
+
+## 5. CSS 고급 선택자
+
+
+
+
+
+
+
+
