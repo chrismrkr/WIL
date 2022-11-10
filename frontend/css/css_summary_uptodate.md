@@ -558,6 +558,7 @@ a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a
 
 요소의 상태에 따라 스타일을 달리 적용할 수 있다.
 
+아래 예제는 Anchor 기능을 통해 웹 페이지의 다른 위치로 이동하기 수월하게 만드는 방법이다.
 ```html
 <style>
   #intro:target {
@@ -569,7 +570,17 @@ a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a
   <li><a href=#intro>Anchor</a></li>
 </ul>
 
-<div id=#intro>
+<div id="intro">
   ...
 </div>
 ```
+
+이것 뿐만 아니라, 가상 요소와 클래스는 다양하므로 잘 찾아서 쓰자.
+
+***
+***
+
+## 6. 트랜지션과 애니메이션
+
+
+
