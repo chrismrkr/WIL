@@ -582,5 +582,129 @@ a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a
 
 ## 6. 트랜지션과 애니메이션
 
+CSS는 웹 요소에 시각적인 효과를 추가하는 기능이었다.
+
+애니메이션 동작을 통해 자바스크립트 없이도 웹 사이트의 메뉴를 부드럽게 열고, 또 웹 요소를 움직일 수 있다.
+
+### 6.1 이미지 변형
+
+먼저 이미지를 변형하는 방법부터 알아보도록 하자.
+
+이미지를 변형하기 위한 기본 문법 형태는 아래와 같다.
+
+```css
+  .photo { transform: 함수(...); }
+```
+
+transform에 사용할 수 있는 함수를 아래와 같이 정리할 수 있다.
+
++ 이미지 2차원 이동: translate(x, y)
++ 이미지 3차원 이동: translate3d(x, y, z)
++ 이미지 2차원 확대: scale(x, y)
++ 이미지 3차원 확대: scale(x, y, z)
++ 이미지 2차원 왜곡: skew(ax, ay)
++ 이미지 2차원 회전: rotate(각도)
++ 이미지 3차원 회전: rotate3d(x벡터, y벡터, z벡터, 각도)
+
+***
+
+### 6.2 트랜지션 알아보기
+
+트랜지션에서는 스타일이 바뀌는 시간을 조절해서 자바스크립트없이 애니메이션 효과를 낼 수 있다.
+
+트랜지션 속성에 대해서 먼저 살펴보자.
+
++ transition-properties: 트랜지션 대상을 설정한다.
++ transition-duration: 트랜지션 실행시간을 설정한다.
++ transition-timing-function: 트랜지션 실행형태를 지정한다.(실행시간 곡선을 설정함)
++ transition-delay: 트랜지션 지연시간을 설정한다.
++ transition: 한꺼번에 설정한다.
+
+트랜지션 대상의 속성이 여러개라면 실행시간도 여러개일 수 있다.
+
+***
+
+
+### 6.3 애니메이션 알아보기
+
+애니메이션은 먼저 #keyframes로 특정 애니메이션을 정의하고, animation-name을 통해 애니메이션을 적용한다.
+
+아래의 예시를 통해 확인해보자.
+
+```css
+@keyframes shape {
+  from {
+    border: 1px solid transparent;
+  }
+  to {
+    border: 1px solid #000;
+    border-radius: 50%;
+  }
+}
+
+#box1 {
+  border: 1px solid transparent;
+  animation-name: shape;
+  animation-duration: 3s;
+}
+```
+
+keyframes를 통해 애니메이션을 정의하고, animation-name으로 적용한다. 
+
+animiation-name 뿐만 아니라 다른 속성은 아래와 같다.
+
++ animation-direction: from -> to로 진행하는데 진행방향을 바꾼다.
++ animation-iteration-count: 반복 횟수를 지정한다.(infinite도 가능)
++ animation-timing-function: 시간 곡선 조절
+
+***
+***
+
+## 7. 반응형 웹과 미디어 쿼리
+
+사용자 접속 환경에 맞추어 사이트의 레이아웃으 자연스럽게 바꿔서 보여주는 것을 반응형 웹 디자인이라고 한다. 
+
+이것에 대해서 알아보자
+
+### 7.1 반응형 웹 알아보기
+
+다양한 화면 크기에 맞게 웹 문서를 표현하는 것이 반응형 웹 디자인이다.
+
+이를 위해서 **뷰포트**라는 것에 대해서 알아보자.
+
+뷰포트란 디바이스 화면에서 실제로 표시되는 영역을 의미한다. 
+
+웹키트를 기반으로 한 모바일 브라우저(ex. 사파리, 크롬, 엣지 등등)은 기본 뷰포트가 980px이다.
+
+그러므로, 스마트폰 뷰포트가 320px 기준으로 개발하면 너비가 맞지 않는다. 그러므로, 뷰 포트를 커스터마이징 해야한다.
+
+기본형은 아래와 같다.
+
+```html
+ <meta name="viewport" content= "속성1=값1, 속성2=값2, ...">
+```
+
+뷰포트의 속성은 아래와 같다.
++ width: device-width 또는 vw 단위 사용
++ height: device-height 또는 vh 단위 사용
++ user-scalable(확대, 축소 가능여부): yes 또는 no
++ initial-scale(초기 확대, 축소 값): 1~10
+
+***
+
+### 7.2 미디어 쿼리
+
+미디어 쿼리란 기기의 **해상도에 따라 서로 다른 스타일 시트를 적용**하는 것을 의미한다.
+
+미디어 쿼리의 기본형은 아래와 같다.
+
+```css
+@media [only | not] 미디어_유형 [and 조건]* 
+```
+
+
+
+
+
 
 
