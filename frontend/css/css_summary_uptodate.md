@@ -702,6 +702,36 @@ animiation-name 뿐만 아니라 다른 속성은 아래와 같다.
 @media [only | not] 미디어_유형 [and 조건]* 
 ```
 
+예를 들어, 아래와 같이 미디어 쿼리를 작성한다.
+
+```css
+@media screen and (min-device-width: 375px) and (min-device-height: 812px) {
+  ...
+}
+
+@media screen and (min-device-width: 812px) and (orientation: landscape) {
+  ...
+}
+```
+
+아이폰 10S의 경우, 너비는 375px, 높이는 812px이다. 세로모드와 가로모드일 때, 화면 스타일을 달리해야 한다.
+
+위와 같이 미디어 쿼리로 구분하여 스타일을 적용할 수 있다.
+
+미디어_유형과 and 조건에 들어갈 수 있는 속성은 다양하게 존재한다. 알아서 확인해서 쓰자.
+
+외부에서 css를 작성한 후, 아래와 같이 미디어 쿼리를 사용해서 적용할 수 있다.
+
+```css
+<link rel="stylesheet" media="미디어 쿼리" href="css 파일 경로">
+@import url("css/table.css") only screen and (mid-width: 321px) and (max-width: 768px);
+```
+
+가급적이면 <link ... >를 쓰자. IE에서는 @import 보다 javascript를 먼저 받기 때문에 에러가 날 수 있다. 
+
+***
+
+### 7.3 그리드 레이아웃 
 
 
 
