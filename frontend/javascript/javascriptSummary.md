@@ -524,4 +524,35 @@ function으로 시작하는 경우,
 
 두번째 경우에는 class 키워드로 대체할 수 있다.
 
-세번째 경우에는 메소드 축약형을 사용할 수 있다.
+세번째 경우에는 메소드 축약형을 사용할 수 있다. 그러므로, 가독성을 위해서 function 예약어를 자제하는 것도 좋은 프로그래밍 방식이라고 생각한다.
+
+## 14. 브라우저와 관련된 객체
+
+자바스크립트를 통해 요소에 동적인 액션을 줄 수 있다. 브라우저 관련 객체에 대해서 알아보도록 하자.
+
+### 14.1 내장 객체
+
++ window: 브라우저의 최상위 객체
++ document: \<body> 태그를 지칭하는 객체
++ navigator: 브라우저의 정보를 가진 객체
++ history: 방문기록을 가진 객체
++ location: 현재 URL 정보를 가진 객체
++ screen: 현재 화면정보를 가진 객체
+
+### 14.2 DOM(document) 객체
+
+document 객체로부터 HTML의 요소를 id로 접근해 스크립트를 적용할 수 있도록 한다.
+
+id 뿐만 아니라 class로도 접근할 수 있다. DOM 객체에서 제공하는 API에 대해서 알아보도록 하자.
+
++ getElementById: id가 있는 HTML 요소에 접근
++ getElementByClassName: class가 있는 HTML 요소에 접근
++ getElementByTagName: 태그 이름으로 HTML 요소에 접근
++ querySelector, querySelectorAll: DOM 객체 트리에 자유롭게 접근함.
++ innerText, innerHTML: HTML 요소의 내용을 수정할 수 있음
++ getAttribute, setAttribute: HTML 요소 태그의 속성 값을 get, 또는 set함.
+
+객체에 접근해서 Event를 발생시키기 위해서는 아래의 API를 사용한다.
+
++ addEventListener("이벤트", 함수)
++ 
