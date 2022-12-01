@@ -24,8 +24,58 @@ MVC 디자인 패턴이란 프론트 컨트롤러로 Http Request를 보내면, 
 
 Filter란 프론트 컨트롤러가 Http Request를 받기 전에 선제적으로 HTTP 요청을 걸러주는 기능이다.
 
+Filter 인터페이스를 구현하는 방식은 아래와 같다.
+
+```java
+public class FilterImpl implements Filter {
+  @Override
+  public void init(...) { ... }
+  @Override 
+  public void destroy() { ... }
+  
+  /* 초기화, 종료 메서드는 기본적으로 구현되어있지만, 추가로 커스터마이징 할 수 있다. */
+  
+ @Override 
+ public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+      HttpRequestServlet httpRequest = (HttpServletRequest) request;
+      String requestURI = httpRequest.getURI();
+      
+      String uuid = UUID.randomUUID().toString();
+      try {
+          log.info("REQUEST [{}][{}]", uuid, requestURI);
+          chain.doFilter(request, response);
+      } catch (Exception e) {
+          throw e;
+      } finally {
+            log.info("RESPONSE [{}][{}]", uuid, requestURI);
+      }    
+   }
+}
+```
+
+Filter를 Chain으로 연결해서 사용하는 클래스를 아래와 같이 스프링 빈으로 등록해서 싱글톤으로 사용할 수 있다.
+
+```java
+@Configuration
+public class WebConfig {
+    @Bean
+    public FilterRegistrationBean logFilter() {
+        FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+        filterFilterRegistrationBean.setFilter(new FilterImpl());
+        filterFilterRegistrationBean.setOrder(1);
+        filterFilterRegistrationBean.addUrlPatterns("/*");
+        return filterFilterRegistrationBean;
+    }
+ }
+```
 
 ### 1.2 사용자 정의 보안 기능 구현
 
+보안 기능은 크게 인증과 인가로 나누어진다.
+
+스프링 시큐리티의 HttpSecurity 클래스에서 인증과 인가와 관련된 API를 제공한다.
+
 
 ### 1.3 인증 API: Form 인증 방식
+
+
