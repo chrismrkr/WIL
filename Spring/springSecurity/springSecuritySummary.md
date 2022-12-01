@@ -75,6 +75,23 @@ public class WebConfig {
 
 스프링 시큐리티의 HttpSecurity 클래스에서 인증과 인가와 관련된 API를 제공한다.
 
+HttpSecurity를 이용해서 WebSecurityConfigureAdapter 클래스를 구현해 기본적인 보안 기능을 제공하는 객체를 생성할 수 있다.
+
+WebSecurityConfigureAdapter를 상속해서 사용자가 정의한 보안 기능을 제공하는 클래스를 구현할 수 있다. 
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().authenticated(); /* 인가 정책: 인증이 된 사용자만이 Request 가능 */
+        http.formLogin(); /* 인증 정책: Form 인증*/
+    }
+}
+```
+
 
 ### 1.3 인증 API: Form 인증 방식
 
