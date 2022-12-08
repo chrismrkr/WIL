@@ -141,3 +141,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
+***
+
+### 1.4 UserPasswordAuthenticationFilter의 구조
+
+AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilter.class를 분석하면 인증필터 구조를 확인할 수 있다.
+
+개괄적인 방법은 아래와 같다.
+
++ 1. Authentication 객체를 만들어 임시로 ID, Password를 저장한다.
++ 2. AuthenticationManager를 통해 실제 인증을 수행한다.
++ 3. 인증에 성공하면 Authentication 객체에 Session을 추가한 후, SecurityContext에 저장한다.
+
+위의 두 클래스를 분석하면 더 명확히 알 수 있다.
+
+***
+
+### 1.5 LogoutFilter
+
+Logout API를 이해하기 전에 쿠키, 세션, 그리고 토큰에 대해서 정리해보도록 하자.
+
++ 쿠키: 세션에 접근하기 위해 Local에 존재하는 key
++ 세션: 서버 메모리에 저장된 정보
++ 토큰: 
