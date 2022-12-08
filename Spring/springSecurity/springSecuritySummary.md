@@ -92,7 +92,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
+위는 기본적인 보안 기능 구현 방식이다. 이외에도 많은 인증과 인가 API를 제공하고 있다.
+
 
 ### 1.3 인증 API: Form 인증 방식
+
 
 
