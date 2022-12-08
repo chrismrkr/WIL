@@ -69,6 +69,8 @@ public class WebConfig {
  }
 ```
 
+***
+
 ### 1.2 사용자 정의 보안 기능 구현
 
 보안 기능은 크게 인증과 인가로 나누어진다.
@@ -94,8 +96,46 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 위는 기본적인 보안 기능 구현 방식이다. 이외에도 많은 인증과 인가 API를 제공하고 있다.
 
+***
 
 ### 1.3 인증 API: Form 인증 방식
 
+Form 인증 방식이란 HTML의 Input Form을 활용해서 User를 인증하는 방법을 의미한다.
 
+사용자가 적절한 ID와 Password를 입력하면 인증 서버에 Session을 등록하고 Session에 접근할 수 있는 Id를 사용자에게 반환한다.
+
+스프링 시큐리티에서 제공하는 인증 API는 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+            http.formLogin() /* 인증 정책 */
+                //.loginPage("/loginPage")
+                .defaultSuccessUrl("/")
+                .failureUrl("/login")
+                .usernameParameter("userId")
+                .passwordParameter("passwd")
+                .loginProcessingUrl("/loginProc")
+                .successHandler(new AuthenticationSuccessHandler() {
+                    @Override
+                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                        System.out.println("authentication: " + authentication.getName());
+                        response.sendRedirect("/");
+                    }
+                })
+                .failureHandler(new AuthenticationFailureHandler() {
+                    @Override
+                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                        System.out.println("exception: " + exception.getMessage());
+                        response.sendRedirect("/login");
+                    }
+                })
+                .permitAll();
+    }
+}
+```
 
