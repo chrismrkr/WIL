@@ -113,28 +113,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-            http.formLogin() /* 인증 정책 */
-                //.loginPage("/loginPage")
-                .defaultSuccessUrl("/")
-                .failureUrl("/login")
-                .usernameParameter("userId")
-                .passwordParameter("passwd")
-                .loginProcessingUrl("/loginProc")
-                .successHandler(new AuthenticationSuccessHandler() {
+           
+           
+           http .formLogin() /* 인증 정책 */ 
+                .loginPage("/loginPage") /* 로그인 Input Form URL */
+                .defaultSuccessUrl("/") /* 로그인 성공시 이동할 URL */
+                .failureUrl("/login") /* 로그인 실패시 이동할 URL */
+                .usernameParameter("userId") /* ID Input Form HTML id */
+                .passwordParameter("passwd") /* Password Input Form HTML id */
+                .loginProcessingUrl("/loginProc") /* 로그인 정보를 처리할 컨트롤러 URL */
+                .successHandler(new AuthenticationSuccessHandler() { /* 로그인 성공 후 호출할 컨트롤러 */
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
                         System.out.println("authentication: " + authentication.getName());
                         response.sendRedirect("/");
                     }
                 })
-                .failureHandler(new AuthenticationFailureHandler() {
+                .failureHandler(new AuthenticationFailureHandler() { /* 로그인 실패 후 호출할 컨트롤러 */
                     @Override
                     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
                         System.out.println("exception: " + exception.getMessage());
                         response.sendRedirect("/login");
                     }
                 })
-                .permitAll();
+                .permitAll(); /* 모든 유저는 인증 가능하다. */
     }
 }
 ```
