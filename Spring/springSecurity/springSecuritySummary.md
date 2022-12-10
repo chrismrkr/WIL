@@ -282,6 +282,42 @@ public class MemberService implements UserDetailService {
 
 RememberMeAuthenticationFilter.class를 분석하면 그 구조를 알 수 있다.
 
+개괄적인 구조는 아래와 같다.
+
++ 1. RememberMeAuthenticationFilter에서 SecurityContext의 Authentication 객체가 유효한지 검증한다. 즉, 세션이 유효한지 검증한다.
++ 2. 세션이 유효하지 않다면, RememberMeService에서 RememberMe 토큰이 유효한지 검증한다.
++ 3. RememberMe 토큰이 유효하다면, 해당 토큰과 연동된 회원정보가 유효한지 확인한다.
++ 4. 회원정보도 유효하다면, 앞서 구현한 UserDetailService 인터페이스를 통해 회원정보를 불러온다.
+
+***
+
+### 1.8 AnonymousAuthenticationFilter
+
+익명사용자를 인증처리하는 필터이다. **오로지 인증 사용자와 구별하기 위해 사용한다.**
+
+과정은 아래와 같다. AnonymousAuthenticationFilter.class를 분석하면 확인할 수 있다.
+
++ 1. 이미 인증된 회원, 즉 Authentication 객체가 존재하는지를 확인한다.
++ 2. 인증된 회원이 아니라면 AnonymousAuthenticationToken을 발급해서 SecurityContext에 저장한다.
+
+***
+
+### 1.9 동시 세션 제어, 세선 고정 보호, 세션 정책
+
+#### 1.9.1 동시 세션 제어
+
+사용자가 두 곳 이상에서 동시에 로그인을 시도할 수 있다. 최대 로그인 허용 개수를 1개라고 가정하자.
+
+2가지 정책을 사용할 수 있다.
+
+<br> 1. 이전 사용자 세션 만료 </br>-> 이전에 로그인한 사람의 세션을 만료하고 새롭개 로그인 하는 곳의 세션을 저장한다.
+
+<br> 1. 현재 사용자 인증 실패 </br>-> 이전에 로그인한 사람의 세션은 유지하고 새롭개 로그인 하는 곳의 인증을 거부한다.
+
+
+
+
+
 
 
 
