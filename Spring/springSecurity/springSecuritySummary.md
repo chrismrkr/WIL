@@ -302,7 +302,7 @@ RememberMeAuthenticationFilter.class를 분석하면 그 구조를 알 수 있�
 
 ***
 
-### 1.9 동시 세션 제어, 세선 고정 보호, 세션 정책
+### 1.9 동시 세션 제어, 세선 고정 보호
 
 #### 1.9.1 동시 세션 제어
 
@@ -311,8 +311,71 @@ RememberMeAuthenticationFilter.class를 분석하면 그 구조를 알 수 있�
 2가지 정책을 사용할 수 있다.
 
 <br><b> 1. 이전 사용자 세션 만료 </b></br>-> 이전에 로그인한 사람의 세션을 만료하고 새롭개 로그인 하는 곳의 세션을 저장한다.
-
 <br><b> 2. 현재 사용자 인증 실패 </b></br>-> 이전에 로그인한 사람의 세션은 유지하고 새롭개 로그인 하는 곳의 인증을 거부한다.
+
+이와 관련된 스프링 시큐리티 API는 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+          http  .sessionManagement() // 세션 관리 정책
+                .maximumSessions(1) // 최대 허용 세션 개수: 1개
+                .maxSessionsPreventsLogin(false) // 동시 로그인 차단 방법(false: 기존 세션 만료, true: 기존 세션 유지)
+                .invalidSessionUrl("...") // 세션이 유효하지 않을 때 이동할 페이지
+                .expiredUrl("...") // 세션이 만료된 경우 이동할 페이지;
+
+    }
+}
+```
+
+#### 1.9.2 세션 고정 보호
+
+세션을 이용한 로그인 방식은 공격자가 JSessionId를 탈취하면 공격당할 수 있다.
+
+이에 대응하기 위한 스프링 시큐리티 API는 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.sessionManagement()
+                .sessionFixation().changeSessionId();
+    }
+}
+```
+
+changeSessionId는 인증할 때 마다 SessionId를 변경한다. 서버의 Session 자체를 변경하는 것은 아니다.
+
+none 옵션은 아무것도 바꾸지 않는다. 
+migrateSessin은 기존 세션의 속성을 받아 Session 자체를 변화시킨다. 
+newSession은 기존 속성을 받지 않고 Session 자체를 변화시킨다.
+
+***
+
+### 1.10 SessionManagementFilter, ConcurrentSessionFilter
+
+세션 관리, 동시 세션 제어, 세션 고정 보호, 세션 생성 정책 등에 대해서 알아보았다.
+
+이 모든 것들은 SessionManagementFilter.class에서 관리된다. 이 클래스를 분석하면 그 흐름을 알 수 있다.
+
+세션을 이용한 인증 방식의 전체적인 Filter의 흐름은 아래와 같다.
+
+UserPasswordAuthenticationFilter -> ConcurrentSessionFilter -> SessionManagementFilter
+
+ConcurrentSessionFilter는 인증 실패 전략일 때 사용되는 필터이다.
+
+
+
+
+
+
 
 
 
