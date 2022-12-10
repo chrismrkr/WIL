@@ -371,8 +371,11 @@ UserPasswordAuthenticationFilter -> ConcurrentSessionFilter -> SessionManagement
 
 ConcurrentSessionFilter는 인증 실패 전략일 때 사용되는 필터이다.
 
+이 흐름을 분석하면 스프링 시큐리티에서 제공하는 기본 인증 API는 마무리된다. 
 
+***
 
+### 1.11 인가 API - 권한 설정 및 표현식 
 
 
 
