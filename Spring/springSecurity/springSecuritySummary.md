@@ -119,8 +119,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/loginPage") /* 로그인 Input Form URL */
                 .defaultSuccessUrl("/") /* 로그인 성공시 이동할 URL */
                 .failureUrl("/login") /* 로그인 실패시 이동할 URL */
-                .usernameParameter("userId") /* ID Input Form HTML id */
-                .passwordParameter("passwd") /* Password Input Form HTML id */
+                .usernameParameter("userId") /* ID Input Form HTML Form name */
+                .passwordParameter("passwd") /* Password Input Form HTML Form name */
                 .loginProcessingUrl("/loginProc") /* 로그인 정보를 처리할 컨트롤러 URL */
                 .successHandler(new AuthenticationSuccessHandler() { /* 로그인 성공 후 호출할 컨트롤러 */
                     @Override
@@ -159,11 +159,11 @@ AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilt
 
 ### 1.5 LogoutFilter
 
-Logout API를 이해하기 전에 쿠키, 세션, 그리고 토큰에 대해서 정리해보도록 하자.
+Logout API를 이해하기 전에 **쿠키, 세션, 그리고 토큰**에 대해서 정리해보도록 하자.
 
-+ 쿠키: 세션에 접근하기 위해 Local에 존재하는 key
-+ 세션: 서버 메모리에 저장된 정보
-+ 토큰: 일반적으로 JWT Token을 의미하고, 인증 절차를 통해 받을 수 있다. Http Header에 JWT Token을 추가해 서버에 전송하여 인가를 받을 수 있다. 그러므로, 서버에서는 인가를 위한 별도의 저장장치가 필요하지 않다.
++ <b>쿠키</b>: 세션에 접근하기 위해 Local에 존재하는 key
++ <b>세션</b>: 서버 메모리에 저장된 정보
++ <b>토큰</b>: 일반적으로 JWT Token을 의미하고, 인증 절차를 통해 받을 수 있다. Http Header에 JWT Token을 추가해 서버에 전송하여 인가를 받을 수 있다. 그러므로, 서버에서는 인가를 위한 별도의 저장장치가 필요하지 않다.
 
 쿠키와 세션을 통한 인가 방식은 세션 하이재킹의 위험성과 서버에 세션을 저장하여 부담이 증가한다는 단점이 있다.
 
@@ -206,3 +206,82 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 (IntelliJ에서 Shift+Shift 단축키로 찾아볼 수 있다.)
 
 SecurityContext의 Authentication 객체를 제거하는 방식으로 진행된다.
+
+***
+
+### 1.6 Remember-Me 
+
+Remember-Me는 세션이 만료된 이후에도 애플리케이션이 사용자를 기억하는 기능이다. 자동 로그인에 활용된다.
+
+세션이 활성화된 상태에서는 로그인이 필요없고, 세션이 비활성화되면 다시 로그인을 해야한다.
+
+Remember-Me 기능을 사용하면 세션이 만료되더라도 자동 로그인을 할 수 있다. 과정은 아래와 같다.
+
++ 1. Remember-me 쿠키를 로컬에 저장한다.
++ 2. Remember-me 쿠키를 key하여 접근할 수 있도록 ID와 Password를 서버에 저장한다. 이때, 메모리 또는 DB에 저장할 수 있다.
++ 3. 세션이 만료되었고 Remeber-me 쿠키가 만료되지 않았다면, 자동 로그인을 할 수 있다.
+
+스프링 시큐리티에서 제공하는 API는 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final UserDetailsService userDetailsService;
+
+    @Autowired
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.rememberMe() // rememberMe API
+                .rememberMeParameter("remember-me") // rememberMe 쿠키 이름
+                .tokenValiditySeconds(3600) // rememberMe 토큰 유효기간(DB 또는 메모리에 remeberMe 토큰이 저장됨을 알 수 있다.)
+                .alwaysRemember(true)
+                .userDetailsService(userDetailsService); // 사용자 정보를 가져오는 Service 지정
+    }
+}
+```
+
+UserDetailService에 대해서 더 알아보도록 하자.
+
+세션이 만료되었고 RemeberMe 토큰이 유효하다면, 저장소(Repository)에서 사용자 정보를 가져와야 자동 로그인을 할 수 있다.
+
+이를 위해 사용되는 것이 스프링 시큐리티의 UserDetailService 인터페이스의 loadUserByUsername 멤버함수이다.
+
+예를 들어, 회원을 관리하는 서비스(MemberService)에서 UserDetailService 인터페이스의 loadUserByUsername을 implement 및 Override하여 회원 정보를 가져올 수 있도록 만들 수 있다.
+
+이때, 회원 정보는 UserDetails 인터페이스로 반환해야 한다. UserDetails는 스프링 시큐리티에서 제공하는 인터페이스로 회원정보와 권한정보를 갖는다.
+
+대략적인 코드는 아래와 같을 것이다.
+
+```java
+@Service
+@RequiredArgsConstructor
+public class MemberService implements UserDetailService {
+    private final MemberRepository memberRepository;
+    
+    /* ... 멤버함수들 있음 ... */
+    
+    @Override
+    public UserDetails loadUserByUsername(Long pk) {
+        Member member = memberRepository.findById(pk);
+        
+        // 빌더 패턴 활용
+        return UserDetails.Builder()
+                .userName(member.getUserName())
+                .bulild();
+    }
+}
+```
+
+***
+
+### 1.7 Remember-Me의 구조
+
+RememberMeAuthenticationFilter.class를 분석하면 그 구조를 알 수 있다.
+
+
+
+
