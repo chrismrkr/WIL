@@ -163,4 +163,46 @@ Logout API를 이해하기 전에 쿠키, 세션, 그리고 토큰에 대해서 
 
 + 쿠키: 세션에 접근하기 위해 Local에 존재하는 key
 + 세션: 서버 메모리에 저장된 정보
-+ 토큰: 
++ 토큰: 일반적으로 JWT Token을 의미하고, 인증 절차를 통해 받을 수 있다. Http Header에 JWT Token을 추가해 서버에 전송하여 인가를 받을 수 있다. 그러므로, 서버에서는 인가를 위한 별도의 저장장치가 필요하지 않다.
+
+쿠키와 세션을 통한 인가 방식은 세션 하이재킹의 위험성과 서버에 세션을 저장하여 부담이 증가한다는 단점이 있다.
+
+토큰 방식은 MSA 아키텍처에서의 애플리케이션 확장성을 늘릴 수 있지만 매번 Header에 토큰을 추가해야한다는 단점이 있다.
+
+스프링 시큐리티에서의 인가 정책은 기본적으로 쿠키와 세션 방식을 따른다. 
+
+스프링 시큐리티에서 제공하는 Logout API는 세션을 만료한다. 제공하는 API는 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+    
+           http .logout() // 로그아웃 처리 API 
+                .logoutUrl("/logout") // 로그아웃을 처리할 URL
+                .logoutSuccessUrl("/login") // 로그아웃 성공시 이동할 URL
+                .addLogoutHandler(new LogoutHandler() { // 로그아웃 실행 시 실행할 컨트롤러 
+                    @Override
+                    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                        request.getSession().invalidate();
+                    }
+                })
+                .logoutSuccessHandler(new LogoutSuccessHandler() { // 로그아웃 성공 후 실행할 컨트롤러
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                        response.sendRedirect("/login");
+                    }
+                });
+    
+    }
+}
+```
+
+자세한 것을 알아보기 위해 스프링 시큐리티의 **LogoutFilter.class** 파일을 분석해보도록 하자.
+
+(IntelliJ에서 Shift+Shift 단축키로 찾아볼 수 있다.)
+
+SecurityContext의 Authentication 객체를 제거하는 방식으로 진행된다.
