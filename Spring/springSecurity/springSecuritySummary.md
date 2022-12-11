@@ -400,7 +400,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests()
+        http    .authorizeRequests()
                 .antMatchers("/user").hasRole("USER")
                 .antMatchers("/admin/pay").hasRole("ADMIN")
                 .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
@@ -410,6 +410,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
++ antMatchers: 권한을 설정할 HTTP API URL. **구체적인 경로가 먼저 오고, 그것보다 큰 범위가 뒤에 나오도록 해야한다.** antMatcher를 순서대로 체크하기 때문이다.
++ hasRole(role): 해당 role이 있으면 접근 가능
++ hasAuthority(authority): 해당 authority가 있으면 접근 가능
+
+***
+
+### 1.12 ExceptionTranslationFilter, RequestCacheAwareFilter
+
+인증 또는 인가에 실패할 때 발생하는 Filter의 흐름에 대해서 알아보도록 하자.
 
 
 
