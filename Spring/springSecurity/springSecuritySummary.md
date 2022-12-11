@@ -228,11 +228,11 @@ Remember-Me 기능을 사용하면 세션이 만료되더라도 자동 로그인
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
-
     @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.rememberMe() // rememberMe API
@@ -377,10 +377,38 @@ ConcurrentSessionFilter는 인증 실패 전략일 때 사용되는 필터이다
 
 ### 1.11 인가 API - 권한 설정 및 표현식 
 
+인증이 완료되면 사용자에게 권한을 부여해야 한다. 권한 설정 방식은 크게 2가지가 있다.
 
+첫번째는 애플리케이션에서 설정하는 방식이고, 두번째는 DB와 연동해서 설정하는 방식이다.
 
+애플리케이션에서 직접 설정하는 방식에 대해서 알아보도록 한다.
 
+아래의 코드를 살펴보자.
 
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("user").password("{noop}1111").roles("USER");
+        auth.inMemoryAuthentication().withUser("sys").password("{noop}1111").roles("SYS", "USER");
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}1111").roles("ADMIN", "SYS", "USER");
+    }
+    
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+
+        http.authorizeRequests()
+                .antMatchers("/user").hasRole("USER")
+                .antMatchers("/admin/pay").hasRole("ADMIN")
+                .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
+                .anyRequest()
+                .authenticated();
+    }
+}
+```
 
 
 
