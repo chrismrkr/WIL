@@ -663,7 +663,7 @@ class child extends parent {
 }
 ```
 
-
+서브클래스에서 부모클래스의 멤버함수를 사용할 때는 call 메소드를 사용하자. 
 
 ***
 
