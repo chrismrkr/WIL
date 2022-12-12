@@ -418,9 +418,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ### 1.12 ExceptionTranslationFilter, RequestCacheAwareFilter
 
-인증 또는 인가에 실패할 때 발생하는 Filter의 흐름에 대해서 알아보도록 하자.
+인증 또는 인가에 실패할 때 발생하는 Filter의 흐름이 있다.
 
+AbstractSecurityInterceptor.class, ExceptionTranslationFilter.class를 분석하면 구조를 이해할 수 있다.
 
+인증 예외가 발생하면 AuthenticationEntryPoint.commence()를 실행하고, 인가 예외가 발생하면 AccessDeniedHandler.handle()을 실행한다.
 
+익명 사용자에 의해 발생하는 인가 예외는 인증 예외를 발생시킨다.
 
+그러므로, 위의 두 클래스만 생성해주면 된다. 스프링 시큐리티에서는 이를 API로 제공한다. 
+
+방법은 아래와 같다.
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.exceptionHandling()
+                .authenticationEntryPoint(new AuthenticationEntryPoint() { 
+                    @Override
+                    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+                        response.sendRedirect("/login");
+                    }
+                })
+                .accessDeniedHandler(new AccessDeniedHandler() {
+                    @Override
+                    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                        response.sendRedirect("/denied");
+                    }
+                });
+    }
+}
+```
+
+***
+
+## 2. 주요 아키텍쳐 이해
 
