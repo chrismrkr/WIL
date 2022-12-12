@@ -479,6 +479,7 @@ function fetchAuthorName(postId) {
 fetchAuthorName(1).then((name) => console.log("name:", name));
 ```
 
+***
 
 ## 12. 싱글톤 패턴
  
@@ -509,8 +510,164 @@ const Singleton = (function() {
     }
 })();
 ```
+***
 
-## 13. function 예약어 사용이 필요할까?
+## 13. 객체 생성 방식
+
+리터럴 방식, 생성자 함수 방식, 그리고 클래스 방식 3가지가 있다.
+
+하나씩 살펴보면서 프로토타입 기반의 객체지향 언어인 자바스크립트에 대해서 좀 더 깊게 알아보도록 하자.
+
+### 13.1 리터럴 방식
+
+아래와 같이 객체를 생성하는 것을 의미한다.
+
+```javascript
+let object = {
+    att1: 10,
+    att2: "hello"
+};
+```
+
+위의 객체의 prototype은 Object이다. 그러므로, 프로토타입의 constructor 함수를 통해 객체가 생성된다.
+
+동일한 모양의 객체를 여러번 만드는 상황에서는 불필요한 코드가 중복된다는 단점이 있다.
+
+### 13.2 생성자 함수 방식
+
+아래와 같이 객체를 생성한다. 메모리 낭비를 막기 위해 즉시실행함수를 사용했다.
+
+```javascript
+const Person = (function() {
+  function Person(name) {
+    this.name = name;
+  }
+  
+  Person.prototype.sayMyName() {
+    console.log(`Hello, My name is ${this.name}`); 
+  }
+  
+  return Person;
+}());
+
+let kim = new Person("kim");
+let lee = new Person("lee");
+```
+
+물론, 아래와 같이 코드를 작성하더라도 결과는 동일하다.
+
+```javascript
+const Person = (function() {
+  function Person(name) {
+    this.name = name;
+    
+    this.sayMyName() {
+      console.log(`Hello, My name is ${this.name}`); 
+    }
+  }
+  
+  return Person;
+}());
+
+let kangok = new Person("kangok");
+let lee = new Person("lee");
+```
+
+kangok 객체와 lee 객체의 프로토타입은 Person이다. 
+
+두번째 코드에서는 두 sayMyName() 멤버함수가 객체 별로 독립적으로 존재하는 낭비가 있다.
+
+두 객체의 프로토타입은 동일하므로 굳이 두번째와 같이 코드를 작성할 필요는 없다. 
+
+그러므로, 객체 생성 시 첫번째처럼 코드를 작성하는 것이 더 바람직하다. 정적 메소드를 추가하려면 아래와 같이 쓰면 된다.
+
+```javascript
+const Person = (function() {
+  function Person(name) {
+    this.name = name;
+  }
+  
+  Person.prototype.sayMyName() {
+    console.log(`Hello, My name is ${this.name}`); 
+  }
+  
+  Person.greet() {
+    console.log("Hello everyone!");
+  }
+  return Person;
+}());
+```
+
+**생성자 함수 방식을 통해 객체를 생성할 때, Arrow 함수를 사용하면 안되는 이유**
+
+일반함수와 Arrow 함수의 차이점부터 먼저 알아보자.
+
+1. this
+
+일반 함수는 this가 동적으로 바인딩 된다. 예를 들어, 일반함수가 멤버함수라면 멤버함수를 호출하는 객체를 지칭하고, 생성자 함수라면 새롭게 생성되는 객체를 의미한다.
+
+Arrow 함수에서의 this가 정적으로 바인딩 되고, 상위 스코프를 의미한다. 상위 스코프는 렉시컬 스코프이다.
+
+2. 프로토타입
+
+Arrow 함수는 일반함수와 달리 prototype이 없다.
+
+
+**객체를 생성할 때 prototype의 constructor를 이용한다. 그러므로, Arrow 함수는 prototype이 없으므로 객체를 생성할 수 없다.**
+
+### 13.3 클래스 방식
+
+클래스 방식도 내부적으로 생성자 방식을 따른다. super, extends 키워드를 통한 상속을 제공하고, 모든 프로퍼티의 enumeration은 false라는 점에서 생성자 방식과 차이가 있다.
+
+참고로, enumeration이 false이면 for ... in ... 으로 프로퍼티 검색이 불가능하다.
+
+또한, static, get, set 키워드도 존재한다. 
+
+클래스 방식으로 아래와 같이 코드를 작성할 수 있다.
+
+```javascript
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  sayMyName() {
+    console.log(`Hello, My name is ${this.name}`); 
+  }
+  
+  static greet() {
+    console.log("Hello everyone!");
+  }
+}
+
+let kim = new Person("kim");
+```
+
+상속의 경우, 서브클래스(자식클래스)의 생성자는 암묵적으로 super(..args)로 정의된다.
+
+아래와 같이 상속을 구현할 수 있다.
+
+```javascript
+class parent {
+  constructor(a) {
+    this.a = a;
+  }
+}
+
+class child extends parent {
+  constructor(a, b, c) {
+    super(a);
+    this.b = b;
+    this.c = c;
+  }
+}
+```
+
+
+
+***
+
+## 14. function 예약어 사용이 필요할까?
 
 자바스크립트로 짜여진 코드를 읽어보면, function 키워드로 시작하는 경우가 많다.
 
@@ -526,11 +683,11 @@ function으로 시작하는 경우,
 
 세번째 경우에는 메소드 축약형을 사용할 수 있다. 그러므로, 가독성을 위해서 function 예약어를 자제하는 것도 좋은 프로그래밍 방식이라고 생각한다.
 
-## 14. 브라우저와 관련된 객체
+## 15. 브라우저와 관련된 객체
 
 자바스크립트를 통해 요소에 동적인 액션을 줄 수 있다. 브라우저 관련 객체에 대해서 알아보도록 하자.
 
-### 14.1 내장 객체
+### 15.1 내장 객체
 
 + window: 브라우저의 최상위 객체
 + document: \<body> 태그를 지칭하는 객체
@@ -539,7 +696,7 @@ function으로 시작하는 경우,
 + location: 현재 URL 정보를 가진 객체
 + screen: 현재 화면정보를 가진 객체
 
-### 14.2 DOM(document) 객체
+### 15.2 DOM(document) 객체
 
 document 객체로부터 HTML의 요소를 id로 접근해 스크립트를 적용할 수 있도록 한다.
 
@@ -555,4 +712,3 @@ id 뿐만 아니라 class로도 접근할 수 있다. DOM 객체에서 제공하
 객체에 접근해서 Event를 발생시키기 위해서는 아래의 API를 사용한다.
 
 + addEventListener("이벤트", 함수)
-+ 
