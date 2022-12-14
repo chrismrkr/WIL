@@ -334,7 +334,7 @@ border-radius: ...; /* 둥근 테두리를 지정할 수 있다. 꼭짓점마다
 아래의 코드를 통해 속성을 사용하는 방법에 대해서 알아보도록 하자.
 
 ```css
-  margin: ...; /* px로 조절하고, top -> left -> bottom -> right를 사용해서 특정 방향만 지정할 수 있다.*/
+  margin: ...; /* px로 조절하고, top -> right -> bottom -> left를 사용해서 특정 방향만 지정할 수 있다.*/
   margin: 10px auto /* 상단과 하단에 10px 마진을 주고, 좌우를 자동(auto)으로 대칭을 맞춘다. */
 ```
 
