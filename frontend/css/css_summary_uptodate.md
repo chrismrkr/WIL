@@ -346,7 +346,19 @@ border-radius: ...; /* 둥근 테두리를 지정할 수 있다. 꼭짓점마다
 
 레이아웃 구성을 위해서 사용되는 css 속성은 display와 float가 있다.
 
-display는 block 또는 inline으로 지정할 수 있으며 전자는 인라인 모델은 블록 모델로, 후자는 블록 모델은 인라인 모델로 변환한다.
+#### 3.4.1 display
+
+display는 block 또는 inline으로 지정할 수 있으며 전자는 블록 모델로, 후자는 인라인 모델로 변환한다.
+
+대표적인 블록 모델로는 \<div> 태그가 있다.
+
+**블록 모델**은 width와 height로 사용자가 지정한 만큼 레이아웃 크기를 결정한다.
+
+기본적으로 하나의 블록이 선언되면 다음 블록은 그 아래 줄에 생성된다. 물론, float 속성을 통해서 바꿀 수 있다.
+
+margin, padding 속성을 사용할 수 있다.
+
+**인라인 모델**은 텍스트의 크기와 길이에 의해 레이아웃의 크기가 자동으로 결정되낟.
 
 inline-block은 두가지 모델의 기능을 함께 사용할 수 있으므로 margin과 padding 속성을 사용할 수 있다.
 
@@ -358,9 +370,13 @@ float는 왼쪽(left)이나 오른쪽(right)로 모델을 배치한다. 일반�
 
 ### 3.5 웹 요소 위치 지정
 
-웹 페이지에 요소를 적절한 위치에 넣기 위해 필요하다. position 속성에 top, right, bottom, left 속성들을 이용하면 만들 수 있다.
+웹 페이지에 요소를 적절한 위치에 넣기 위해 필요하다. position 속성과 top, right, bottom, left 속성들을 이용하면 만들 수 있다.
 
-top, right, bottom, left 속성은 마찬가지로 픽셀(px)로 조정하면 된다. position 속성에 대해서 알아보자.
+top, right, bottom, left 속성은 마찬가지로 픽셀(px)로 조정하면 된다.
+
+어느 위치를 기준으로 top, right, bottom, left를 적용할 것인지를 결정해야 한다.
+
+이를 위해 position 속성에 대해서 알아보자.
 
 + static: 문서의 흐름에 맞게 배치한다. 기본 값이다.
 + relative: 문서 흐름에 맞게 배치하되, 위치 조정을 할 수 있다.
