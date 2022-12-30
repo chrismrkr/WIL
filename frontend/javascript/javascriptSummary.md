@@ -705,7 +705,7 @@ id 뿐만 아니라 class로도 접근할 수 있다. DOM 객체에서 제공하
 + getElementById: id가 있는 HTML 요소에 접근
 + getElementByClassName: class가 있는 HTML 요소에 접근
 + getElementByTagName: 태그 이름으로 HTML 요소에 접근
-+ querySelector, querySelectorAll: DOM 객체 트리에 자유롭게 접근함.
++ querySelector, querySelectorAll: CSS 선택자를 통해 검색
 + innerText, innerHTML: HTML 요소의 내용을 수정할 수 있음
 + getAttribute, setAttribute: HTML 요소 태그의 속성 값을 get, 또는 set함.
 
