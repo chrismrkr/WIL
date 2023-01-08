@@ -117,3 +117,11 @@ public void main() {
 ```
 
 코드가 길어졌다는 단점이 있다. 그러나, 객체를 생성하는 입장에서는 생성자 방식보다 더 직관적으로 사용할 수 있다.
+
+이러한 패턴이 가능한 이유는 static inner class가 outer class의 private에 접근할 수 있는 특성이 있기 때문이다. 
+
+**static** inner class가 아닌 inner class라면, outer class의 객체가 생성된 이후에만 내부 클래스에 접근할 수 있다.
+
+그러나, static inner class이므로 outer class 객체가 생성되기 이전에 클래스만 로드되어도 inner class에 접근할 수 있다. 
+
+## 2. 람다식과 함수형 인터페이스
