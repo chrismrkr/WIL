@@ -776,6 +776,12 @@ xhr.setRequestHeader('content-type', 'application/json');
 xhr.send({id: "user", password: "1111"});
 ```
 
+Self-Descriptive한 API란 HTTP 응답 상태코드 및 메세지, Content-Type, media 정보를 링크로 첨부하여 생성하는 것이다.
+
+HATEOAS한 API란 링크를 통해 다음 상태로 전이될 수 있는 것을 의미한다. 상세조회 링크를 사용해서 어느 링크로 전이되는지 알 수 있도록 한다.
+
+두가지 특성을 가진 HTTP API를 RESTful API라고 한다.
+
 #### 16.3.2 HTTP 응답
 
 ```javascript
