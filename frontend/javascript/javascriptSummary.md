@@ -747,7 +747,40 @@ request, response Body는 객체 리터럴 방식으로 생성한다.
 
 #### 16.2.3 메소드
 
-+ open: HTTP 요청 초기화
-+ send: HTTP 요청 전송
-+ abort: 이미 요청된 HTTP 중단
-+ 
++ open(): HTTP 요청 초기화
++ send(): HTTP 요청 전송
++ abort(): 이미 요청된 HTTP 중단
++ setRequestHeader(): HTTP 헤더 설정
+
+### 16.3 시나리오
+
+#### 16.3.1 HTTP 요청
+
+```javascript
+
+// GET 요청
+let xhr = new XMLHttpRequest();
+
+xhr.open('GET', '/users');
+xhr.setRequestHeader('content-type', 'application/json');
+
+xhr.send();
+
+
+// POST 요청
+let xhr2 = new XMLHttpRequest();
+
+xhr.open('POST', '/users');
+xhr.setRequestHeader('content-type', 'application/json');
+
+xhr.send({id: "user", password: "1111"});
+```
+
+#### 16.3.2 HTTP 응답
+
+```javascript
+xhr.onreadystatechange = () => {
+  debugger;
+};
+```
+xhr.readyState의 상태를 확인하여 분기될 수 있도록 코드를 작성한다. 뿐만 아니라 xhr.status를 통해서도 확인할 수 있다.
