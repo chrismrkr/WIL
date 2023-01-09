@@ -712,3 +712,42 @@ id 뿐만 아니라 class로도 접근할 수 있다. DOM 객체에서 제공하
 객체에 접근해서 Event를 발생시키기 위해서는 아래의 API를 사용한다.
 
 + addEventListener("이벤트", 함수)
+
+
+## 16. Ajax 통신
+
+Ajax 통신이란 비동기 방식으로 데이터를 송수신하는 방법을 의미한다.
+
+자바스크립트에서는 XMLHttpRequest 객체를 통해 Ajax 통신을 한다. (HTML의 \<form>,\<a> 태크와 연동해서 통신한다.)
+
+XMLHttpRequest는 비동기 통신을 위한 프로퍼티와 메소드를 제공하는 객체이다.
+
+### 16.1 JSON 생성 방식
+
+request, response Body는 객체 리터럴 방식으로 생성한다.
+
++ JSON.stringfy(): 객체를 직렬화 한다.
++ JSON.parse(): 직렬화된 내용을 객체로 변환한다.
+
+### 16.2 XMLHttpRequest 특징
+
+#### 16.2.1 프로퍼티
+
++ readyState: 현재 HTTP 요청 상태를 나타내는 상수
++ status: HTTP 요청에 대한 응답 상태를 나타내는 정수
++ statusText: HTTP 요청에 대한 응답 메세지를 나타내는 메세지
++ responseType: HTTP 응답 타입(ex. application/json)
++ response: HTTP 요청에 대한 응답 dataBody
+
+#### 16.2.2 이벤트 핸들러
+
++ onreadystatechange(): readyState 프로퍼티 변경을 감지함.
++ onerror(): HTTP 요청이 에러난 경우
++ onload(): HTTP 요청이 성공적인 경우
+
+#### 16.2.3 메소드
+
++ open: HTTP 요청 초기화
++ send: HTTP 요청 전송
++ abort: 이미 요청된 HTTP 중단
++ 
