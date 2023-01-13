@@ -604,9 +604,43 @@ const Person = (function() {
 
 1. this
 
-일반 함수는 this가 동적으로 바인딩 된다. 예를 들어, 일반함수가 멤버함수라면 멤버함수를 호출하는 객체를 지칭하고, 생성자 함수라면 새롭게 생성되는 객체를 의미한다.
+this는 함수가 **호출**되는 시점에 정의된다는 것을 유의하자. 렉시컬 스코프와 달리 정의되는 시점이 아닌 호출되는 시점이다.
 
-Arrow 함수에서의 this가 정적으로 바인딩 되고, 상위 스코프를 의미한다. 상위 스코프는 렉시컬 스코프이다.
+일반 함수에서 this는 window 객체이다. 일반 함수 내의 callback, 중첩 함수도 마찬가지로 this는 window 객체이다. 
+
+예를 들어, 객체 내의 메소드 함수에서 callback 또는 중첩 함수가 쓰인다면, 여기서의 this는 전역객체이다. 주의하자.
+
+리터럴과 new를 통해 생성한 객체의 this는 해당 객체를 바인딩한다.
+
+메소드 함수에서의 this는 호출하는 객체를 바인딩한다.
+
+생성자 함수에서의 this에는 생성하는 객체를 바인딩한다. 아래의 예제를 보자. 문제가 있는 코드이다.
+
+```javascript
+let person = {
+  name: "kim",
+  sayHi() {
+    setTimeout(
+      function() {
+        console.log(this.name)
+      }, 100)
+  }
+};
+```
+sayHi()를 통해 name이 정상적으로 출력되지 않는다. 이를 제대로 하려면 setTimeout 부분을 Arrow 함수로 바꾼다.
+
+```javascript
+setTimeout(
+      () => {
+        console.log(this.name)
+      }, 100)
+```
+
+화살표 함수의 this는 상위 스코프의 this이기 때문에 정상적으로 출력된다.
+
+
+
+Arrow 함수에서의 this가 정적으로 바인딩 되고, 상위 스코프의 this를 바인딩한다. 상위 스코프는 렉시컬 스코프이다.
 
 2. 프로토타입
 
