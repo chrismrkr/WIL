@@ -1,0 +1,37 @@
+# JQuery 정리
+
+## 1. 기본 문법
+
+```javascript
+$(선택자. CSS와 동일).동작함수1().동작함수2();
+```
+
+## 2. 예제
+
+문법에 대해서 정리하기 전에 아래의 요구사항을 만족하기 위해 jQuery 및 자바스크립트로 코드를 작성하자.
+
+**li 요소들을 클릭하면 클래스 이름을 selected로 바꾸는 jQuery 및 스크립트를 작성하시오.**
+
+```html
+    <ul id="navigation">
+      <li>HTML</li>
+      <li>CSS</li>
+      <li>javascript</li>
+      <li class="selected">jQuery</li>
+      <li>PHP</li>
+      <li>mysql</li>
+    </ul>
+```
+
+```javascript
+  let liList = document.querySelectirAll("#navigation li");
+  liList.forEach((li, idx) => {
+    li.className = "";
+    li.className = "selected";
+  });
+  
+  $("#navigation li").on("click", () => {
+    $("#navigation li").removeClass('selected');
+    $(this).addClass('selected');
+  });
+```
