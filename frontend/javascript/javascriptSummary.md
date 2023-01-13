@@ -635,8 +635,9 @@ setTimeout(
         console.log(this.name)
       }, 100)
 ```
-
 화살표 함수의 this는 상위 스코프의 this이기 때문에 정상적으로 출력된다.
+
+
 
 
 
