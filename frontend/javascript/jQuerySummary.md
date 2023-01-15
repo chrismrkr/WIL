@@ -2,6 +2,8 @@
 
 ## 1. 기본 문법
 
+선택 및 동작함수1, 동작함수2로 동작한다.
+
 ```javascript
 $(선택자. CSS와 동일).동작함수1().동작함수2();
 ```
@@ -34,4 +36,16 @@ $(선택자. CSS와 동일).동작함수1().동작함수2();
     $("#navigation li").removeClass('selected');
     $(this).addClass('selected');
   });
+```
+
+## 3. HTML을 인수로 전달받는 경우
+
+```javascript
+
+```
+
+## 4. Javascript 객체를 인수로 받는 경우
+
+```javascript
+
 ```
