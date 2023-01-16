@@ -637,9 +637,22 @@ setTimeout(
 ```
 화살표 함수의 this는 상위 스코프의 this이기 때문에 정상적으로 출력된다.
 
+여기서 화살표 함수 대신 apply, call, 또는 bind 함수를 사용해서 해결할 수 있다.
 
+```javascript
+let person = {
+  name: "kim",
+  sayHi() {
+    setTimeout(
+      function() {
+        console.log(this.name)
+      }.bind(this), 100);
+  }
+};
+```
+apply, call, bind 모두 함수의 this를 첫번째 인수로 바꾸는 함수이다. 
 
-
+bind는 apply, call과 달리 함수를 호출하지 않는다. apply는 call과 달리 arguments를 배열로 받아야 한다.
 
 Arrow 함수에서의 this가 정적으로 바인딩 되고, 상위 스코프의 this를 바인딩한다. 상위 스코프는 렉시컬 스코프이다.
 
