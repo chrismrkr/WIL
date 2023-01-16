@@ -41,11 +41,23 @@ $(선택자. CSS와 동일).동작함수1().동작함수2();
 ## 3. HTML을 인수로 전달받는 경우
 
 ```javascript
-
+$('<p id="test">My <em>new</em> text</p>').appendTo('body');
 ```
 
 ## 4. Javascript 객체를 인수로 받는 경우
 
 ```javascript
+let foo = {
+    foo: 'bar',
+    hello: 'world'
+};
 
+let bar = $(foo).prop('foo');
+let hello = $(foo).prop('hello');
+$(foo).prop('hello', 'modifyHello');
 ```
+
+## 5. 특징
+
++ $()는 자기 자신을 반환하므로 체이닝이 가능하다.
++ this 사용 가능
