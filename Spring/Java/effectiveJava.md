@@ -125,3 +125,38 @@ public void main() {
 그러나, static inner class이므로 outer class 객체가 생성되기 이전에 클래스만 로드되어도 inner class에 접근할 수 있다. 
 
 ## 2. 람다식과 함수형 인터페이스
+
+람다식은 함수형 인터페이스로 참조할 수 있다.
+
+람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다.
+
+@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
+
+예를 들어서, 아래 코드를 실행하고자 한다면,
+
+```java
+runLambda( () -> { System.out.println("hello"); }
+```
+
+아래와 같이 정의하면 된다.
+```java
+public interface Lambda {
+  public void run();
+}
+
+void runLambda(Lambda l) {
+  l.run();
+}
+```
+
+람다식은 익명클래스이고 인터페이스로 참조할 수 있다.
+
+Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아래와 같다.
+
++ Runnable의 void run() : 매개변수 X, 반환 X
++ Supplier<T> T get() : 매개변수 X, 반환 O
++ Consumer<T> void accept(T t) : 매개변수 O, 반환 X
++ Function<T, R> R apply(T t) : 매개변수 O, 반환 O
++ Predicate<T> boolean test(T t) : 매개변수 O, 반환 boolean
+  
+  
