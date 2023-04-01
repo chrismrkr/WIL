@@ -15,5 +15,8 @@ JUnit5는 자바 개발자들이 단위테스트를 작성할 때 사용하는 �
 
 ## 2. 테스트에 이름 표시하는 방법
 ```java
-@DisplayNameGeneration : 
+@DisplayNameGeneration : 테스트의 이름을 다른 것으로 레퍼런스하기 위해 사용한다.
+@DisplayName : 메소드에 지정하여 테스트의 이름을 변경한다.
 ```
+
+## 3. 
