@@ -89,4 +89,191 @@ assumeTrue(조건), assumingThat(조건, executable)을 통해 프로그래밍�
 
 ## 6. 커스텀 태그
 
-JUnit5에서 제공하는 것 뿐만 아니라 직접 태그를 만들 수 있다.
+JUnit5에서 제공하는 것 뿐만 아니라 직접 태그를 만들 수 있다. 아래 예시를 통해 방법을 알 수 있다.
+
+메소드에 공통적으로 붙는 애노테이션이 많아질 때 유용해보인다.
+
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Test
+@Tag("fast")
+public @interface FastTest {
+}
+
+@FastTest
+@DisplayName("스터디 fast Test")
+void tagTest1() {
+    Study study = new Study(100);
+    assertThat(study.getLimit()).isGreaterThan(0);
+}
+```
+
+## 7. 반복 테스트(중요)
+
+예제를 통해 살펴보면 반복 테스트 방법을 직관적으로 알 수 있다.
+ 
+```java
+public class RepeatedTest1 {
+    @DisplayName("repeat test1")
+    @RepeatedTest(value = 10, name = "{displayName}, {currentRepetition}/{totalRepetitions}")
+    void repeat(RepetitionInfo repetitionInfo) {
+        System.out.println("test" + repetitionInfo + "/" + repetitionInfo.getTotalRepetitions());
+    }
+
+    @DisplayName("repeat test2")
+    @ParameterizedTest(name="{index} {displayName}, message={0}")
+    @ValueSource(strings = {"날씨가", "많이", "더워지고", "있네요."})
+    void parameterizedTest(String message) {
+        System.out.println(message);
+    }
+}
+```
+@RepeatedTest와 @ParameterizedTest, @ValueSource를 주목해서 살펴보면 된다.
+
+이외에도 다양한 반복 테스트 방법이 있다.
+
+주로 인자를 객체에 바인딩하여 테스트를 해야하므로 주의깊게 주의깊게 살펴보아야 한다.
+
+ArgumentConverter.class를 정의해서 @ValueSource에서 제공되는 값을 생성자를 통해 객체에 바인딩하여 매개변수로 전달할 수 있다.
+
+```java
+    @DisplayName("스터디 만들기")
+    @ParameterizedTest(name="{index} {displayName} message={0}")
+    @ValueSource(strings = {"날씨가", "많이", "더워지고", "있습니다."})
+    @EmptySource
+    @NullSource
+    void parameterizedTest1(String message) {
+        System.out.println(message);
+    }
+
+    @DisplayName("스터디 만들기 : ArgumentConverter 사용")
+    @ParameterizedTest(name="{index} {displayName} message={0}")
+    @ValueSource(ints = {10, 20, 40})
+    void parameterizedTest2(@ConvertWith(StudyConverter.class) Study study) {
+        System.out.println(study.getLimit());
+    }
+    static class StudyConverter extends SimpleArgumentConverter {
+        @Override
+        protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
+            assertEquals(Study.class, targetType, "can only convert to Study");
+            // Constructor를 통해서 변환됨
+            return new Study(Integer.parseInt(source.toString()));
+        }
+    }
+```
+
+ArgumentAccessor 또는 ArgumentAggregator를 통해 @Source의 인자를 조합하여 객체에 바인딩하는 방법도 있다. 
+```java
+    @DisplayName("스터디 만들기 : ArgumentAccessor 사용")
+    @ParameterizedTest(name = "{index} {displayName} message={0}")
+    @CsvSource({"10, '자바 스터디'", "20, 스프링"})
+    void parameterizedTest4(ArgumentsAccessor argumentsAccessor) {
+        Study study = new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
+        System.out.println(study);
+    }
+
+    @DisplayName("스터디 만들기 : ArgumentAggregator 사용")
+    @ParameterizedTest(name = "{index} {displayName} message={0}")
+    @CsvSource({"10, '자바 스터디'", "20, 스프링"})
+    void parameterizedTest5(@AggregateWith(StudyArgumentsAggregator.class) Study study) {
+        System.out.println(study);
+    }
+
+    static class StudyArgumentsAggregator implements ArgumentsAggregator {
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor argumentsAccessor, ParameterContext parameterContext) throws ArgumentsAggregationException {
+            return new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
+        }
+    }
+```
+
+## 8. 테스트 인스턴스 전략 변경
+
+JUnit은 테스트마다 새로운 인스턴스를 생성한다. 그러므로, 클래스의 필드변수를 기본적으로 공유할 수 없다.
+
+왜냐하면, 테스트간 의존성이 없어야하기 때문이다.
+
+그러나, 필드변수를 공유해야할 때도 있다.
+
+즉, 테스트마다 새로운 인스턴스를 생성하는 것이 아니라 인스턴트를 공유할 필요성이 있다는 뜻이다.
+
+이때는 클래스에 아래의 애노테이션을 붙이자.
+
+```java
+@TestInstance(LifeCycle.PER_CLASS)
+```
+
+## 9. 테스트 순서 
+
+시나리오를 테스트하는 등의 테스트 순서를 지정할 필요가 있을 수 있다.
+
+아래의 애노테이션을 클래스에 붙이도록 하자.
+
+```java
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+```
+
+MethodOrderer.OrderAnnotation.class 뿐만 아니라 다른 구현체도 존재한다.
+
+## 10. junit-platform.properties
+
+test쪽의 Annotation 설정을 일괄 변경하고 싶을 때 사용하도록 한다.
+
+## 11. JUnit5 확장 모델
+
+예제를 통해 살펴보자.
+
+시간이 오래 걸리는 테스트인데 @SlowTest가 없는 테스트를 찾아내서 경고 메세지를 출력하고자 한다면 아래와 같이 코드를 작성하면 된다.
+
+```java
+public class SlowTestExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+    private static long THRESHOLD = 1000L;
+    public SlowTestExtension(long THRESHOLD) {
+        this.THRESHOLD = THRESHOLD;
+    }
+    @Override
+    public void beforeTestExecution(ExtensionContext extensionContext) throws Exception {
+        ExtensionContext.Store store = getStore(extensionContext);
+        store.put("START_TIME", System.currentTimeMillis());
+    }
+    @Override
+    public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
+        ExtensionContext.Store store = getStore(extensionContext);
+        Long startTime = store.remove("START_TIME", long.class);
+        long duration = System.currentTimeMillis() - startTime;
+        if(duration > THRESHOLD && !extensionContext.getTags().contains("slow")) {
+            System.out.printf("Please consider mark method [%s] with @SlowTest\n", extensionContext.getRequiredTestMethod().getName());
+        }
+    }
+
+    ExtensionContext.Store getStore(ExtensionContext extensionContext) {
+        String testClassName = extensionContext.getRequiredTestClass().getName();
+        String testMethodName = extensionContext.getRequiredTestMethod().getName();
+        ExtensionContext.Store store = extensionContext.getStore(ExtensionContext.Namespace.create(testClassName, testMethodName));
+        return store;
+    }
+}
+```
+
+```java
+//@ExtendWith(SlowTestExtension.class) /* 선언적인 방법 */
+public class SlowTestSamples {
+
+    @RegisterExtension /* THRESHOLD를 지정하고 싶을 때 사용할 수 있다. 프로그래밍적인 방법 */
+    static SlowTestExtension slowTestExtension = new SlowTestExtension(1000L);
+
+    @SlowTest
+    void slowTest1() throws InterruptedException {
+        Thread.sleep(1010);
+    }
+    @SlowTest
+    void slowTest2() throws InterruptedException {
+        Thread.sleep(1010);
+    }
+    @Test
+    void slowTest3() throws InterruptedException {
+        Thread.sleep(1010);
+    }
+}
+```
