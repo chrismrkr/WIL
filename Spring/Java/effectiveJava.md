@@ -132,7 +132,7 @@ public void main() {
 
 람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다.
 
-@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
+\@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
 
 예를 들어서, 아래 코드를 실행하고자 한다면,
 
@@ -156,12 +156,14 @@ void runLambda(Lambda l) {
 Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아래와 같다.
 
 + Runnable의 void run() : 매개변수 X, 반환 X
-+ Supplier<T> T get() : 매개변수 X, 반환 O
-+ Consumer<T> void accept(T t) : 매개변수 O, 반환 X
-+ Function<T, R> R apply(T t) : 매개변수 O, 반환 O
-+ Predicate<T> boolean test(T t) : 매개변수 O, 반환 boolean
++ Supplier\<T> T get() : 매개변수 X, 반환 O
++ Consumer\<T> void accept(T t) : 매개변수 O, 반환 X
++ Function\<T, R> R apply(T t) : 매개변수 O, 반환 O
++ Predicate\<T> boolean test(T t) : 매개변수 O, 반환 O
+  
+## 2.2 스트림(Stream)
 
-## 2.2 
+스트림(Stream)의 중간연산자에서 함수형 인터페이스를 사용한다.
   
 **스트림(Stream)이란 Collection이나 배열과 같은 서로 다른 데이터 소스마다 다른 방식으로 다뤄하는 문제점을 해결하기 위해 등장했다.**
 
@@ -183,3 +185,22 @@ Stream의 특징은 아래와 같다.
 + 중간연산 : 연산 결과가 Stream인 연산. 연속해서 사용 가능
 + 최종연산 : 연산 결과가 Stream이 아닌 연산. 연속해서 사용 불가능
 + IntStream, DoubleStream 등 기본형 스트림 존재 : Stream<Integer>를 대체할 수 있음
+  
+#### 2.2.1 스트림 생성방법
+
+자주 쓰이는 것은 아래와 같다.
+  
++ Collection : Collection.stream()으로 생성
++ 배열 : Arrays.stream(배열)로 생성
++ 두 스트림 연결 : Stream.concat(stream1, stream@)으로 생성
+  
+
+#### 2.2.2 스트림의 중간연산
+  
+자주 쓰이는 것은 아래와 같다.
+  
++ 스트림 자르기 : skip(long n), limit(long maxSize)
++ 요소 걸러내기 : filter(Predicate\<T> predicate), distinct()
++ 정렬          : sorted(Comparater\<T> comparater)
++ 변환          : map(Function\<T, R> mapper)
+  
