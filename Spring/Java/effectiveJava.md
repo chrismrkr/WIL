@@ -126,6 +126,8 @@ public void main() {
 
 ## 2. 람다식과 함수형 인터페이스, 그리고 스트림(Stream)
 
+### 2.1 람다식과 함수형 인터페이스
+
 람다식은 함수형 인터페이스로 참조할 수 있다.
 
 람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다.
@@ -158,5 +160,26 @@ Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아
 + Consumer<T> void accept(T t) : 매개변수 O, 반환 X
 + Function<T, R> R apply(T t) : 매개변수 O, 반환 O
 + Predicate<T> boolean test(T t) : 매개변수 O, 반환 boolean
+
+## 2.2 
   
+**스트림(Stream)이란 Collection이나 배열과 같은 서로 다른 데이터 소스마다 다른 방식으로 다뤄하는 문제점을 해결하기 위해 등장했다.**
+
+Stream을 사용하면 서로 다른 데이터 소스도 동일한 방법으로 다룰 수 있다. 이에 따라 재사용성도 높아진다.
+
+```java
+Stream<String> strStream1 = strList.stream();
+Stream<String> strStream2 = Arrays.stream(strArr);
+
+strStream1.sorted().foreach((str) -> System.out.println(str));
+strStream2.sorted().foreach((str) -> System.out.println(str));
+```
   
+Stream의 특징은 아래와 같다.
+  
++ 원본 데이터 소스를 변경하지 않음
++ 일회용 : 한번 사용하면 재활용이 불가능함
++ 스트림 연산 : DB의 SELECT 쿼리를 하는 것과 유사함
++ 중간연산 : 연산 결과가 Stream인 연산. 연속해서 사용 가능
++ 최종연산 : 연산 결과가 Stream이 아닌 연산. 연속해서 사용 불가능
++ IntStream, DoubleStream 등 기본형 스트림 존재 : Stream<Integer>를 대체할 수 있음
