@@ -124,7 +124,7 @@ public void main() {
 
 그러나, static inner class이므로 outer class 객체가 생성되기 이전에 클래스만 로드되어도 inner class에 접근할 수 있다. 
 
-## 2. 람다식과 함수형 인터페이스
+## 2. 람다식과 함수형 인터페이스, 그리고 스트림(Stream)
 
 람다식은 함수형 인터페이스로 참조할 수 있다.
 
