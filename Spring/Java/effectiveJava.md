@@ -132,7 +132,7 @@ public void main() {
 
 람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다.
 
-\@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
+@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
 
 예를 들어서, 아래 코드를 실행하고자 한다면,
 
@@ -178,13 +178,14 @@ strStream2.sorted().foreach((str) -> System.out.println(str));
 ```
   
 Stream의 특징은 아래와 같다.
+
   
 + 원본 데이터 소스를 변경하지 않음
 + 일회용 : 한번 사용하면 재활용이 불가능함
 + 스트림 연산 : DB의 SELECT 쿼리를 하는 것과 유사함
 + 중간연산 : 연산 결과가 Stream인 연산. 연속해서 사용 가능
 + 최종연산 : 연산 결과가 Stream이 아닌 연산. 연속해서 사용 불가능
-+ IntStream, DoubleStream 등 기본형 스트림 존재 : Stream<Integer>를 대체할 수 있음
++ IntStream, DoubleStream 등 기본형 스트림 존재 : Stream\<Integer>를 대체할 수 있음
   
 #### 2.2.1 스트림 생성방법
 
@@ -192,15 +193,40 @@ Stream의 특징은 아래와 같다.
   
 + Collection : Collection.stream()으로 생성
 + 배열 : Arrays.stream(배열)로 생성
-+ 두 스트림 연결 : Stream.concat(stream1, stream@)으로 생성
++ 두 스트림 연결 : Stream.concat(stream1, stream2)으로 생성
   
 
 #### 2.2.2 스트림의 중간연산
-  
+
 자주 쓰이는 것은 아래와 같다.
   
 + 스트림 자르기 : skip(long n), limit(long maxSize)
 + 요소 걸러내기 : filter(Predicate\<T> predicate), distinct()
 + 정렬          : sorted(Comparater\<T> comparater)
-+ 변환          : map(Function\<T, R> mapper)
++ 변환          : map(Function\<T, R> mapper), 원하는 필드만 뽑아내기 위해 사용
++ 조회          : peek((obj) -> System.out.println(obj.getAttr())
+
+mapToInt(), mapToDouble(), mapToLong()도 존재하고 각각 IntStream, DoubleStream, LongStream을 반환한다.
+
+Stream\<T[]>를 Stream\<T>로 변환하기 위해서는 flatMap()을 사용한다.
+
+#### 2.2.3 Optional\<T>
+
+**Optional 객체에서도 Stream과 동일하게 중간연산을 적용할 수 있다.**
+
+Optional\<T>는 제너릭 클래스인 T 타입 객체를 갑싸는 래퍼 클래스이다. 반환 값이 null인지 매번 if로 확인하지 않고 Optional을 통해 간단히 처리할 수 있다.
+
+Optional.of(instance)로 생성할 수 있다.
+
+Optional에서 객체를 가져오기 위해서는 .get(), .orElse(Supplier\<R> other) 등을 사용할 수 있다.
+ 
+#### 2.2.4 스트림의 최종 연산
+
+최종 연산이란 스트림을 소모해서 최종 결과를 만드는 함수이다. 중간 연산과 달리 최종 연산 후에는 스트림을 더이상 사용할 수 없다.
+
++ forEach(Consumer\<T> action) : 스트림을 소모하며 action을 반복적으로 수행
++ count, sum, average, min, max 통계 연산 : min, max는 Comparater\<T> 필요 
+
+
+
   
