@@ -1,6 +1,6 @@
 # Mockito
 
-Mock 객체는 프로그래머가 직접 행동을 관리하는 객체이고,
+Mock 객체는 프로그래머에 의해 행동이 관리하는 객체이고,
 
 Mockito는 Mock 객체를 쉽게 만들고 관리할 수 있는 방법을 제공한다.
 
@@ -56,4 +56,32 @@ Mock 객체의 행동에 대한 결과를 아래와 같이 프로그래머가 �
            .thenThrow(new RuntimeException())
            .thenReturn(Optional.empty());
 ```
+
+## 3. Mock 객체 결과 확인
+
+Mock 객체가 어떻게 사용되었는지 확인하는 방법도 있다. 자세한 방법은 아래와 같다.
+
+### 3.1 특정 메소드가 어떻게 호출되었는지 확인하기
+
+memberService(Mock 객체)가 notify(study) 메소드를 1번 실행했는지 확인하는 예시이다.
+```java
+   Mockito.verify(memberService, Mockito.times(1)).notify(study);
+```
+
+memberService(Mock 객체)가 validate(Mockito.any()) 메소드를 한번도 실행하지 않았는지 확인하는 예시이다.
+```java
+   Mockito.verify(memberService, Mockito.never()).validate(Mockito.any());
+```
+
+### 3.2 특정 메소드가 어떤 순서로 호출되었는지 확인하기
+
+memberService(Mock 객체)가 notify(study) -> notify(member) 순서로 메소드를 호출했는지 확인하는 예시이다.
+```java
+   // memberService 특정함수를 어떤 순서로 호출했는지 확인
+   InOrder inOrder = Mockito.inOrder(memberService);
+   inOrder.verify(memberService).notify(study);
+   inOrder.verify(memberService).notify(member);
+```
+
+
 
