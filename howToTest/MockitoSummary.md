@@ -12,8 +12,8 @@ Mockito는 Mock 객체를 쉽게 만들고 관리할 수 있는 방법을 제공
 
 ### 1.1 프로그래밍적 방식
 ```java
-        MemberService memberService = Mockito.mock(MemberService.class);
-        StudyRepository studyRepository = Mockito.mock(StudyRepository.class);
+   MemberService memberService = Mockito.mock(MemberService.class);
+   StudyRepository studyRepository = Mockito.mock(StudyRepository.class);
 ```
 
 ### 1.2 선언적 방식
@@ -28,3 +28,32 @@ class StudyServiceTest {
         assertNotNull(studyService);
     }
 ```
+## 2. Mock 객체 Stubbing
+
+Stubbing이란 Mock 객체의 행동과 결과를 프로그래머가 조작하는 것을 의미한다.
+
+Mock 객체의 행동에 대한 결과를 아래와 같이 프로그래머가 조작할 수 있다.
+
+```java
+   Member expectedMember = new Member();
+   expectedMember.setId(1L);
+   expectedMember.setEmail("kangok@email.com");
+
+   // stubbing : memberService.findById(1L)시 리턴할 값을 임의로 결정해둔다. 1L은 expectedMember를 반환함
+   Mockito.when(memberService.findById(1L)).thenReturn(Optional.of(expectedMember));
+```
+
+또한, Mock 객체의 행동에 대한 결과를 아래와 같이 매번 다르게 만들 수 있다.
+
+```java
+   Member expectedMember = new Member();
+   expectedMember.setId(1L);
+   expectedMember.setEmail("kangok@email.com");
+
+   // stubbing : memberService.findById(1L)시 리턴할 값을 임의로 결정해둔다. 1L은 expectedMember를 반환함
+   Mockito.when(memberService.findById(Mockito.any()))
+           .thenReturn(Optional.of(expectedMember))
+           .thenThrow(new RuntimeException())
+           .thenReturn(Optional.empty());
+```
+
