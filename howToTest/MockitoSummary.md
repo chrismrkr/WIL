@@ -83,5 +83,29 @@ memberService(Mock 객체)가 notify(study) -> notify(member) 순서로 메소�
    inOrder.verify(memberService).notify(member);
 ```
 
+## 4. BDD 스타일 Mockito API
+
+BDD(Behavior Driven Development) 스타일이란 Mock 객체의 행동을 given, when, then 3단계로 구분하여 정의하여 개발하는 것을 의미한다.
+
+이것이 테스트에서도 잘 활용된다. BDDMockito 클래스의 정적 멤버함수로 제공된다.
+
+```java
+    @Test
+    void study(@Mock MemberService memberService, @Mock StudyRepository studyRepository) {
+        // Given
+        StudyService studyService = new StudyService(memberService, studyRepository);
+        Study study = new Study(10, "Java");
+        BDDMockito.given(studyRepository.save(study)).willReturn(study);
+
+        // When
+        studyService.openStudy(study);
+
+        // Then : mock 상태를 확인한다.
+        Assertions.assertEquals(StudyStatus.OPENED, study.getStudyStatus());
+        Assertions.assertNotNull(study.getOpenedDateTime());
+        BDDMockito.then(memberService).should().notify(study);
+        BDDMockito.then(memberService).shouldHaveNoMoreInteraction();
+    }
+```
 
 
