@@ -87,7 +87,7 @@ root.render()
 
 state는 비동기적으로 변화할 수 있고, 생성자에서 정의한다.
 
-state를 변경할 때는 반드시 this.setState를 사용하여 React가 인식할 수 있도록 한다.
+**state를 변경할 때는 반드시 this.setState를 사용하여 React가 인식할 수 있도록 한다.**
 
 ## 5. 이벤트 처리하기
 
@@ -157,8 +157,61 @@ class App extends React.Component {
       this.setState({isToggle: !this.isToggle});
     }
     render() {
-      return <button onClick={click}> {this.state.isToggle ? "ON" : "OFF"} </button>
+      return <button onClick={click}> {this.state.isToggle ? "ON" : "OFF"} </button>;
     }
   }
 ```
+
+## 6. 조건부 렌더링
+
+자바스크립트 조건문을 렌더링에도 사용할 수 있다. 
+
+## 7. 리스트와 key
+
+자바스크립트에서의 리스트 변환 방법은 아래와 같다.
+
+```js
+const numbers = [1,2,3,4,5];
+numbers.map(number => number*2);
+```
+
+유사한 방법으로 반복적으로 컴포넌트를 렌더링할 수 있다.
+
+```jsx
+class NumberList extends React.Component {
+  constructor(props) { super(props); }
+  render() {
+    const numbers = [1,2,3,4,5];
+    const liList = numbers.map(number => <li>{number}</li>);  
+    return (
+      <ul>{liList}</ul>
+    );
+  }
+}
+```
+
+DOM 노드가 리스트를 순차 순회할 때, React도 리스트를 순차 순회한다.
+
+React는 리스트가 기존과 동일한지 순차적으로 확인하면서 element가 추가되었다면 변경한다.
+
+그러므로, 만약 리스트의 맨 앞에 element가 추가되면, react는 순차 순회하므로 모든 자식을 변경해야하는 문제가 있다.
+
+이를 해결하기 위해서 \<li>에는 key가 존재한다. key는 아래와 같이 추가하면 된다.
+
+```jsx
+class NumberList extends React.Component {
+  constructor(props) { super(props); }
+  render() {
+    const numbers = [1,2,3,4,5];
+    const liList = numbers.map(number => <li key=number.toString()>{number}</li>);  
+    return (
+      <ul>{liList}</ul>
+    );
+  }
+}
+```
+
+## 8. Form
+
+
 
