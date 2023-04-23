@@ -1,5 +1,7 @@
 # React
 
+React Document를 공부하여 정리한 내용이다.
+
 ## 1. JSX
 
 Javascript Extension, React element를 생성하는데 사용하는 문법이다.
@@ -309,5 +311,37 @@ this.state는 데이터의 변경사항을 반영하기 위해 사용된다. (�
 
 ## 10. 합성과 상속
 
+### 컴포넌트를 다른 컴포넌트에 담기
+
+첫번째로 props.chilldren 속성을 사용할 수 있다.
+
+```jsx
+class Border extends React.Component {
+  render() {
+    return <div> {props.children} </div>;
+  }
+}
+```
+
+뿐만 아니라 고유 식별자로도 컴포넌트를 담을 수 있다.
+
+```jsx
+class Border extends React.Component {
+  render() {
+    return (
+      <div>
+        <div>{props.left}</div>
+        <div>{props.right}</div>
+      </div>
+    );
+  }
+}
+
+<Border left={...} right={...} />
+```
+
+구체적인 컴포넌트가 일반적인 컴포넌트를 렌더링 하는 방식으로 합성이 일어난다.
+
+## 11. React로 생각하기
 
 
