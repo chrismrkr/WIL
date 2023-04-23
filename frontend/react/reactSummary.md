@@ -213,5 +213,63 @@ class NumberList extends React.Component {
 
 ## 8. Form
 
+\<form> element는 다른 React DOM element와 달리 내부 상태를 갖는다.
 
+순수 HTML \<form>은 name 속성을 통해 입력 값을 받는다.
 
+```html
+<form action="...">
+  <input type='text' name='username' />
+</form>
+```
+
+기본적으로 \<form>은 새로운 페이지로 이동하는 동작을 한다.
+
+그러나, 자바스크립트를 통해 \<form>을 제출한 후, 입력 데이터에 접근하는 방식이 사용되기도 한다. 이를 제어 컴포넌트라고 한다.
+
+### 제어 컴포넌트
+
+\<input>, \<textarea>, \<select>와 같은 form element는 사용자 입력을 바탕으로 컴포넌트의 state를 관리한다.(setState({...})
+
+state를 단일 출처로 하여 입력과 이벤트를 제어한다. 아래의 예제를 살펴보자.
+
+```jsx
+// <input>에 값을 입력한 후 submit시, alert에 <input> 값이 담기는 컴포넌트 구현하기
+class InputButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: ""};
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    this.setState({value : e.target.value});
+  }
+  handleSubmit(e) {
+    alert(this.state.value);
+    e.preventDefault();
+  }
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <input type="text" value={this.state.value} onChange={this.handleChange} />
+        <submit type="submit" value="submit"/>
+      </form>
+    );
+  }
+}
+```
+
+제어 컴포넌트의 핵심은 state에 Single Source of Truth를 만들고, 이를 입력과 이벤트 핸들러에서 사용한다는 것이다.
+
+form 태그와 관련된 Formik 라이브러리에 대해서도 알아보면 좋다.
+
+## 9. state 끌어올리기
+
+동일한 데이터의 변경사항을 여러 컴포넌트에 반영해야 하는 경우도 있다. 
+
+이러한 경우에 가까운 부모 컴포넌트에 state를 저장하여 자식으로 전달하는 것을 state 끌어올리기라고 한다.
+
+```jsx
+
+```
