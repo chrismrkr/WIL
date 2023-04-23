@@ -271,5 +271,43 @@ form 태그와 관련된 Formik 라이브러리에 대해서도 알아보면 좋
 이러한 경우에 가까운 부모 컴포넌트에 state를 저장하여 자식으로 전달하는 것을 state 끌어올리기라고 한다.
 
 ```jsx
+// 섭씨 온도를 입력하여 물이 끓는지 아닌지를 확인하는 온도 계산기 구현
+class Calculator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {temparature: ""};
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    this.setState({temparature : e.target.value});
+  }
+  return (
+    <fieldset>
+      <legend>온도를 입력하세요</legend>
+      <input value={this.state.temparature} onChange={this.handleChange} />
+      <BoilingVerdict celsius={parseFloat(this.state.temparature)} />
+    </fieldset>
+  );
+}
 
+class BoilingVerdict extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    if(this.props.celsius > 100) return <p> 끓는 중.. </p>;
+    else return <p> 아직 안 끓는 중.. </o>;
+  }
+}
 ```
+
+this.state는 데이터의 변경사항을 반영하기 위해 사용된다. (반대로, props는 불변 속성을 저장한다.)
+
+그러므로, state 내의 속성은 서로 독립적이어야 한다. 예를 들어, 배열과 배열의 길이가 this.state 속성에 같이 있으면 안된다.
+
+배열이 변경될 때 배열의 길이는 항상 변화하므로, 데이터의 정합성이 깨질 위험성이 있기 때문이다.
+
+## 10. 합성과 상속
+
+
+
