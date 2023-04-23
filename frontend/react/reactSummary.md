@@ -70,7 +70,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(</Clock />);
 ```
 
-**호출 과정**
+\<**호출 과정**> : 
 root.render() 
 -> DOM 업데이트 
 -> DOM 업데이트 시 componentDidMount() 호출 
