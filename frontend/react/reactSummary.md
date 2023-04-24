@@ -388,3 +388,5 @@ state 위치를 결정하기 위해서 React Document에서 제시한 방법은 
 이를 역방향 바인딩이라고 하며 React와는 반대되는 방식이다.
 
 onChange, onClick, onBlur 등을 통해서 역방향 바인딩을 구현할 수 있다.
+
+상위 컴포넌트는 하위 컴포넌트에 callback을 전달하여 state가 변경되면 호출되게 만들도록 한다.
