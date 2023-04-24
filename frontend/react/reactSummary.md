@@ -383,3 +383,8 @@ state 위치를 결정하기 위해서 React Document에서 제시한 방법은 
 
 ### Step5. 역방향 데이터 흐름 추가
 
+하단에 있는 \<form> 컴포넌트에서 상위 컴포넌트의 state를 변경해야 할 수도 있다.
+
+이를 역방향 바인딩이라고 하며 React와는 반대되는 방식이다.
+
+onChange, onClick, onBlur 등을 통해서 역방향 바인딩을 구현할 수 있다.
