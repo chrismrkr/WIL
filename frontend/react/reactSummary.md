@@ -313,7 +313,7 @@ this.state는 데이터의 변경사항을 반영하기 위해 사용된다. (�
 
 ### 컴포넌트를 다른 컴포넌트에 담기
 
-첫번째로 props.chilldren 속성을 사용할 수 있다.
+첫번째로 props.children 속성을 사용할 수 있다.
 
 ```jsx
 class Border extends React.Component {
