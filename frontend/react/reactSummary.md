@@ -389,4 +389,85 @@ state 위치를 결정하기 위해서 React Document에서 제시한 방법은 
 
 onChange, onClick, onBlur 등을 통해서 역방향 바인딩을 구현할 수 있다.
 
-상위 컴포넌트는 하위 컴포넌트에 callback을 전달하여 state가 변경되면 호출되게 만들도록 한다.
+상위 컴포넌트는 하위 컴포넌트에 callback을 전달하여 상위 컴포넌트의 state를 변경할 수 있도록 구현할 수 있다.
+
+예를 들어, 특정 이름을 키워드를 검색하면 해당되는 목록 리스트를 보여주는 화면이라고 하자.
+
+```jsx
+class SearchMain extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            itemList : []
+        };
+        this.changeItemList = this.changeOrderItemList.bind(this); 
+    }
+
+    changeItemList() {
+        this.setState({
+            itemList : [ {
+                    item_id: 1,
+                    name: "사과",
+                    price: 1000,
+                    quantity: 3
+                }, {
+                    item_id: 2,
+                    name: "배",
+                    price: 2000,
+                    quantity: 10
+                }
+            ]
+        });
+    }
+    render() {
+        return (
+            <div>
+              <SearchController searchCallback={this.changeItemList} />
+              <SearchResult itemList={this.state.itemList} />
+            </div>
+        );
+    }
+}
+
+class SearchController extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: ""
+        }
+        this.handleButton = this.handleButton.bind(this);
+    }
+    handleChange(event) {
+        this.setState({
+            username : event.target.value
+        });
+    }
+    handleButton(event) {
+        this.props.searchCallback();
+        event.preventDefault();
+    }
+    render() {
+        return (
+            <form onSubmit={(e) => this.handleButton(e)}>
+                <label>
+                    <b>이름</b>
+                    <input type="text" value={this.state.username} onChange={(e)=>this.handleChange(e)} placeholder="이름을 입력하세요."></input>
+                </label>
+                <input type="submit" value="조회"/>
+            </form>
+        );
+    }
+}
+
+class SearchResult extends Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        const liList = this.props.itemList.map(item => <li>{item.name}</li>);
+        return (
+            <ul>{liList}</ul>
+        );    
+    }
+}
+```
