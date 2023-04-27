@@ -435,7 +435,6 @@ class SearchController extends Component {
         this.state = {
             username: ""
         }
-        this.handleButton = this.handleButton.bind(this);
     }
     handleChange(event) {
         this.setState({
@@ -451,7 +450,7 @@ class SearchController extends Component {
             <form onSubmit={(e) => this.handleButton(e)}>
                 <label>
                     <b>이름</b>
-                    <input type="text" value={this.state.username} onChange={(e)=>this.handleChange(e)} placeholder="이름을 입력하세요."></input>
+                    <input type="text" value={this.state.username} onChange={(e)=>this.handleChange(e)}></input>
                 </label>
                 <input type="submit" value="조회"/>
             </form>
@@ -471,3 +470,10 @@ class SearchResult extends Component {
     }
 }
 ```
+
+Main에서 changeItemList 함수를 SearchControl 컴포넌트의 callback 함수로 전달하고,
+
+SearchControl 컴포넌트에서 changeItem을 호출하면 Main의 this.state.itemList가 변경된다.
+
+React는 this.state의 변경을 감지하고, 그 중 SearchResult를 다시 렌더링한다.
+
