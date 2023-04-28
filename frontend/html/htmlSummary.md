@@ -246,9 +246,13 @@ HTML 코드의 가독성을 높이기 위해 사용된다.
 <form [속성="속성값"]>여러 폼 요소</form>
 ```
 
-태그의 속성은 method, action, name, target이 있다. 주로 사용하는 것은 method와 action이다.
+**\<form> 속성**
 
-method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS 서버 프로그램을 실행시킨다.
++ method : get, post
++ name : 서버에서 form data를 참조하기 위해 사용함
++ action : URL 또는 HTML 링크
++ enctype : 서버 전송 시, 데이터 인코딩 타입 지정
++ autocomplete : 이전에 입력했던 값을 기반으로 드롭다운 옵션을 제공
 
 ##### 3.1.2 자동 완성 속성
 
@@ -258,7 +262,7 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 
 \<fieldset> 태그를 통해 하나의 폼을 여러개로 나누어 **표현**할 수 있다.
 
-\<legend> 태그를 통해 \<fieldset> 태그로 묶인 그룹의 제목을 지정할 수 있다. 입력 방식은 아래와 같다.
+\<legend> 태그를 통해 \<fieldset>의 제목을 지정한다. 아래의 예제를 통해 알 수 있다.
 
 ```html
 <form action="...">
@@ -274,16 +278,16 @@ method는 HTTP 통신에서의 method를 의미하고 action은 WEB 또는 WAS �
 </form>
 ```
 
-#### 3.1.4 폼 요소에 레이블을 붙이는 태그
+#### 3.1.4 \<label> 태그
 
 \<label> 태그는 \<input> 같은 폼 요소에 레이블을 붙일 때 사용하는 태그이다.
 
 ```html
-<label for="user_id">아이디</label>
 <input type="text" id="user_id">
+<label for="user_id">아이디</label>
 ```
 
-입력 폼을 작성할 때는 이런식으로 만들자.
+예를 들어, type='checkbox'인 input은 박스를 클릭해야 반응하지만, label과 연동된 경우에는 텍스트를 클릭해도 박스가 반응한다. 
 
 ***
 
@@ -297,8 +301,6 @@ type 속성을 이용해서 어떻게, 무엇을 input으로 받을지를 결정
 ***
 
 ### 3.3 input 태그의 주요 속성
-
-\<input> 태그는 여러개의 type 속성이 있고, 그 이외에 주요한 속성을 알아보도록 한다. 
 
 #### 3.3.1 autofocus
 
@@ -314,11 +316,37 @@ type 속성을 이용해서 어떻게, 무엇을 input으로 받을지를 결정
 
 #### 3.3.3 readonly
 
-input 필드를 읽기 전용으로 만들어 사용자는 입력할 수 없다.(왜 있는걸까..)
+input 필드를 읽기 전용으로 만들어 사용자는 입력할 수 없다.
 
 #### 3.3.4 required 
 
 필수 입력 값을 지정한다. 입력하지 않으면 브라우저가 자체적으로 오류를 띄운다.
+
+#### 3.3.5 min, max
+
+최소 - 최대 숫자를 지정한다.
+
+#### 3.3.6 maxLength
+
+입력할 수 있는 최대 문자열 길이를 지정한다.
+
+#### 3.3.7 type
+
++ hidden
++ text
++ tel
++ url
++ email
++ password
++ date : 연-월-일 선택(사용자 지역 기준)
++ datetime: 국제 표준시 기준 날짜 및 시간
++ datetime-local : 지역 기준 날짜 및 시간
++ month, week, time : 사용자 지역 기준
++ button
++ file : 파일 첨부 버튼
++ submit
++ image
+
 
 ****
 
@@ -328,7 +356,7 @@ input 이외의 다양한 태그를 제시한다.
 
 #### 3.4.1 여러줄을 한번에 입력받는 태그
 
-\<textarea>라는 입력 태그가 있다. \<input> 태그와 달리 여러 줄을 한번에 입력받기 위한 태그이다.
+\<textarea>는 여러 줄을 한번에 입력받기 위한 태그이다.
 
 rows 속성을 통해 입력받을 줄을 설정하고, cols 속성을 통해 몇글자를 입력받을지 결정한다. cols의 단위는 바이트이다.
 
