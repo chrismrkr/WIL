@@ -678,9 +678,23 @@ PermitAllFilter.beforeInvocation()을 시작으로 인가 처리를 시작한다
 permitAll Request가 아니라면 AbstractSecurityInteceptor.beforeInvocation(object)를 실행한다.
 
 ```java
-
+public abstract class AbstractSecurityInterceptor implements InitializingBean, ApplicationEventPublisherAware, MessageSourceAware {
+    protected InterceptorStatusToken beforeInvocation(Object object) {
+        Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource().getAttributes(object);
+        
+        Authentication authenticated = this.authenticateIfRequired();
+        
+        this.attemptAuthorization(object, attributes, authenticated);
+    }
+}
 ```
+SecurityMetadataSoruce로부터 인가 정보(Collection\<ConfigAttribute>)를 가져온다.
 
+SecurityMetadataSource에는 ```LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap``` 형태로 인가 정보가 저장되어 있다.
+
+```this.obtainSecurityMetadataSource().getAttributes(object)```를 이용해 인증 객체의 권한과 일치하는 정보를 가져온다.
+
+예를 들어, 인증 객체의 권한이 ROLE_USER이고, 인가 정보에는 { ROLE_USER -> GET /home, ROLE_USER -> GET /user, ROLE_MANAGER -> GET /manager }가 있다면, 위 메소드를 통해 { ROLE_USER -> GET /home, ROLE_USER -> GET /user }를 인가정보로 가져온다.
 
 
 
