@@ -746,8 +746,7 @@ FilterSecurityInterceptor에서는 AuthenticationManager, SecurityMetadataSource
 
 ### 2.8 AccessDecisionManager, AccessDecisionVoter
 
-AccessDecisionManager는 인가 허용/거부르 결정하는 객체이고, AccessDeicisionVoter는 허용/거부의 구체적인 방식을 나타내는 객체이다.
-
+AccessDecisionManager는 인가 허용/거부를 결정하는 객체이고, AccessDeicisionVoter는 허용/거부의 구체적인 방식을 나타내는 객체이다.
 
 AccessDecisionManager의 상속 구조는 AccessDecisionManager -> AbstractAccessDecisionManager -> AffirmativeBased이다.
 
@@ -756,6 +755,97 @@ AbstractAccessDecisionManager는 ```List<AccessDecisionVoter<?>> decisionVoters`
 AccessDecisionManager는 인터페이스이고 대표적인 구현체는 AffirmativeBased이고, AffirmativeBased는 decisionVoters 중 1개만 통과해도 인가를 허용하도록 하는 구현체이다.
 
 ```java
+public class AffirmativeBased extends AbstractAccessDecisionManager {
+    public AffirmativeBased(List<AccessDecisionVoter<?>> decisionVoters) {
+        super(decisionVoters);
+    }
 
+    public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException {
+        int deny = 0;
+        Iterator var5 = this.getDecisionVoters().iterator();
+        while(var5.hasNext()) {
+            AccessDecisionVoter voter = (AccessDecisionVoter)var5.next();
+            int result = voter.vote(authentication, object, configAttributes);
+            switch (result) {
+                case -1:
+                    ++deny;
+                    break;
+                case 1:
+                    return;
+            }
+        }
+
+        if (deny > 0) {
+            throw new AccessDeniedException(this.messages.getMessage());
+        } else {
+            this.checkAllowIfAllAbstainDecisions();
+        }
+    }
+}
 ```
+
+AccessDecisionVoter 중 가장 많이 사용되는 것은 RoleVoter이다. 코드를 통해 구체적으로 살펴보자.
+
+주석과 코드를 통해 파악할 수 있다.
+
+```java
+public class RoleVoter implements AccessDecisionVoter<Object> {
+    private String rolePrefix = "ROLE_";
+    
+    public int vote(Authentication authentication, Object object, Collection<ConfigAttribute> attributes) {
+          int result = 0;
+          Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+          
+          Iterator var6 = attributes.iterator(); // object(request)에 접근할 수 있는 권한 리스트를 순회
+          while(true) {
+                ConfigAttribute attribute;
+                do {
+                    if (!var6.hasNext()) {
+                        return result;
+                    }
+                    attribute = (ConfigAttribute)var6.next();
+                } while(!this.supports(attribute));
+                
+
+                result = -1;
+                Iterator var8 = authorities.iterator();
+
+                while(var8.hasNext()) {
+                    GrantedAuthority authority = (GrantedAuthority)var8.next();
+                    if (attribute.getAttribute().equals(authority.getAuthority())) {
+ // authentication 객체가 가진 권한 리스트 중 하나와 object(request)에 접근할 수 있는 권한 중 일치하는 것을 찾음.
+                        return 1;
+                    }
+                }
+            }     
+    }
+}
+```
+
+FilterSecurityInterceptor에서는 AuthenticationManager, SecurityMetadataSource, 그리고 AccessDecisionManager가 사용되었다. 
+
+마찬가지로 AccessDecisionManager는 RoleVoter 리스트가 사용되었으므로 이를 SecurityConfig 클래스에서 설정한다.
+
+```java
+    private List<AccessDecisionVoter<?>> getAccessDecisionVoter() {
+        List<AccessDecisionVoter<? extends Object> > accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(roleVoter()); // 자원 권한 관련 voter
+        return accessDecisionVoters;
+    }
+```
+
+이외에도 다양한 AccessDecisionManager와 Voter가 존재하나 추후 더 살펴보도록 한다.
+
+***
+
+## 3. 스프링 시큐리티 실전 및 
+
+
+
+
+
+
+
+
+
 
