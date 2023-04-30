@@ -694,7 +694,58 @@ SecurityMetadataSource에는 ```LinkedHashMap<RequestMatcher, List<ConfigAttribu
 
 ```this.obtainSecurityMetadataSource().getAttributes(object)```를 이용해 인증 객체의 권한과 일치하는 정보를 가져온다.
 
-예를 들어, 인증 객체의 권한이 ROLE_USER이고, 인가 정보에는 { ROLE_USER -> GET /home, ROLE_USER -> GET /user, ROLE_MANAGER -> GET /manager }가 있다면, 위 메소드를 통해 { ROLE_USER -> GET /home, ROLE_USER -> GET /user }를 인가정보로 가져온다.
+예를 들어, HTTP 요청은 GET /home이고 인가 정보에는 { GET /home -> ROLE_USER,  GET /user -> ROLE_USER, GET /manager -> ROLE_MANAGER }가 있다면, 위 메소드를 통해 {GET /home -> ROLE_USER}를 인가정보로 가져온다.
+
+SecurityMetadataSource에 대해서는 이후에 더 자세히 다루도록 한다.
+
+
+```Authentication authenticated = this.authenticateIfRequired();```에서는 ThreadLocal에 저장된 인증 객체를 가져온다.
+
+만약, 리소스 접근 사용자가 인증된 상태가 아니라면, authenticationManager를 통해 인증 과정을 거친다.
+
+
+앞서 불러온 리소스 요청 정보, 인가 정보, 인증 정보를 이용해 ```this.attemptAuthorization(object, attributes, authenticated);```를 실행한다. 실질적인 인가 처리를 실행한다.
+
+```java
+private void attemptAuthorization(Object object, Collection<ConfigAttribute> attributes, Authentication authenticated) {
+        try {
+            this.accessDecisionManager.decide(authenticated, object, attributes);
+        } catch (AccessDeniedException var5) {
+            if (this.logger.isTraceEnabled()) {
+                this.logger.trace(...));
+            } else if (this.logger.isDebugEnabled()) {
+                this.logger.debug(...));
+            }
+
+            this.publishEvent(new AuthorizationFailureEvent(object, attributes, authenticated, var5));
+            throw var5;
+        }
+    }
+```
+
+accessDecisionManager.decide()를 통해 **request 요청하는 사용자가 권한이 있는지**를 확인한다.
+
+권한이 있다면 인가 처리를 완료한다.
+
+만약, 위 과정에서 하나라도 실패한다면, Exception을 발생시키고 이를 ExceptionTranslationFilter에서 try-catch를 통해 잡아낸다. AccessDeniedHandler가 호출되기도 한다.
+
+accessDecisionManager에 대해서는 추후 더 자세히 살펴보자.
+
+FilterSecurityInterceptor에서는 AuthenticationManager, SecurityMetadataSource, 그리고 AccessDecisionManager가 사용되었다. 그러므로, 이를 SecurityConfig 클래스에서 지정해야 한다.
+
+```java
+    @Bean
+    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
+        PermitAllFilter permitAllFilter = new PermitAllFilter(permitAllResources);
+        permitAllFilter.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
+        permitAllFilter.setAccessDecisionManager(affirmativeBased());
+        permitAllFilter.setAuthenticationManager(authenticationManager());
+        return permitAllFilter;
+    }
+```
+
+
+### 2.8 AccessDecisionManager, AccessDecisionVoter
 
 
 
