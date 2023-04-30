@@ -725,7 +725,7 @@ private void attemptAuthorization(Object object, Collection<ConfigAttribute> att
 
 accessDecisionManager.decide()를 통해 **request 요청하는 사용자가 권한이 있는지**를 확인한다.
 
-권한이 있다면 인가 처리를 완료한다.
+권한이 있다면 인가 처리를 완료하고 return 한다.
 
 만약, 위 과정에서 하나라도 실패한다면, Exception을 발생시키고 이를 ExceptionTranslationFilter에서 try-catch를 통해 잡아낸다. AccessDeniedHandler가 호출되기도 한다.
 
@@ -744,11 +744,18 @@ FilterSecurityInterceptor에서는 AuthenticationManager, SecurityMetadataSource
     }
 ```
 
-
 ### 2.8 AccessDecisionManager, AccessDecisionVoter
 
- 
+AccessDecisionManager는 인가 허용/거부르 결정하는 객체이고, AccessDeicisionVoter는 허용/거부의 구체적인 방식을 나타내는 객체이다.
 
 
+AccessDecisionManager의 상속 구조는 AccessDecisionManager -> AbstractAccessDecisionManager -> AffirmativeBased이다.
 
+AbstractAccessDecisionManager는 ```List<AccessDecisionVoter<?>> decisionVoters```를 갖는다.
+
+AccessDecisionManager는 인터페이스이고 대표적인 구현체는 AffirmativeBased이고, AffirmativeBased는 decisionVoters 중 1개만 통과해도 인가를 허용하도록 하는 구현체이다.
+
+```java
+
+```
 
