@@ -155,13 +155,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilter.class를 분석하면 인증필터 구조를 알 수 있다.
 
-개괄적인 방법은 아래와 같다.
+예를 들어, POST /login HTTP 메소드로 로그인 요청을 보낼 수 있다.
 
-+ 1. Authentication 객체를 만들어 임시로 ID, Password를 저장한다.
-+ 2. AuthenticationManager를 통해 실제 인증을 수행한다.
-+ 3. 인증에 성공하면 Authentication 객체에 Session을 추가한 후, SecurityContext에 저장한다.
+로그인 요청을 보냈을 때, 일어나는 과정은 아래와 같다.
 
-위의 두 클래스를 분석하면 더 명확히 알 수 있다.
++ 1. AuthenticationToken 객체를 만들어 임시로 ID, Password를 저장한다.
++ 2. AuthenticationManager를 호출한다. authenticationManager는 AuthenticationFilter에 등록되어 있다.
+
+만약, UsernamePasswordAuthenticationFilter 이외에 새로운 Filter를 생성하고자 한다면, AuthenticationManager도 새롭게 생성해서 등록해야 한다.
+
++ 3. AuthenticationManager -> Provider를 거쳐서 인증에 성공하면, Authentication 객체에 Session을 추가한 후, SecurityContext(ThreadLocal)에 저장한다.
+
+만약, 인증에 실패하면 AuthenticationFailureHandler.onAuthenticationFailure() 메소드를 통해 처리된다.
 
 ***
 
@@ -190,7 +195,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
     
            http .logout() // 로그아웃 처리 API 
-                .logoutUrl("/logout") // 로그아웃을 처리할 URL
+                .logoutUrl("/logout") // 로그아웃을 처리할 URL : HTTP POST /logout
                 .logoutSuccessUrl("/login") // 로그아웃 성공시 이동할 URL
                 .addLogoutHandler(new LogoutHandler() { // 로그아웃 실행 시 실행할 컨트롤러 
                     @Override
@@ -213,7 +218,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 (IntelliJ에서 Shift+Shift 단축키로 찾아볼 수 있다.)
 
-SecurityContext의 Authentication 객체를 제거하는 방식으로 진행된다.
+SecurityContext에 저장된 AuthenticationToken를 제거하여 로그아웃한다.
 
 ***
 
@@ -227,7 +232,7 @@ Remember-Me 기능을 사용하면 세션이 만료되더라도 자동 로그인
 
 + 1. Remember-me 쿠키를 로컬에 저장한다.
 + 2. Remember-me 쿠키를 key하여 접근할 수 있도록 ID와 Password를 서버에 저장한다. 이때, 메모리 또는 DB에 저장할 수 있다.
-+ 3. 세션이 만료되었고 Remeber-me 쿠키가 만료되지 않았다면, 자동 로그인을 할 수 있다.
++ 3. 세션이 만료되었고 Remember-me 쿠키가 만료되지 않았다면, 자동 로그인을 할 수 있다.
 
 스프링 시큐리티에서 제공하는 API는 아래와 같다.
 
@@ -244,8 +249,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.rememberMe() // rememberMe API
-                .rememberMeParameter("remember-me") // rememberMe 쿠키 이름
-                .tokenValiditySeconds(3600) // rememberMe 토큰 유효기간(DB 또는 메모리에 remeberMe 토큰이 저장됨을 알 수 있다.)
+                .rememberMeParameter("remember-me") // rememberMe 쿠키 key 이름
+                .tokenValiditySeconds(3600) // rememberMe 토큰 유효기간(DB 또는 메모리에 rememberMe 토큰이 저장됨을 알 수 있다.)
                 .alwaysRemember(true)
                 .userDetailsService(userDetailsService); // 사용자 정보를 가져오는 Service 지정
     }
@@ -256,7 +261,7 @@ UserDetailService에 대해서 더 알아보도록 하자.
 
 세션이 만료되었고 RemeberMe 토큰이 유효하다면, 저장소(Repository)에서 사용자 정보를 가져와야 자동 로그인을 할 수 있다.
 
-이를 위해 사용되는 것이 스프링 시큐리티의 UserDetailService 인터페이스의 loadUserByUsername 멤버함수이다.
+이를 위해 스프링 시큐리티에서는 UserDetailService 인터페이스의 loadUserByUsername 멤버함수를 제공한다.
 
 예를 들어, 회원을 관리하는 서비스(MemberService)에서 UserDetailService 인터페이스의 loadUserByUsername을 implement 및 Override하여 회원 정보를 가져올 수 있도록 만들 수 있다.
 
@@ -350,7 +355,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement()
@@ -362,7 +366,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 changeSessionId는 인증할 때 마다 SessionId를 변경한다. 서버의 Session 자체를 변경하는 것은 아니다.
 
 none 옵션은 아무것도 바꾸지 않는다. 
-migrateSessin은 기존 세션의 속성을 받아 Session 자체를 변화시킨다. 
+migrateSession은 기존 세션의 속성을 받아 Session 자체를 변화시킨다. 
 newSession은 기존 속성을 받지 않고 Session 자체를 변화시킨다.
 
 ***
@@ -385,13 +389,11 @@ ConcurrentSessionFilter는 인증 실패 전략일 때 사용되는 필터이다
 
 ### 1.11 인가 API - 권한 설정 및 표현식 
 
-인증이 완료되면 사용자에게 권한을 부여해야 한다. 권한 설정 방식은 크게 2가지가 있다.
+인증이 완료되면 사용자에게 권한을 부여한다. 권한 설정 방식은 URL, Method 방식 2가지가 있다.
 
-첫번째는 애플리케이션에서 설정하는 방식이고, 두번째는 DB와 연동해서 설정하는 방식이다.
+2가지 방법은 선언적 방식과 동적 방식을 모두 지원한다. 
 
-애플리케이션에서 직접 설정하는 방식에 대해서 알아보도록 한다.
-
-아래의 코드를 살펴보자.
+아래의 코드는 선언적 URL 방식의 인가 처리 예시이다. 
 
 ```java
 @Configuration
@@ -420,13 +422,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 + antMatchers: 권한을 설정할 HTTP API URL. **구체적인 경로가 먼저 오고, 그것보다 큰 범위가 뒤에 나오도록 해야한다.** antMatcher를 순서대로 체크하기 때문이다.
 + hasRole(role): 해당 role이 있으면 접근 가능
-+ hasAuthority(authority): 해당 authority가 있으면 접근 가능
+
+자세한 인가 처리에 대한 내용은 이후에 더 설명하도록 한다.
 
 ***
 
 ### 1.12 ExceptionTranslationFilter, RequestCacheAwareFilter
 
-인증 또는 인가에 실패할 때 발생하는 Filter의 흐름이 있다.
+인증 및 인가에 실패할 때 발생하는 Filter의 흐름이 있다.
 
 AbstractSecurityInterceptor.class, ExceptionTranslationFilter.class를 분석하면 구조를 이해할 수 있다.
 
@@ -461,8 +464,127 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 }
 ```
-
 ***
-
 ## 2. 주요 아키텍쳐 이해
+
+### 2.1 FilterChainProxy
+
+프로그램이 실행될 때, FilterChainProxy에 앞서 생성한 SecurityFilterChain Bean들이 저장된다.
+
+이에 따라, 프로그램에 HTTP 요청이 들어왔을 때, FilterChainProxy를 통해 적절한 SecurityFilterChain을 거치게 된다. SecurityFilterChain은 여러개 등록할 수 있다.
+
+WebSecurityConfigurerAdapter가 Deprecated 되었으므로 FilterChainProxy에 직접 SecurityFilterChain을 등록하는 방식을 사용한다.
+
+### 2.2 Authentication 
+
+사용자의 인증 정보를 저장하는 객체이다. 
+
+Authentication, CredentialContainer -> AbstractAuthenticationToken 의 상속 구조를 갖는다.
+
+스프링에서 기본적으로 제공하는 formLogin() 인증은 AbstractAuthenticationToken을 상속하여 구현한 UsernamePasswordAuthenticationToken을 사용한다.
+
+AbstractAuthenticationToken을 상속하여 직접 Token 클래스를 구현할 수 있다.
+
+인증 토큰은 principal(ID 정보), credentials(password), authorities(권한 정보), details(부가 정보), authenticated(인증 여부)를 필드 속성으로 갖는다.
+
+UsernamePasswordAuthenticationToken을 통한 인증 과정은 아래와 같다.
+
++ 1. UsernamePasswordAuthenticationFilter : POST /login을 통해 전달된 \<form>의 name 속성을 참조하여 ID, Password를 가져온다.
++ 2. Authentication 객체 생성 : ID와 Password를 저장한 임시 인증 객체를 만든다.
++ 3. AuthenticationManager : authenticationManager에서 제공하는 provider를 통해 인증처리 한다.
++ 4. Authentication 객체 완성 : 인증에 성공하면, ID, Password 및 권한정보를 추가해 토큰을 완성한다.
++ 5. SecurityContext 저장 : 인증 객체를 서버에 저장한다. 사용자는 ID를 통해 접근할 수 있다.
+
+### 2.3 SecurityContextHolder, SecurityContext
+
+SecurityContext는 Authentication 객체 저장소이고, ThreadLocal에 저장된다. ThreadLocal이란 스레드마다 할당된 저장공간이다. 인증이 완료되면 HTTP Session에 인증 객체를 저장하고, 
+
+SecurityContextHolder는 SecurityContext들을 관리하는 클래스이다. 아래의 코드를 통해 SecurityContext의 인증객체를 가져올 수 있다.
+
+```java
+Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+```
+
+### 2.4 Authentication Flow
+
+회원(User)의 인증은 provider에서 담당했다. provider는 UserDetailsService를 필드로 갖는다.
+
+UserDetailsService는 회원 정보를 검증하고, 일치하면 권한 정보를 추가한 authentication을 SecurityContext에 저장하여 반환하는 메소드 제공한다.
+
+```java
+@Service("UserDetailsService")
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
+    // 이 클래스 자체를 UserService 안에서 오버라이딩 하는 방법도 있다.
+    private final UserRepository userRepository;
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = userRepository.findByUsername(username);
+
+        if(account == null) {
+            throw new UsernameNotFoundException("UsernameNotFoundException");
+        }
+        List<GrantedAuthority> roles = new ArrayList<>();
+
+        List<AccountRole> accountRoleList = account.getAccountRoleList();
+        for(AccountRole accountRole: accountRoleList) {
+            roles.add(new SimpleGrantedAuthority(accountRole.getRole().getRoleName()));
+        }
+
+        AccountContext accountContext = new AccountContext(account, roles);
+        return accountContext;
+    }
+}
+
+public class AccountContext extends User {
+    private final Account account;
+    public AccountContext(Account account, Collection<? extends GrantedAuthority> authorities) {
+        super(account.getUsername(), account.getPassword(), authorities);
+        this.account = account;
+    }
+
+    public Account getAccount() {
+        return this.account;
+    }
+}
+```
+
+그러므로, provider는 항상 userDetailsService를 필드로 갖고 있어야 한다. userDetailsService의 흐름을 파악하면 Authentication Flow를 더 상세히 알 수 있다. 
+
+### 2.5 AuthenticationManager
+
+인증 요청의 종류에 따라 적절한 provider를 호출하는 객체이다. 
+
+예를 들어, Form 인증, RememberMe 인증, 그리고 Oauth 인증이 있을 수 있다.
+
+AuthenticationManager는 인증 요청 종류에 따라 적절한 provider를 불러온다. 
+
+```java
+public class ProviderManager implements AuthenticationManager, MessageSourceAware, InitializingBean {
+    ...
+    private List<AuthenticationProvider> providers;
+    private AuthenticationManager parent;
+    
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        Class<? extends Authentication> toTest = authentication.getClass();
+        
+        Iterator var9 = this.getProviders().iterator();
+        while(var9.hasNext()) {
+            AuthenticationProvider provider = (AuthenticationProvider)var9.next();
+            if (provider.supports(toTest)) { // provider와 authentication이 서로 매칭됨.
+              ...
+              try {
+                    result = provider.authenticate(authentication);
+               }
+            }
+       }
+ }  
+```
+
+부모 authenticationManager를 설정하여 provider 탐색을 계속할 수도 있다.
+
+### 2.6 AuthenticationProvider
+
+
 
