@@ -586,5 +586,104 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 
 ### 2.6 AuthenticationProvider
 
+AuthenticationProvider는 인터페이스이고, 이를 통해 실질적인 인증을 담당하는 클래스를 구현한다.
+
++ authentication(Authentication authentication) : 인증 처리 메서드. 앞서 섫명한 UserDetailsService를 이용함 
++ supports(Class\<?> authentication) : provider가 지원하는 Authentication 클래스를 지정함.
+
+```java
+public interface AuthenticationProvider {
+    Authentication authenticate(Authentication authentication) throws AuthenticationException;
+    boolean supports(Class<?> authentication);
+}
+
+@RequiredArgsConstructor
+public class AjaxAuthenticationProvider implements AuthenticationProvider {
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = (String)authentication.getCredentials();
+
+        AccountContext accountContext = (AccountContext)userDetailsService.loadUserByUsername(username);
+        if(!passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
+            throw new BadCredentialsException("BadCredentialException");
+        }
+
+        /*
+        FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails)authentication.getDetails();
+        String secretKey = formWebAuthenticationDetails.getSecretKey();
+
+        if(secretKey != null || "secret".equals(secretKey)) {
+            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
+        }
+         */
+
+        AjaxAuthenticationToken authenticationToken = new AjaxAuthenticationToken(accountContext.getAccount(),
+                null, accountContext.getAuthorities());
+        return authenticationToken;
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(AjaxAuthenticationToken.class);
+    }
+}
+```
+
+### 2.7 FilterSecurityInterceptor, Authorization
+
+FilterSecurityInterceptor는 HTTP GET /** 등으로 리소스에 접근할 때 거치게되는 Filter 클래스이다.
+
+SecurityFilterChain의 마지막에 위치하고, 요청의 승인/거부를 최종적으로 결정한다.
+
+AbstractSecurityInteceptor -> FilterSecurityInterceptor 순서로 상속하여 커스터마이징할 수 있다.
+
+FilterSecurityInterceptor를 상속하여 PermitAllFilter를 구현한 것을 예제로 살펴보자.
+
+```java
+@Slf4j
+public class PermitAllFilter extends FilterSecurityInterceptor {
+    List<RequestMatcher> permitAllRequestMatcher = new ArrayList<>();
+    public PermitAllFilter(String... permitAllResources) {
+        for(String resource : permitAllResources) {
+            this.permitAllRequestMatcher.add(new AntPathRequestMatcher(resource));
+        }
+    }
+
+    @Override
+    protected InterceptorStatusToken beforeInvocation(Object object) {
+        boolean permitAll = false;
+        HttpServletRequest request = ((FilterInvocation) object).getRequest();
+        for(RequestMatcher requestMatcher : permitAllRequestMatcher) {
+            if(requestMatcher.matches(request)) {
+                permitAll = true;
+                break;
+            }
+        }
+        if(permitAll) {
+            return null;
+        }
+        return super.beforeInvocation(object);
+    }
+}
+```
+
+PermitAllFilter.beforeInvocation()을 시작으로 인가 처리를 시작한다.
+
+만약, requestMatcher(ex. GET /login)가 permitAllRequestMatcher 리스트에 존재한다면 별도의 인가 처리를 거치지 않고 자원 접근을 허용한다.(return null)
+
+permitAll Request가 아니라면 AbstractSecurityInteceptor.beforeInvocation(object)를 실행한다.
+
+```java
+
+```
+
+
+
+
+
 
 
