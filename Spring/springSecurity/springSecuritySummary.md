@@ -73,13 +73,11 @@ public class WebConfig {
 
 ### 1.2 사용자 정의 보안 기능 구현
 
-보안 기능은 크게 인증과 인가로 나누어진다.
+보안 기능은 인증과 인가로 나누어진다.
 
-스프링 시큐리티의 HttpSecurity 클래스에서 인증과 인가와 관련된 API를 제공한다.
+스프링 시큐리티의 HttpSecurity 클래스에서는 인증 및 인가 API를 제공한다.
 
-HttpSecurity를 이용해서 WebSecurityConfigureAdapter 클래스를 구현해 기본적인 보안 기능을 제공하는 객체를 생성할 수 있다.
-
-WebSecurityConfigureAdapter를 상속해서 사용자가 정의한 보안 기능을 제공하는 클래스를 구현할 수 있다. 
+WebSecurityConfigureAdapter 클래스를 상속한 후, HttpSecurity를 이용해서 기본적인 보안 기능을 제공하는 객체를 생성할 수 있다.
 
 ```java
 @Configuration
@@ -94,7 +92,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-위는 기본적인 보안 기능 구현 방식이다. 이외에도 많은 인증과 인가 API를 제공하고 있다.
+Spring Security 5.7.0+ 버전 이후로는 WebSecurityConfigurerAdapter가 Deprecated되어 사용하지 않는다.
+
+대신에 보안 설정 클래스를 @Bean으로 등록하는 방식을 사용할 수 있다.
+
+```java
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().authenticated(); 
+        http.formLogin();
+    }
+}
+```
 
 ***
 
@@ -102,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 Form 인증 방식이란 HTML의 Input Form을 활용해서 User를 인증하는 방법을 의미한다.
 
-사용자가 적절한 ID와 Password를 입력하면 인증 서버에 Session을 등록하고 Session에 접근할 수 있는 Id를 사용자에게 반환한다.
+사용자가 적절한 ID와 Password를 입력하면 인증 서버에 Session을 등록하고 Session에 접근할 수 있는 Id 쿠키를 사용자에게 반환한다.
 
 스프링 시큐리티에서 제공하는 인증 API는 아래와 같다.
 
@@ -110,17 +121,14 @@ Form 인증 방식이란 HTML의 Input Form을 활용해서 User를 인증하는
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-           
-           
            http .formLogin() /* 인증 정책 */ 
                 .loginPage("/loginPage") /* 로그인 Input Form URL */
                 .defaultSuccessUrl("/") /* 로그인 성공시 이동할 URL */
                 .failureUrl("/login") /* 로그인 실패시 이동할 URL */
-                .usernameParameter("userId") /* ID Input Form HTML Form name */
-                .passwordParameter("passwd") /* Password Input Form HTML Form name */
+                .usernameParameter("userId") /* ID Input Form(HTML Form name 속성으로 참조) */
+                .passwordParameter("passwd") /* Password Input Form(HTML Form name 속성으로 참조) */
                 .loginProcessingUrl("/loginProc") /* 로그인 정보를 처리할 컨트롤러 URL */
                 .successHandler(new AuthenticationSuccessHandler() { /* 로그인 성공 후 호출할 컨트롤러 */
                     @Override
@@ -145,7 +153,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ### 1.4 UserPasswordAuthenticationFilter의 구조
 
-AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilter.class를 분석하면 인증필터 구조를 확인할 수 있다.
+AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilter.class를 분석하면 인증필터 구조를 알 수 있다.
 
 개괄적인 방법은 아래와 같다.
 
