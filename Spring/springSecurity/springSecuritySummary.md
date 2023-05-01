@@ -840,9 +840,75 @@ FilterSecurityInterceptor에서는 AuthenticationManager, SecurityMetadataSource
 
 ## 3. 스프링 시큐리티 실전 및 심화 
 
+### 3.1 시큐리티 모듈 커스터마이징
 
+AuthenticationProvider, AuthenticationSuccessHandler, AuthenticationFailureHandler, accessDeniedHandler 등의 시큐리티 관련 모듈을 커스터마이징은 해당되는 인터페이스를 구현하면 된다.
 
+인터페이스 구현은 2장에서 몇가지 했으므로 예제 코드는 생략한다. 그리고, httpSecurity에 아래와 같이 설정하면 된다.
 
+```java
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+          http
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
+
+        .and()
+                .authenticationProvider(authenticationProvider())
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login_proc")
+                .authenticationDetailsSource(authenticationDetailsSource)
+                .defaultSuccessUrl("/", true)
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
+                .permitAll();
+
+        http
+                .exceptionHandling()
+                .accessDeniedPage("/accessDenied")
+                .accessDeniedHandler(accessDeniedHandler());
+
+        http.addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class);
+        return http.build();
+}       
+```
+
+### 3.2 Ajax 인증 예제
+
+스프링 시큐리티에서는 Form 인증 방식을 기본적으로 제공한다.
+
+인증 프로세스를 새롭게 Ajax 방식으로 구현하였다. 아래 URL을 참고한다.
+
+https://github.com/chrismrkr/toyproject-spring_security_ajaxAuthentication
+
+### 3.3 DB 연동 URL 인가 방식
+
+URL 인가 방식은 선언적 방식과 동적 방식 2가지가 존재한다.
+
+선언적 방식은 대표적으로 antMatchers(...).hasRole(...) 표현식을 이용한다.
+
+예를 들어, ```http.antMatchers("/api/messages").hasRole("MANAGER")```로 설정하면 ROLE_MANAGER 권한을 가진 사용자만 해당 리소스에 접근할 수 있다.
+
+반면에, 선언전 방식 대신에 DB와 연동하는 것을 동적 방식이라고 한다. 
+
+DB에는 권한-리소스 key-value 형태로 저장되어있다. 이를 활용해 SecurityMetadataSource를 생성한다.
+
+자세한 내용은 아래의 URL을 참고한다.
+
+https://github.com/chrismrkr/toyproject-spring_security_DBAuthorization
+
+SecurityMetadataSource를 이전과 다르게 구현하면 된다. SecurityMetadataSource 인터페이스는 아래와 같다.
+
+```java
+public interface SecurityMetadataSource extends AopInfrastructureBean {
+    Collection<ConfigAttribute> getAttributes(Object request) throws IllegalArgumentException;
+    Collection<ConfigAttribute> getAllConfigAttributes();
+    boolean supports(Class<?> clazz);
+}
+```
+
+requestMap(Security DB에 저장된 내용), securityResourceService(Security DB Dao)
 
 
 
