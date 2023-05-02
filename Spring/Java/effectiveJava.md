@@ -248,5 +248,6 @@ Optional에서 객체를 가져오기 위해서는 .get(), .orElse(Supplier\<R> 
 + count, sum, average, min, max 통계 연산 : min, max는 Comparater\<T> 필요 
 
 
+## 3. 모든 객체(Object)의 공통 메소드
 
-  
+
