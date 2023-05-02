@@ -86,4 +86,48 @@ git은 branch를 통해 비선형적인 개발이 가능하다.
 
 branch 병합 시, conflict가 발생할 수 있다. 발생 가능하 시나리오는 아래와 같다.
 
+1. 특정 branch에 병합 또는 push 하려고 하는데, 기존 branch가 변경된 경우.
+
+이때, 변경이란 동일한 코드 블록이 변경되었거나, 파일 이름이 변경되었거나, 파일이 삭제된 경우를 의미한다.
+
+이 경우에는 git pull을 통해 기존과 동기화를 한 후, add -> commit을 한다.
+
+그러면 branch 상태가 branch|merging으로 바뀌고, 이때 원하는 코드만을 남기고 파일을 저장한다.
+
+그리고 add -> git commit -> x! option을 사용하면 conflict가 해결된다.
+
+2. 동일한 이름의 파일이 서로 다른 branch에서 생성 또는 변경된 후, 공통 branch로 merge되는 경우에 conflict가 발생한다.
+
+이외에도 파일 권한 및 속성이 변경될 때도 conflict가 발생할 수 있다.
+
+merge를 취소하려면 ```git merge --abort``` 커맨드를 사용한다.
+
+기존 branch가 동기화가 되지 않아서 conflict가 발생하므로, 경우에 따라 어떻게 할지 결정하면 된다.
+
+
+## 4. Github(원격 저장소) 공유
+
+### 4.1 원격 저장소 저장 커맨드
+
++ 1. git remote add [원격 저장소 참조 이름] [github URL]
+
+예를 들어, ```git remote add origin https://github.com/xxx/test.git``` 커맨드는,
+
+해당 URL 원격 저장소를 등록하고, origin 이름으로 참조한다는 것을 의미한다. 여러 원격 저장소를 1개의 git에 등록할 수 있다.
+
++ 2. git push [원격 저장소 참조 이름] [branch명]
+
+예를 들어, ```git push origin main```은 원격 저장소 origin에 main branch를 push한다는 뜻이다. 여기서 conflict가 발생할 수 있다.
+
+```git remote -v```로 원격 저장소 리스트를 확인할 수 있고, ```git remote rm [원격 저장소 참조명]```으로 원격 저장소 참조를 삭제할 수 있다.
+
+### 4.2 git clone [URL] [local 디렉토리명]
+
+local 디렉토리에 URL에 해당하는 원격 저장소를 복제한다. 
+
+### 4.3 git pull [원격 저장소 참조명] [branch명]
+
+원격 저장소와 로컬 저장소를 동기화한다.
+
+
 
