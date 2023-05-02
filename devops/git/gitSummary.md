@@ -35,5 +35,5 @@ local repository를 생성한다. 초기 브랜치 기본 이름은 master이나
 
 파일을 stage area로 올린다. 파일명 대신에 -A 옵션을 넣으면 변경된 모든 파일을 stage area로 올린다.
 
-### 2.5 git commit [-m "메세지"]
+### 2.5 git commit [-m "메세지"] 
 
