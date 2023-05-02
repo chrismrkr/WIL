@@ -908,9 +908,26 @@ public interface SecurityMetadataSource extends AopInfrastructureBean {
 }
 ```
 
-requestMap(Security DB에 저장된 내용), securityResourceService(Security DB Dao)
+여기에 requestMap(Security DB에 저장된 내용), securityResourceService(Security DB Dao)를 추가하여 구현체를 만든다.
 
+```java
+public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
+    private LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
+    private SecurityResourceService securityResourceService;
 
+    Collection<ConfigAttribute> getAttributes(Object request) throws IllegalArgumentException;
+    Collection<ConfigAttribute> getAllConfigAttributes();
+    boolean supports(Class<?> clazz);
+}
+```
+
+SecurityMetadataSoruce를 등록하면, FilterSecurityInterceptor에서 인가를 시도할 때 사용할 수 있게 된다.
+
+### 3.4 AOP 인가 방식
+
+URL 단위가 아닌 서비스 단위로 인가처리를 수행한다.
+
+ 
 
 
 
