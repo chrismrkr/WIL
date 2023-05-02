@@ -17,6 +17,8 @@
 local repository -> stage area -> remote repository 3단계로 나뉜다. git add, git commit, git push 명령어를 사용하여 통제한다.
 
 
+
+
 ## 2. 기본 명령어
 
 ### 2.1 git help [명령어]
@@ -61,6 +63,27 @@ commit 이력을 확인한다. 여러 옵션들이 많고, 도움말을 통해 �
 
 commit id 이전 버전의 이력을 새롭게 다시 commit한다.
 
+
+
+
 ## 3. 작업 분기 및 병합
+
+git은 branch를 통해 비선형적인 개발이 가능하다.
+
+### 3.1 git branch
+
+현재 존재하는 모든 branch를 확인한다.
+
+### 3.2 git switch -c [브랜치명]
+
+새로운 branch를 생성하고, 그 branch로 이동한다.
+
+### 3.3 git merge [브랜치명]
+
+현재 브랜치에 [브랜치명] branch를 병합한다.
+
+### 3.4 confilct 해법
+
+branch 병합 시, conflict가 발생할 수 있다. 발생 가능하 시나리오는 아래와 같다.
 
 
