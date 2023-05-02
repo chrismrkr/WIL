@@ -130,14 +130,14 @@ public void main() {
 
 람다식은 함수형 인터페이스로 참조할 수 있다.
 
-람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다.
+람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다. override, static, default 메소드는 제외한다.
 
-@FunctionalInterface를 붙여서 컴파일 시정에 확인할 수 있다.
+@FunctionalInterface를 붙여서 컴파일 시점에 확인할 수 있다.
 
 예를 들어서, 아래 코드를 실행하고자 한다면,
 
 ```java
-runLambda( () -> { System.out.println("hello"); }
+runLambda( () -> { System.out.println("hello"); } )
 ```
 
 아래와 같이 정의하면 된다.
@@ -146,12 +146,16 @@ public interface Lambda {
   public void run();
 }
 
-void runLambda(Lambda l) {
-  l.run();
+void runLambda(Lambda lambda) {
+  lambda.run();
 }
 ```
 
 람다식은 익명클래스이고 인터페이스로 참조할 수 있다.
+
+람다를 사용하는 것이 익명 클래스를 사용하는 것보다 간결하므로 특별한 경우(ex. 추상 메소드가 여러 개인 인터페이스)가 아닐 때는 람다를 쓰는 것을 권장한다.
+
+람다식 사용하면서도 코드의 가독성이 떨어지면 메소드 참조(ex. Integer::parseInt)를 사용하자.
 
 Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아래와 같다.
 
@@ -160,7 +164,23 @@ Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아
 + Consumer\<T> void accept(T t) : 매개변수 O, 반환 X
 + Function\<T, R> R apply(T t) : 매개변수 O, 반환 O
 + Predicate\<T> boolean test(T t) : 매개변수 O, 반환 O
-  
+
+이외에도 여러가지가 있다. 예를 들어, long을 받아 int를 반환하는 함수형 인터페이스는 LongToIntFunction이다.
+
+이처럼, 직관적인 이름을 가진 표준 함수형 인터페이스가 java.util.function에 많으므로 참고하도록 한다.
+
+주의할 점은 박싱된 기본 타입(Long, Integer 등)을 함수형 인터페이스에 사용하면 성능이 많이 느려질 수 있다는 것이다.
+
+그러나, 표준형 함수형 인터페이스를 사용할 수 있음에도 불구하고 직접 작성한 Comparator\<T>를 생각해보자.
+
+Comparator\<T>는 ToIntBiFunction\<T, U>와 동일한 형태이다.
+
+```java
+Collections.sort(arr, new Comparator<Integer>((o1, o2) -> return o1 < o2) );
+```
+
+그럼에도 Comparator를 사용하는 이유는 이름이 용도를 잘 설명하여 가독성을 높이기 때문이다. 또한, 해당 인터페이스에서 유용한 디폴트 메소드를 제공한다.
+
 ## 2.2 스트림(Stream)
 
 스트림(Stream)의 중간연산자에서 함수형 인터페이스를 사용한다.
