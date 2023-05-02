@@ -925,10 +925,100 @@ SecurityMetadataSoruce를 등록하면, FilterSecurityInterceptor에서 인가�
 
 ### 3.4 AOP 인가 방식
 
-URL 단위가 아닌 서비스 단위로 인가처리를 수행한다.
+URL이 아닌 서비스 단위로 인가처리를 수행한다.
 
- 
+**인가를 위한 초기화 과정은 아래와 같다.**
 
++ 1. 전체 Bean을 검사하여 보안이 설정된 메소드(서비스)를 검색한다.(ex. @secured("ROLE_USER")가 붙은 메소드 탐색)
++ 2. 보안 설정된 메소드의 프록시 객체를 생성한다.
++ 3. 프록시에 인가처리를 담당하는 기능을 advice에 등록한다.
 
+**인가 진행 과정은 아래와 같다.**
 
++ 1. 보안 설정된 메소드(서비스)를 호출한다.
++ 2. 실제 서비스가 아닌 프록시 객체를 호출한다.
++ 3. 등록된 Advice를 통해 인가 처리한다.
++ 4. 인가 처리에 성공하면 실제 메소드(서비스)를 호출한다.
 
+**AOP 기반 인가처리에 사용되는 클래스와 역할은 아래와 같다.**
+
++ 1. DefaultAdvisorAutoProxyCreator : 메소드(서비스)의 프록시 객체를 생성하는 클래스
++ 2. MethodSecurityMetadataSourceAdvisor : pointcut과 interceptor를 필드로 갖는 클래스로 보안 설정 및 탐색 역할을 위임받는 클래스
++ 3. MethodSecurityMetadataSourcePointcut : 메소드(서비스)에 보안 설정이 되어있는지 탐색하는 클래스
++ 4. DelegatingMethodSecurityMetadataSource : 탐색된 클래스 및 메소드를 전달받는 클래스
++ 5. MethodSecurityMetadataSource : 메소드와 관련 보안 설정이 저장된 클래스
++ 6. MethodSecurityInterceptor : 보안이 설정된 메서드(서비스)인 경우, 메소드 advice(인가 기능)이 저장되는 클래스
+
+서비스 요청 -> advice 확인 -> methodSecurityMetadataSource -> 서비스 호출 흐름으로 진행된다.
+
+애노테이션을 활용한 선언적 방식의 AOP 인가 기능을 사용하기 위해서는, 보안 설정 클래스에 아래의 Annotation 설정이 필요하다.
+
+```java
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@RequiredArgsConstructor
+public class MethodSecurityConfig {
+  ...
+}
+```
+
+GlobalMethodSecurityConfiguartion.class를 통해 구체적인 동작과정을 확인할 수 있다.
+
+### 3.5 DB 연동 AOP 기반 인가
+
+URL 기반 인가처리는 HTTP 요청 -> FilterSecurityInteceptor -> FilterSecurityMetadataSource(DB 연동) -> invoke 과정으로 흐른다.
+
+마찬가지로, AOP 기반 인가처리도 MethodSecurityMetadataSource를 DB 방식으로 변경하면 된다.
+
+MapBasedMethodSecurityMetadataSource 클래스가 DB 연동 방식을 지원한다. 아래와 같이 코드를 작성하면 된다.
+
+```java
+@Configuration
+@EnableGlobalMethodSecurity
+@RequiredArgsConstructor
+public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
+
+    private final SecurityResourceService securityResourceService;
+
+    @Override
+    protected MethodSecurityMetadataSource customMethodSecurityMetadataSource() {
+        return mapBasedMethodSecurityMetadataSource(); // 생성자에 DB를 연동된 Map을 주입한다.
+    }
+
+    @Bean
+    public MapBasedMethodSecurityMetadataSource mapBasedMethodSecurityMetadataSource() {
+        return new MapBasedMethodSecurityMetadataSource(methodResourcesFactoryBean().getObject());
+    }
+    @Bean
+    public MethodResourcesFactoryBean methodResourcesFactoryBean() {
+        MethodResourcesFactoryBean methodResourcesFactoryBean = new MethodResourcesFactoryBean(securityResourceService);
+        return methodResourcesFactoryBean;
+    }
+}
+
+@RequiredArgsConstructor
+public class MethodResourcesFactoryBean implements FactoryBean<LinkedHashMap<String, List<ConfigAttribute>>> {
+    private final SecurityResourceService securityResourceService;
+    private LinkedHashMap<String, List<ConfigAttribute>> resourceMap;
+
+    @Override
+    public LinkedHashMap<String, List<ConfigAttribute>> getObject()  {
+        if(resourceMap == null) {
+            init();
+        }
+        return resourceMap;
+    }
+    private void init() {
+        resourceMap = (LinkedHashMap<String, List<ConfigAttribute>>) securityResourceService.getMethodResourceList();
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return LinkedHashMap.class;
+    }
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+}
+```
