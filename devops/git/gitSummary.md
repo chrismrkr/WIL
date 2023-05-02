@@ -37,3 +37,30 @@ local repository를 생성한다. 초기 브랜치 기본 이름은 master이나
 
 ### 2.5 git commit [-m "메세지"] 
 
+stage area에 저장된 파일을 등록한다. push 커맨드를 통해 remote repository로 보낼 준비를 한다.
+
+### 2.6 git log
+
+commit 이력을 확인한다. 여러 옵션들이 많고, 도움말을 통해 찾아보도록 한다.
+
+**자주 사용하는 옵션**
++ -p : 각 commit 사이의 차이점을 보여준다.
++ --grapth : 그래프 형태(branch, merge 포함)로 commite 이력을 보여준다.
++ --author : git log --author = "..." 커맨드로 사용한다. 해당 이름으로 commit된 것만 로그로 보여준다.
++ --oneline : commit와 메세지만 간략하게 로그로 보여준다.
++ --since, --until, --grep
+
+### 2.7 git reset [commit id] \<options>
+
+특정 commit까지 이력을 초기화한다.
+
++ --soft 옵션 : commit 상태만 변경하고, index와 working tree는 유지된다.
++ --hard 옵션 : 해당 commit id까지 index와 working tree가 모두 변경된다.
+
+### 2.8 git revert [commit id]
+
+commit id 이전 버전의 이력을 새롭게 다시 commit한다.
+
+## 3. 작업 분기 및 병합
+
+
