@@ -363,4 +363,4 @@ instanceof 대신에 getClass()를 사용할 수 있지만, 이는 메소드가 
 
 equals를 재정의했지만 hashCode를 재정의하지 않는다면 Collection 원소로 사용할 때 문제가 발생한다. 
 
-
+equals 함수의 의해 동일하다고 판단된 객체들의 해시 값은 항상 동일해야 한다.
