@@ -250,4 +250,70 @@ Optional에서 객체를 가져오기 위해서는 .get(), .orElse(Supplier\<R> 
 
 ## 3. 모든 객체(Object)의 공통 메소드
 
+### 3.1 equals 함수는 일반 규약을 지켜 재정의(override)한다.
+
+아래 중 하나에 해당되는 경우는 equals 함수를 재정의할 필요가 없다.
+
++ 각 인스턴스는 항상 고유하다. 즉, 필드에 의존하지 않는다.
++ 인스턴스의 동일성을 검사할 일이 없다.
++ 상위 클래스에서 재정의한 equals 함수가 하위 클래스에도 들어맞는다.
++ 클래스가 private 또는 package-private이므로 equals를 호출할 일이 없다.
+
+equals 함수를 재정의할 때는 아래의 규약을 지킨다.
+
++ 반사성 : x.equals(x)는 true를 반환
++ 대칭성 : x.equals(y) == y.equals(x)
++ 추이성 : x.equals(y) == true 이고 y.equals(z) == true 이면, x.equals(z)는 true이다.
++ 일관성 : x.equals(y)는 x 또는 y가 변하지 않는 한 항상 같은 값을 반환한다.
+
+아래의 코드를 살펴보며 equals 함수를 재정의하는 것의 까다로움을 느껴보자.
+
+```java
+public class Point {
+  private final int x, y;
+  public Point(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof Point)) return false;
+    
+    Point obj = (Point)obj;
+    return this.x==obj.x && this.y==obj.y;
+  }
+}
+
+public class ColorPoint extends Point {
+  private final Color color;
+  public ColorPoint(int x, int y, Color color) {
+    super(x, y);
+    this.color = color;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof ColorPoint)) return false;
+    return super.equals(obj) && (ColorPoint obj).color == this.color;
+  }
+}
+
+class UnitTest {
+  @Test
+  void test() {
+    Point point = new Point(1, 2);
+    ColorPoint colorPoint = new ColorPoint(1, 2, COLOR_RED);
+    
+    point.equals
+  }
+}
+```
+
+
+
+
+
+
+
 
