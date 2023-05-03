@@ -333,11 +333,25 @@ public class ColorPoint extends Point {
   }
 }
 ```
+
 위와 같이 변경하면 대칭성을 만족한다. 그러나, 이행성을 만족할 수 없다.
 
+```java
+class UnitTest {
+  @Test
+  void transivityTest() {
+    ColorPoint p1 = new ColorPoint(1, 2, COLOR_RED);
+    Point p2 = new Point(1, 2);
+    ColorPoint p3 = new ColorPoint(1, 2, COLOR_BLUE);
+    
+    Assertions.assertTrue(p1.equals(p2)); // pass : true
+    Assertions.assertTrue(p2.equals(p3)); // pass : true
+    Assertions.assertTrue(p1.equals(p3)); // fail : false
+  }
+}
+```
 
-
-
+해법은 뭘까? 
 
 
 
