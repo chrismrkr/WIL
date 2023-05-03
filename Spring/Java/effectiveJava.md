@@ -263,7 +263,7 @@ equals 함수를 재정의할 때는 아래의 규약을 지킨다.
 
 + 반사성 : x.equals(x)는 true를 반환
 + 대칭성 : x.equals(y) == y.equals(x)
-+ 추이성 : x.equals(y) == true 이고 y.equals(z) == true 이면, x.equals(z)는 true이다.
++  : x.equals(y) == true 이고 y.equals(z) == true 이면, x.equals(z)는 true이다.
 + 일관성 : x.equals(y)는 x 또는 y가 변하지 않는 한 항상 같은 값을 반환한다.
 
 아래의 코드를 살펴보며 equals 함수를 재정의하는 것의 까다로움을 느껴보자.
@@ -301,14 +301,39 @@ public class ColorPoint extends Point {
 
 class UnitTest {
   @Test
-  void test() {
+  void symmetryTest() {
     Point point = new Point(1, 2);
     ColorPoint colorPoint = new ColorPoint(1, 2, COLOR_RED);
     
-    point.equals
+    Assertions.assertTrue(point.equals(colorPoint)); // pass
+    Assertions.assertTrue(colorPoint.equals(point)); // fail
   }
 }
 ```
+
+instanceof는 해당 객체가 비교하는 클래스의 객체인지를 비교한다.
+
+주의해야할 점은 부모 객체는 자식 클래스의 instanceof가 아니지만(false), 자식 객체는 부모 클래스의 instanceof이다.(true)
+
+이에 따라, 대칭성 테스트(symmetryTest)를 통과할 수 없으므로 equals 함수는 수정되어야 한다.
+
+```java
+public class ColorPoint extends Point {
+  private final Color color;
+  public ColorPoint(int x, int y, Color color) {
+    super(x, y);
+    this.color = color;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof Point)) return false;
+    if(!(obj instanceof ColorPoint)) return super.equals(obj);
+    return super.equals(obj) && (ColorPoint obj).color == this.color;
+  }
+}
+```
+위와 같이 변경하면 대칭성을 만족한다. 그러나, 이행성을 만족할 수 없다.
 
 
 
