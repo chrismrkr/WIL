@@ -174,14 +174,44 @@ Case3. 삭제하면 하한 밑으로 떨어지고 재분배도 불가능한 경�
 
 ### 3.1 트랜잭션의 특징
 
-+ Atomicity : 원자성, 한 트랜잭션 내의 작업은 모두 실행되어야 한다.
++ Atomicity : 원자성, 한 트랜잭션 내의 작업은 모두 실행되어야 한다. 그렇지 않으면 실행하면 안된다.
 + Consistency : 일관성, DB의 데이터가 일관되게 유지되어야 한다.
 + Isolation : 고립성, 한 트랜잭션은 다른 트랜잭션에 영향을 주어서는 안된다.
 + Duration : 영구성, 한번 저장된 데이터는 추가 작업이 없으면 계속 유지되어야 한다.
 
 ### 3.2 비관적 락 기법
 
+트랜잭션 충돌은 반드시 일어난다는 가정 하에, transaction lock을 관리하는 기법이다.
 
+비관적 락 기법은 Read와 Write 모두에 대해서 exclusive lock을 유지한다. 이러면 트랜잭션 충돌은 발생하지 않는다.
+
+그러나, Dead Lock이 발생할 수 있다. 아래의 예를 보면 T1, T2는 DeadLock 상태가 된다.
+
+T1 : R(A)                           W(B) Commit           
+
+T2 :            R(B) W(A) Commit
+
+만약 Read 작업에 대해서 Lock을 사용하지 않았다면 DeadLock을 막을 수 있었다. 그러나, dirty-read, non-repeatable read, phantom read 문제가 발생할 수 있다.
+
+### 3.3 Isolation level 조절 정책
+
+Read에 대해서 exclusive lock을 하지 않으면 isolation에 위배될 수 있다. 그러므로, 고립성을 관리하는 정책이 필요하다. 
+
+### 3.3.1 read uncommited
+
+commit되지 않은 데이터도 read 작업에 반영되는 것이다. 여기서는 dirty-read, non-repeadtable read, phantom read 3가지 문제 모두 존재한다.
+
+dirty-read 예제는 다음과 같다. T1의 read(A) 결과가 다르다.
+
+T1:            read(A)                read(A)
+T2: Write(A)              RollBack  
+
+### 3.3.2 read commited
+
+**commit되지 않은 데이터는 undo 로그에서 값을 가져온다는 정책이다.** 그러므로, 위의 dirty read는 막을 수 있다.
+
+T1: 
+T2: 
 
 ***
 
