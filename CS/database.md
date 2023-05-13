@@ -203,8 +203,9 @@ commit되지 않은 데이터도 read 작업에 반영되는 것이다. 여기�
 
 dirty-read 예제는 다음과 같다. T1의 read(A) 결과가 다르다.
 
-T1:            read(A)                read(A)
-T2: Write(A)              RollBack  
+<p> T1:            read(A)                read(A) </p>
+
+<p>T2: Write(A)              RollBack  </p>
 
 ### 3.3.2 read commited
 
