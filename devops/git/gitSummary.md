@@ -82,11 +82,11 @@ git은 branch를 통해 비선형적인 개발이 가능하다.
 
 현재 브랜치에 [브랜치명] branch를 병합한다.
 
-### 3.4 confilct 해법
+### 3.4 conflict 해법
 
-branch 병합 시, conflict가 발생할 수 있다. 발생 가능하 시나리오는 아래와 같다.
+branch 병합 시, conflict가 발생할 수 있다. 발생 가능한 시나리오는 아래와 같다.
 
-1. 특정 branch에 병합 또는 push 하려고 하는데, 기존 branch가 변경된 경우.
+**1. 특정 branch에 병합 또는 push 하려고 하는데, 기존 branch가 변경된 경우**
 
 이때, 변경이란 동일한 코드 블록이 변경되었거나, 파일 이름이 변경되었거나, 파일이 삭제된 경우를 의미한다.
 
@@ -96,7 +96,7 @@ branch 병합 시, conflict가 발생할 수 있다. 발생 가능하 시나리�
 
 그리고 add -> git commit -> x! option을 사용하면 conflict가 해결된다.
 
-2. 동일한 이름의 파일이 서로 다른 branch에서 생성 또는 변경된 후, 공통 branch로 merge되는 경우에 conflict가 발생한다.
+**2. 동일한 이름의 파일이 서로 다른 branch에서 생성 또는 변경된 후, 공통 branch로 merge되는 경우에 conflict가 발생한다.**
 
 이외에도 파일 권한 및 속성이 변경될 때도 conflict가 발생할 수 있다.
 
