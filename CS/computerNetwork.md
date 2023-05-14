@@ -105,7 +105,15 @@ ip의 별칭, 즉 ip-name, name-ip Map을 갖고 있는 서버를 의미한다.
 
 예를 들어, www.naver.com ip를 찾는 과정은 아래와 같다.
 
+1. 클라이언트는 local DNS Server에 www.naver.com에 해당되는 ip를 요청한다.
+2. local DNS Server는 root Server에 .com 도메인 서버가 존재하는지 질의한다.(Top Level Domain)
+3. root Server는 .com 도메인 name Server(TLD Server)를 안내한다.
+4. local DNS Server는 TLD Server에 naver.com이 있는지 질의한다.(second level Domain)
+5. TLD Server는 nave.com을 아는 Authoritive Server를 안내한다.
+6. local DNS Server는 Authoritive Server에 www.naver.com에 해당하는 ip를 질의한다. (Sub domain)
+7. ip를 받은 후, 클라이언트에 전달한다.
 
+root Server로 부터 TLD Server를 알아내는데 많은 시간이 걸리므로 이를 local DNS Server에 캐싱하기도 한다.
 
 ***
 
