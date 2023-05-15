@@ -373,6 +373,27 @@ public class Order {
 
 또한, 엔티티를 생성하는 것은 필요에 따라 static 생성 메소드, 생성자, setter 등을 사용하도록 한다. 
 
+**연관관계 저장 시 주의사항**
+
+연관관계 주인을 선택하는 것을 외래키 관리자를 선택하는 것이다. 그러므로, 연관관계 주인 쪽에서 연관관계를 매핑하면 기능상 문제는 없다.
+
+그러나, 객체 관점에서 양방향 모두 매핑해주는 것이 좋다.
+
+```java
+ Team teamA = new Team("teamA");
+ Member member1 = new Member("m1");
+ Member member2 = new Member("m2");
+ 
+ member1.setTeam(teamA);
+ teamA.getMemberList().add(member1); // 없어도 문제없지만, 테스트 코드 작성 시 문제를 일으킬 수 있다.
+ 
+ member2.setTeam(teamA);
+ teamA.getMemberList().add(member2);
+```
+
+또한, 연관관계가 수정될 때도 이전 연관관계를 완전히 끊는 것에 주의한다.
+
+
 ### 3.5 상속관계 매핑
 **관계형 데이터베이스에서 상속관계를 직접적으로 다룰 수 없다. 그러나, 슈퍼타입-서브타입 모델로 상속 관계와 근접하게 표현할 수 있다.**
 
@@ -989,3 +1010,6 @@ for(Member member : members) {
 그러므로, @BatchSize를 사용해 SQL의 IN 예약어를 활용함으로써 발생하는 쿼리의 수를 최적화할 수 있다.
 
 ***
+
+
+## 7. 틀
