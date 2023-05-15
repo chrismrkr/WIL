@@ -1,7 +1,13 @@
 # JPA(JAVA Persistence API)
 ***
 ## 1. JPA 소개
-**JPA란 JAVA Persistent API의 약자로 관계형 데이터베이스를 객체지향 언어인 Java로 운영 및 개발할 때 발생하는 패러다임의 불일치를 해결하기 위한 기술이다.**
+**JPA란 JAVA Persistent API의 약자이다.**
+
+Java는 데이터베이스와 연동하여 개발할 때, JDBC API를 사용해야 한다.
+
+그러나, JDBC를 사용하면 매번 WAS-DB 사이에 connection을 생성하고 해제해야 한다는 단점이 있고, SQL 의존적인 개발을 해야한다.
+
+SQL 의존적인 개발을 하면 Java의 객체지향의 특성을 제대로 살릴 수 없다. 이러한 문제를 해결한 Java의 DB 매핑 기술이 JPA이다.
 
 ### 1.1 환경설정 
 **./src/main/resources/META-INF/persistence.xml 파일을 생성해 WAS와 연동할 DB 정보를 입력한다. 필수적인 정보는 아래와 같다.**
@@ -12,8 +18,13 @@
 
 또한 ./pom.xml을 생성해 하이버네이트와 데이터베이스 의존관계를 설정한다.
 
-### 1.2 JPA 간단 동작방식
-**persistence.xml에 설정한 persistence Unit(영속성 유닛)당 하나의 persistence.EntityManager를 생성할 수 있다. 즉, 하나의 데이터 베이스마다 하나의 영속성 컨텍스트를 설정할 수 있다는 것을 의미한다. 영속성 유닛은 여러 Entity Manager를 생성할 수 있고 Entity Manager 사이에는 스레드 공유하면 트랜잭션에 문제를 일으킬 수 있다.**
+### 1.2 JPA 동작방식
+
+**persistence.xml에 설정한 persistence Unit(영속성 유닛)당 하나의 persistence.EntityManager를 생성할 수 있다.**
+
+**즉, 하나의 데이터 베이스마다 하나의 영속성 컨텍스트를 설정할 수 있다는 것을 의미한다.** 
+
+**영속성 유닛은 여러 Entity Manager를 생성할 수 있고 Entity Manager 사이에는 스레드 공유하면 트랜잭션에 문제를 일으킬 수 있다.**
 
 ### 1.3 JPA의 중요 특징: 영속성 컨텍스트
 + 1차 캐시
