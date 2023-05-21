@@ -108,4 +108,26 @@ BDD(Behavior Driven Development) 스타일이란 Mock 객체의 행동을 given,
     }
 ```
 
+## 5. 기타
+
+### 5.1 SecurityContextHolder와 전역 객체 Mocking
+
+Spring Security에서 구현한 클래스를 테스트하면서 ```java SecurityContextholder.getContext() ```를 Mocking 해야 했다.
+
+Mocking 방법은 아래와 같다.
+
+```java
+@ExtendWith(MockitoExtension.class)
+public class AuthenticationAggregateTest {
+    @Mock
+    private SecurityContext securityContext;
+    
+    ...
+    
+    MockitoAnnotations.openMocks(this);
+    SecurityContextHolder.setContext(securityContext);
+    BDDMockito.given(((MfaAuthenticationToken)securityContext.getAuthentication())).willReturn(storedAuthenticationToken);
+    
+}
+```
 
