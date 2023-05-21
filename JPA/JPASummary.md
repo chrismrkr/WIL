@@ -20,15 +20,17 @@ SQL 의존적인 개발을 하면 Java의 객체지향의 특성을 제대로 �
 
 ### 1.2 JPA 동작방식
 
-**persistence.xml에 설정한 persistence Unit(영속성 유닛)당 하나의 persistence.EntityManager를 생성할 수 있다.**
+**persistence.xml에 설정한 persistence Unit당 하나의 persistence.EntityManager를 생성할 수 있다.**
 
-**즉, 하나의 데이터 베이스마다 하나의 영속성 유닛(Entity Manager Factory)와 영속성 컨텍스트를 설정할 수 있다는 것을 의미한다.** 
+**즉, 하나의 데이터 베이스마다 하나의 영속성 유닛(Entity Manager Factory)을 설정할 수 있다는 것을 의미한다.** 
 
 **영속성 유닛은 여러 Entity Manager를 생성할 수 있고 Entity Manager 사이에는 스레드 공유하면 문제를 일으킬 수 있다.**
 
 ### 1.3 JPA의 영속성 컨텍스트
 
 영속성 컨텍스트란 데이터베이스에 레코드를 저장하거나 레코드를 읽어올 때, 엔티티 매니저가 이를 기록하는 공간이다.
+
+영속성 컨텍스트는 트랜잭션마다 개별적으로 생성되는 것이 기본이다.
 
 #### 1.3.1 엔티티의 생명주기
 
