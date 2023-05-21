@@ -112,22 +112,32 @@ BDD(Behavior Driven Development) 스타일이란 Mock 객체의 행동을 given,
 
 ### 5.1 SecurityContextHolder와 전역 객체 Mocking
 
-Spring Security에서 구현한 클래스를 테스트하면서 ```java SecurityContextholder.getContext() ```를 Mocking 해야 했다.
+Spring Security에서 구현한 클래스를 테스트하면서 ```java SecurityContextHolder.getContext() ```를 Mocking 해야 했다.
 
-Mocking 방법은 아래와 같다.
+아래와 같이 Mocking하여 테스트할 수 있었다. 
 
 ```java
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationAggregateTest {
     @Mock
-    private SecurityContext securityContext;
+    private SecurityContext securityContext;    
     
-    ...
-    
-    MockitoAnnotations.openMocks(this);
-    SecurityContextHolder.setContext(securityContext);
-    BDDMockito.given(((MfaAuthenticationToken)securityContext.getAuthentication())).willReturn(storedAuthenticationToken);
-    
+    @Test
+    void test() {
+      ...
+      MockitoAnnotations.openMocks(this);
+      SecurityContextHolder.setContext(securityContext);
+      BDDMockito.given(((MfaAuthenticationToken)securityContext.getAuthentication())).willReturn(storedAuthenticationToken);
+    }
 }
 ```
+
+그러나, 전역 객체(static 객체), 여기서는 SecurityContextHolder를 테스트 할 때마다 Mocking 해야하는 코드가 좋은 코드인지에 대한 생각이 들었다.
+
+스프링 프레임워크의 장점은 객체 간의 약한 결합에 있다. 약한 결합이므로 runtime에 Ioc 컨테이너를 통해 DI가 발생한다. 이에 따라, 단위테스트를 하는데 장점이 있었다.
+
+그러므로, 코드에서 전역객체(static 객체)를 사용하는 것은 강한 결합을 만드므로 좋은 코드가 아니라는 생각이 들었다.
+
+
+
 
