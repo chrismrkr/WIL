@@ -735,7 +735,7 @@ void main() {
   }
 ```
 
-cascade 옵션은 대표적으로 persist, remove, 그리고 all이 있다.
+cascade 옵션으로는 persist, remove, 그리고 all이 있다.
 
 
 ### 4.3 고아객체
