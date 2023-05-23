@@ -1015,7 +1015,7 @@ for(Member member : members) {
 
 위와 동일하게 Fetch Join을 이용해 해결할 수 있다. 그러나, 페이징이 불가능하다!
 
-그러므로, @BatchSize를 사용해 SQL의 IN 예약어를 활용함으로써 발생하는 쿼리의 수를 최적화할 수 있다.
+그러므로, @BatchSize를 사용해 SQL의 IN 예약어를 활용함으로써 발생하는 쿼리의 수를 최적화할 수 있다. 
 
 ***
 
