@@ -1013,9 +1013,31 @@ for(Member member : members) {
  
 + **@OneToMany에서의 N+1 문제 해결방법**
 
-위와 동일하게 Fetch Join을 이용해 해결할 수 있다. 그러나, 페이징이 불가능하다!
+위와 동일하게 Fetch Join을 이용해 해결할 수 있다. 그러나 데이터가 실제보다 더 뻥튀기 되어 검색되는 결과가 발생한다.
 
-그러므로, @BatchSize를 사용해 SQL의 IN 예약어를 활용함으로써 발생하는 쿼리의 수를 최적화할 수 있다. 
+```java
+  Member m1 = new Member("kim");
+  Member m2 = new Member("lee");
+  Team t1 = new Team("korea");
+  
+  m1.setTeam(t1);
+  m2.setTeam(t2);
+  teamRepository.save(t1);
+  memberRepository.save(m1);
+  memberRepository.save(m2);
+  
+  // ============
+  
+  List<Team> teamList = em.createQuery("select t from team t join fetch t.members").resultList();
+  // (korea - lee), (korea - kim) 두 레코드가 쿼리 결과로 나오므로 teamList에는 {korea, korea}가 바인딩됩니다.
+```
+물론, JPQL에 distinct 키워드를 방지해서 데이터가 중복해서 나오는 문제를 막을 수 있다. 
+
+그러나, 페이징이 불가능하다. 
+
+그러므로, @BatchSize를 사용해 SQL의 IN 예약어를 활용함으로써 발생하는 쿼리의 수를 최적화할 수 있다.
+
+결론은 @OneToMany에서는 즉시 로딩과 @BatchSize를 통해서 타협점을 찾을 수 있다는 것이다.
 
 ***
 
