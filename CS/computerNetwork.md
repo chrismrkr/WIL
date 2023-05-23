@@ -265,13 +265,59 @@ Link State와 달리 중앙화된 방식은 아니다.
 
 ### 5.2 네트워크 보안 중요 개념
 
-+ 대칭키 : 상호 간에 동일한 키를 공유함
-+ 비대칭키 : 공개키를 통해 암호화하고 비공개키를 통해 복호화함.
++ 대칭키 암호화 : 상호 간에 동일한 키를 공유함
++ 비대칭키 암호화 : 공개키를 통해 암호화하고 비공개키를 통해 복호화함.
 + DES : 대칭키를 통해 암호화 및 복호화함. 
-+ XSS, CSRF, SQL Injection : 
++ CSRF
+
+1. 사용자가 웹 사이트 A에 로그인한 상태로 접근(JSessionId 노출)
+
+2. 해커는 웹 사이트 A에서 특정 버튼을 클릭하면 악의적인 action을 취하도록 함정을 파둔다.(악의적인 링크를 담은 게시물)
+
+3. 사용자가 악의적인 action을 하면 JSessionId를 포함되어 있으므로 사용자가 그 행동을 한 것으로 유도한다.
+
+이를 방어하기 위해서는 refer나 csrf 토큰을 포함해 실제 action된 곳과 host가 동일한지 확인하도록 한다.
+
++ XSS
+
++ SQL Injection
 
 
+### 5.3 OAuth
 
+페이스북에서 네이버의 캘린더 정보를 가져오겠다 라는 요구사항을 들어주기 위한 프로토콜이다.
+
+#### 5.3.1 핵심 개념
+
+Resource Owner : 개인정보를 소유하는 사람
+
+Resource Server : 개인 정보를 소유하는 서버
+
+Authorization Server : 권한을 제공하는 서버
+
+client : 신규 애플리케이션 서버
+
+#### 5.3.2 동작 과정
+
+-> 사용자 : 신규 client 접근 시도
+
+-> client : client ID와 redirect url 제공, 이를 통해 authroziation server에 로그인 페이지를 요청
+
+-> authorization server : 로그인 페이지 제공
+
+-> 사용자 : ID / PW 입력
+
+-> authorization server : 인증번호(authorization code) 발급하여 사용자에게 제공
+
+-> 사용자 : client에게 authorization code를 전달하여 access token을 받아올 것을 요청
+
+-> client : authorization server에게 authorization code를 제공하여 access token 발급 요청
+
+-> authorization server : access token 발급하여 client에 제공
+
+-> client : 로그인 완료 후 access token을 사용자에게 전달
+
+-> 사용자 : access token으로 서비스 요청 가능.
 
 
 
