@@ -1050,7 +1050,7 @@ public class Hello {
 
 #### 6.2 JDK 동적 프록시: InvocationHandler 인터페이스
 
-리플렉션 대신, 자바 언어에서 제공하는 JDK 동적 프록시 기술을 이용할 수 있다.
+리플렉션 대신, 자바 언어에서 제공하는 JDK 동적 프록시 기술을 이용할 수 있다. 동적 프록시를 사용하면 런타임에 프록시 객체를 개발자 대신에 생성한다.
 
 아래와 같은 인터페이스와 클래스가 있다고 하자.
 
@@ -1058,7 +1058,6 @@ public class Hello {
 public interface AInterface {
     String call();
 }
-
 @Slf4j
 public class AImpl implements AInterface {
     @Override
@@ -1071,7 +1070,6 @@ public class AImpl implements AInterface {
 public interface BInterface {
     String call();
 }
-
 @Slf4j
 public class BImpl implements BInterface{
     @Override
