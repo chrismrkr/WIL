@@ -1248,3 +1248,7 @@ InvocationHanlder와 CGLIB 모두 단점이 있다. 다음 장에서 이를 해�
 ***
 
 ### 7. 스프링에서 지원하는 프록시
+
+인터페이스가 있는 구현체인 경우 InvocationHandler를 사용하고, 없는 경우에는 MethodInterceptor를 사용해야 했다.
+
+이러한 복잡함을 줄이기 위해 스프링에서 Advice를 제공한다.
