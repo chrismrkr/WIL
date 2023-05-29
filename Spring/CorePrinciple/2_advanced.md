@@ -619,17 +619,13 @@ public class ProxyPatternClient { /* 클라이언트 */
 
 
 public class ProxyPatterntest {
-
     @Test
     void test() {
         Subject cacheProxy = new CacheProxy(new RealSubject());
         ProxyPatternClient client = new ProxyPatternClient(cacheProxy);
         client.execute();
     }
-
 }
-
-
 ```
 
 코드를 해석하면 프록시 서버의 target Value가 유효하거나 그렇지 않은 경우에 따라 클라이언트가 응답을 받는 곳은 다르다.
@@ -1349,7 +1345,7 @@ public class ProxyFactoryConfigV1 {
 
 BeanPostProcessor 인터페이스 구현하여 클래스를 생성한 후, 이를 빈으로 등록하여 빈 후처리기로 사용할 수 있다.
 
-스프링 빈 컨테이너에 등록하기 바로 직전에 빈 후처리기가 Bean이 특정 조건을 만족한다면 프록시를 등록하도록 한다.
+빈 컨테이너에 등록한 후, 빈 후처리기가 Bean이 특정 조건을 만족한다면 빈 객체 대신에 프록시를 등록한다.
 
 ```java
 Slf4j
@@ -1444,7 +1440,7 @@ advisor1의 경우에는 메소드에 request, order, save가 존재하는 모�
 
 이때 사용하는 것이 **AspectJExpressionPointcut**이다. AOP에 특화된 pointcut 표현식이다. 자세한 것은 추후 다루도록 한다.
 
-위의 예제에서는 Bean 중복을 막기 위해서 주석처리가 필요했다.
+참고로 위의 예제에서는 Bean 중복을 막기 위해서 주석처리가 필요했다.
 
 ### 9. @Aspect AOP
 
