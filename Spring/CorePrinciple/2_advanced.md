@@ -1252,3 +1252,101 @@ InvocationHanlder와 CGLIB 모두 단점이 있다. 다음 장에서 이를 해�
 인터페이스가 있는 구현체인 경우 InvocationHandler를 사용하고, 없는 경우에는 MethodInterceptor를 사용해야 했다.
 
 이러한 복잡함을 줄이기 위해 스프링에서 Advice를 제공한다.
+
++ Advice : 부가기능을 추상화한 개념
++ Pointcut : 부가기능을 어떤 서비스에 적용할지 필터링 역할
++ Advisor : Advice와 Pointcut을 각 1개씩 갖는 역할
+
+위의 개념을 활용하여 Controller - Service - Repository에 로그 추적 부가기능을 아래와 같이 적용할 수 있다.
+
+
+첫번째로 부가기능을 담당할 LogTrace 클래스를 생성한다. MethodInterceptor 인터페이스를 구현해야 한다.
+
+```java
+public class LogTraceAdvice implements MethodInterceptor {
+    private final LogTrace logTrace;
+    public LogTraceAdvice(LogTrace logTrace) {
+        this.logTrace = logTrace;
+    }
+
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        TraceStatus status = null;
+        try {
+            Method method = invocation.getMethod();
+            String message = method.getDeclaringClass().getSimpleName()+"."+method.getName()+"()";
+            status = logTrace.begin(message);
+
+            Object result = invocation.proceed(); // 비즈니스 로직 실행
+
+            logTrace.end(status);
+            return result;
+        } catch(Exception e) {
+            logTrace.exception(status, e);
+            throw e;
+        }
+    }
+}
+```
+
+두번째로 Controller - Service - Repository를 수동 빈으로 등록하되 프록시로 등록한다.
+
+```java
+@Slf4j
+@Configuration
+public class ProxyFactoryConfigV1 {
+    @Bean
+    public OrderControllerV1 orderControllerV1(LogTrace logTrace) {
+        OrderControllerV1Impl orderController = new OrderControllerV1Impl(orderServiceV1(logTrace));
+        ProxyFactory proxyFactory = new ProxyFactory(orderController);
+        proxyFactory.addAdvisor(getAdvisor(logTrace));
+        
+        OrderControllerV1 proxy = (OrderControllerV1)proxyFactory.getProxy();
+        log.info("ProxyFactory Proxy={}, target={}", proxy.getClass(), orderController.getClass());
+        return proxy;
+    }
+
+    @Bean
+    public OrderServiceV1 orderServiceV1(LogTrace logTrace) {
+        OrderServiceV1 orderService = new OrderServiceV1Impl(orderRepositoryV1(logTrace));
+        ProxyFactory proxyFactory = new ProxyFactory(orderService);
+        proxyFactory.addAdvisor(getAdvisor(logTrace));
+        
+        OrderServiceV1 proxy = (OrderServiceV1)proxyFactory.getProxy();
+        log.info("ProxyFactory Proxy={}, target={}", proxy.getClass(), orderService.getClass());
+        return proxy;
+    }
+
+    @Bean
+    public OrderRepositoryV1 orderRepositoryV1(LogTrace logTrace) {
+        OrderRepositoryV1 orderRepository = new OrderRepositoryV1Impl();
+        ProxyFactory factory = new ProxyFactory(orderRepository);
+        factory.addAdvisor(getAdvisor(logTrace));
+
+        OrderRepositoryV1 proxy = (OrderRepositoryV1)factory.getProxy();
+        log.info("ProxyFactory proxy={}, target={}", proxy.getClass(), orderRepository.getClass());
+        return proxy;
+    }
+
+    private Advisor getAdvisor(LogTrace logTrace) {
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        pointcut.setMappedNames("request*", "order*", "save*");
+        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+        return new DefaultPointcutAdvisor(pointcut, advice); // advisor는 pointcut, advice를 각 1개씩 갖는다.
+    }
+}
+```
+
+부가기능을 적용하고자 하는 클래스가 인터페이스를 갖던 말던 advice를 통해 부가기능을 적용할 수 있었다.
+
+그러나, 부가기능을 적용하는 Bean마다 반드시 프록시를 생성해야 한다는 점과 자동 빈 등록일 경우에는 프록시를 등록할 수 없다는 단점이 있다.
+
+이러한 문제를 빈 후처리기로 해결할 수 있다.
+
+### 8. 빈 후처리
+
+
+
+
+
+
