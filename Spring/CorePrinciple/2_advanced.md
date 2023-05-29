@@ -1345,7 +1345,108 @@ public class ProxyFactoryConfigV1 {
 
 ### 8. 빈 후처리
 
+#### 8.1 BeanPostProcessor 인터페이스 구현을 통한 빈 후처리기 직접 생성
 
+BeanPostProcessor 인터페이스 구현하여 클래스를 생성한 후, 이를 빈으로 등록하여 빈 후처리기로 사용할 수 있다.
+
+스프링 빈 컨테이너에 등록하기 바로 직전에 빈 후처리기가 Bean이 특정 조건을 만족한다면 프록시를 등록하도록 한다.
+
+```java
+Slf4j
+@RequiredArgsConstructor
+public class PackageLogTracePostProcessor implements BeanPostProcessor {
+    private final String basePackage;
+    private final Advisor advisor;
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        //프록시 적용 대상 여부 체크
+        //프록시 적용 대상이 아니라면 원본을 그대로 반환
+        String packageName = bean.getClass().getPackageName();
+        if(!packageName.startsWith(basePackage)) {
+            return bean;
+        }
+
+        //프록시 대상이면 프록시를 만들어서 반환
+        ProxyFactory proxyFactory = new ProxyFactory(bean);
+        proxyFactory.addAdvisor(advisor);
+
+        Object proxy = proxyFactory.getProxy();
+        log.info("create proxy: target={}, proxy={}", bean.getClass(), proxy.getClass());
+        return proxy;
+    }
+}
+
+@Slf4j
+@Configuration
+@Import({AppV1Config.class, AppV2Config.class})
+public class BeanPostProcessorConfig {
+    @Bean
+    public PackageLogTracePostProcessor logTracePostProcessor(LogTrace logTrace) {
+        return new PackageLogTracePostProcessor("hello.proxy.app", getAdvisor(logTrace));
+    }
+
+    private Advisor getAdvisor(LogTrace logTrace) {
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        pointcut.setMappedNames("request*", "order*", "save*");
+        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+        return new DefaultPointcutAdvisor(pointcut, advice);
+    }
+}
+```
+
+이를 통해 빈을 등록할 때, 프록시 객체를 반환하는 귀찮은 별도의 설정 로직을 제거하고, 자동 빈 등록일 때도 프록시 객체가 등록되도록 변경할 수 있었다.
+
+#### 8.2 스프링에서 제공하는 빈 후처리기
+
+스프링에서는 빈 후처리기를 이미 제공한다. 그러므로, BeanPostProcessor 인터페이스를 구현할 필요가 없다.
+
+gradle 빌드 기준으로 ```implementation 'org.springframework.boot:spring-boot-starter-aop'```를 추가하여 자동 프록시 생성기를 추가할 수 있다.
+
+자동 프록시 생성기는 아래와 같이 동작한다.
+
+1. Advisor를 @Bean으로 등록한다. Advisor에는 advice와 pointcut이 존재한다.
+2. 빈 객체가 생성될 때, 모든 advisor를 조회한다.
+3. pointcut을 통해 프록시를 적용할지 결정한다.
+4. 프록시를 적용해야 한다면 프록시를 생성해서 빈으로 등록한다.
+
+**그러므로, 개발자가 할 일은 advisor를 Bean으로 등록만 하면 된다.**
+
+또한 pointcut은 프록시가 생성될 때와 사용될 때 advice 적용 여부를 판단한다.
+
+```java
+@Configuration
+@Import({AppV1Config.class, AppV2Config.class})
+public class AutoProxyConfig {
+//    @Bean
+    public Advisor advisor1(LogTrace logTrace) {
+        // pointcut
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        pointcut.setMappedNames("request*", "order*", "save*");
+        // advice
+        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+        return new DefaultPointcutAdvisor(pointcut, advice);
+    }
+
+    @Bean
+    public Advisor advisor2(LogTrace logTrace) {
+        // pointcut
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut.setExpression("execution(* hello.proxy.app..*(..)) && !execution(* hello.proxy.app..noLog(..))");
+        // advice
+        LogTraceAdvice advice = new LogTraceAdvice(logTrace);
+        return new DefaultPointcutAdvisor(pointcut, advice);
+    }
+}
+```
+
+advisor1의 경우에는 메소드에 request, order, save가 존재하는 모든 클래스를 프록시로 등록하므로 좀 더 정밀한 pointcut 조건이 필요하다.
+
+이때 사용하는 것이 **AspectJExpressionPointcut**이다. AOP에 특화된 pointcut 표현식이다. 자세한 것은 추후 다루도록 한다.
+
+위의 예제에서는 Bean 중복을 막기 위해서 주석처리가 필요했다.
+
+### 9. @Aspect AOP
 
 
 
