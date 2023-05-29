@@ -1444,6 +1444,49 @@ advisor1의 경우에는 메소드에 request, order, save가 존재하는 모�
 
 ### 9. @Aspect AOP
 
+Advisor 빈을 코드로 생성하는 방법 대신에 @Aspect 애노테이션을 활용해 선언적 방식으로 쉽게 만들 수 있다.
+
+```java
+@Slf4j
+@Aspect
+@RequiredArgsConstructor
+public class LogTraceAspect {
+    private final LogTrace logTrace;
+
+    @Around("execution(* hello.proxy.app..*(..))") // 포인트컷
+    public Object execute(ProceedingJoinPoint joinPoint) throws Throwable { // 어드바이스
+        TraceStatus status = null;
+        try {
+            String message = joinPoint.getSignature().toShortString();
+            status = logTrace.begin(message);
+
+            Object result = joinPoint.proceed(); // 비즈니스 로직 실행
+
+            logTrace.end(status);
+            return result;
+        } catch(Exception e) {
+            logTrace.exception(status, e);
+            throw e;
+        }
+    }
+}
+```
+
+@Around를 통해 포인트컷을 생성하고, execute 함수를 통해 어드바이스를 생성한다.
+
+해당 클래스에 @Aspect가 붙어있으면 자동 프록시 생성기는 이를 어드바이저로 등록한다.
+
+**@Aspect가 붙은 클래스를 어드바이저로 저장하는 과정**
+
+컨테이너에 등록된 Bean 중에서 @Aspect가 붙은 Bean을 조회하여 이를 Advisor로 등록한다.
+
+**프록시를 생성하는 방법**
+
+컨테이너에 등록된 Advisor와 @Aspect 기반으로 생성된 Advisor를 모두 조회한 후, 포인트컷을 통해 프록시 적용 대상인지 확인한다.
+
+만약 프록시 적용 대상이라면, 빈 객체를 프록시 빈 객체로 바꾸어서 컨테이너에 등록한다.
+
+### 10. 스프링 AOP 개념
 
 
 
