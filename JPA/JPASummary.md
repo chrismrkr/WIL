@@ -1104,6 +1104,43 @@ T2: --------------Update(A)----commit-------------- \<non-repeatable read>
 
 ## 9. 영속성 컨텍스트 관리
 
+스프링에서는 트랜잭션과 영속성 컨텍스트의 범위가 같다는 것을 기본 전략으로 한다. 특징은 아래와 같다.
+
+1. 트랜잭션 종료는 영속성 컨텍스 종료를 의미하고, 영속성 컨텍스트에 있던 객체들은 준영속 상태가 된다.
+2. @Transactional은 AOP로 구현된 기능이고, 메소드가 정상 종료되면 트랜잭션 commit, 영속성 컨텍스트는 종료된다.
+3. 반대로 메소드 예외가 발생하면, 트랜잭션은 rollback되고 영속성 컨텍스트는 그대로 유지된다.(flush 호출하지 않음)
+4. 동일한 트랜잭션에서는 동일한 영속성 컨텍스트를 공유한다.
+
+트랜잭션 종료로 인해 영속성 컨텍스트가 종료되면, 영속 객체들은 준영속 상태가 된다.
+
+이에 따라, 지연로딩을 할 수 없다는 문제점이 발생한다. 아래의 예제 코드를 보면 알 수 있다.
+
+```java
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+  private final MemberRepository memberRepository;
+  
+  @Transactional
+  public Member findByName(String name) {
+      return memberRepository.findByName(name);
+  }
+}
+
+@Controller
+@RequiredArgsConstructor
+public class MemberController {
+  private final MemberService memberService;
+  @GetMapping("/member")
+  public String getMember(@RequestParam String name) {
+      Member m = memberService.findByName(name);
+      m.getTeam(); // 에러 발생. 영속성 컨텍스트가 종료되었으므로 지연로딩 불가능
+  }
+}
+```
+
+
+
 
   
   
