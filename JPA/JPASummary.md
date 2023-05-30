@@ -1139,6 +1139,38 @@ public class MemberController {
 }
 ```
 
+이를 해결하기 위해서는 몇가지 방법이 존재한다.
+
+### 9.1 글로벌 Fetch 전략
+
+Member 엔티티에 @ManyToOne으로 조인된 Team을 즉시 로딩(fetch=FetchType.Eager)한다. 
+
+이렇게 하면 트랜잭션이 종료되어 Member가 준영속 상태가 되더라도 Team도 존재하게 된다. 
+
+그러나, 사용하지 않을 수 있는 엔티티를 로딩하거나 N+1 문제가 발생할 수 있다.
+
+### 9.2 Fetch Join 활용
+
+지연 로딩이더라도 Fetch Join을 통해 프록시 객체를 로딩하여 원하는 결과를 얻을 수 있다.
+
+그러나, findMember(), findMemberWithTeam()과 같이 repository 메소드가 무분별하게 늘어날 수 있다는 단점이 있다.
+
+또한, 프레젠테이션 계층(Controller)이 리포지토리 계층을 침범했다는 문제점도 있다.
+
+### 9.3 강제 초기화
+
+Member를 로딩할 때, 영속성 컨텍스트가 종료되기 전 member.getTeam()과 같은 메소드로 강제로 불러오는 방법도 있다.
+
+이처럼, 강제로 초기화하는 계층을 FACADE 계층이라고 한다. FACADE가 추가하여,
+
+Controller -> FACADE(@Transactional) -> Service -> Repository 계층 구조로 변경할 수 있다.
+
+### 9.4 OSIV
+
+결국, 모든 문제는 프레젠테이션 계층에서 영속성 컨텍스트가 종료되어 엔티티가 준영속 상태가 되었기 때문에 발생했다. 적절한 타협점이 필요하다.
+
+프레젠테이션 계층까지 영속성 컨텍스트를 살려두는 전략을 OSIV(Open Session in View)라고 한다.
+
 
 
 
