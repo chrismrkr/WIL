@@ -1104,11 +1104,11 @@ T2: --------------Update(A)----commit-------------- \<non-repeatable read>
 
 ## 9. 영속성 컨텍스트 관리
 
-스프링에서는 트랜잭션과 영속성 컨텍스트의 범위가 같다는 것을 기본 전략으로 한다. 특징은 아래와 같다.
+스프링에서는 트랜잭션과 영속성 컨텍스트의 범위가 같은 것을 기본 전략으로 한다. 특징은 아래와 같다.
 
 1. 트랜잭션 종료는 영속성 컨텍스 종료를 의미하고, 영속성 컨텍스트에 있던 객체들은 준영속 상태가 된다.
 2. @Transactional은 AOP로 구현된 기능이고, 메소드가 정상 종료되면 트랜잭션 commit, 영속성 컨텍스트는 종료된다.
-3. 반대로 메소드 예외가 발생하면, 트랜잭션은 rollback되고 영속성 컨텍스트는 그대로 유지된다.(flush 호출하지 않음)
+3. 만약 메소드 Exception이 발생하면, 트랜잭션은 rollback되고 영속성 컨텍스트는 그대로 유지된다.(flush 호출하지 않음)
 4. 동일한 트랜잭션에서는 동일한 영속성 컨텍스트를 공유한다.
 
 트랜잭션 종료로 인해 영속성 컨텍스트가 종료되면, 영속 객체들은 준영속 상태가 된다.
@@ -1143,7 +1143,7 @@ public class MemberController {
 
 ### 9.1 글로벌 Fetch 전략
 
-Member 엔티티에 @ManyToOne으로 조인된 Team을 즉시 로딩(fetch=FetchType.Eager)한다. 
+예를 들어, Member 엔티티에 @ManyToOne으로 조인된 Team을 즉시 로딩(fetch=FetchType.Eager)한다. 
 
 이렇게 하면 트랜잭션이 종료되어 Member가 준영속 상태가 되더라도 Team도 존재하게 된다. 
 
@@ -1171,9 +1171,53 @@ Controller -> FACADE(@Transactional) -> Service -> Repository 계층 구조로 �
 
 프레젠테이션 계층까지 영속성 컨텍스트를 살려두는 전략을 OSIV(Open Session in View)라고 한다.
 
+과거 OSIV는 request가 들어올 때 Filter나 Interceptor를 통해 영속성 컨텍스트를 생성하고, 트랜잭션이 종료될 때 영속성 컨텍스트를 종료하는 방식을 사용했다. **이를 요청 당 트랜잭션 OSIV 방식이라고 한다.**
 
+이 방법을 통해 request-response가 끝나기 전에 영속성 컨텍스트가 종료되는 것을 막을 수 있었다.
 
+그러나, 아래와 같이 프레젠테이션 계층에서 엔티티가 변경된다면, 트랜잭션이 끝날 때 변경 감지로 변경사항이 실제 엔티티에 반영되는 문제점이 발생한다.
 
+```java
+@Controller
+public class MemberController {
+    ...
+    public String viewMember(Long id) {
+        Member m = memberService.getMember(id);
+        m.setName("aaa"); // 변경감지로 DB에 반영되어 문제가 된다.
+        ...
+    }
+}
+```
+
+이를 막기 위해서 DTO를 사용하는 방법도 있지만, 코드량이 매우 늘어난다는 단점이 있다.
+
+### 9.5 스프링 OSIV
+
+스프링 OSIV는 프레젠테이션-서비스-레포지토리 계층 중, 서비스 계층이 종료되면 트랜잭션은 종료하나 영속성 컨텍스트는 살려두는 전략을 사용한다.
+
+영속성 컨텍스트는 트랜잭션 없어도 조회는 가능하므로 지연로딩이 가능하다.
+
+그리고, request-response가 종료되면 영속성 컨텍스트도 종료된다. 이때, 영속성 컨텍스트는 flush되지 않으므로 DB에 반영되지도 않는다.
+
+JPA 서블릿 필터에 OSIV를 적용하려면 ```OpenEntityInViewFilter```를 사용하고, 인터셉터에 OSIV를 적용하려면 ```OpenEntityManagerInViewInterceptor```를 사용하면 된다.
   
-  
+**한가지 주의사항**은 아래와 같이 영속성 컨텍스트가 살아있는 상태에서, 새로운 서비스를 호출하는 경우이다.
 
+```java
+class MemberController {
+  ...
+  public String viewMember(Long id) {
+      Member m = service.getMember(id);
+      m.setName("XXX");
+      
+      service.biz(); // <- 이 부분에서 문제가 발생한다.
+      ...
+  }
+}
+```
+
+영속성 컨텍스트는 JPQL이 실행되면 자동 flush되어 DB에 반영된다.
+
+이에 따라 기존의 영속성 컨텍스트는 flush되고 변경감지에 의해 DB에 변경 내용이 반영되는 문제가 발생한다.
+
+그러므로, 트랜잭션보다 영속성 컨텍스트의 범위가 넓고 여러 트랜잭션이 공유되는 상황(OSIV)에서는 편리하지만 주의가 필요하다.
