@@ -1339,6 +1339,8 @@ public class ProxyFactoryConfigV1 {
 
 이러한 문제를 빈 후처리기로 해결할 수 있다.
 
+***
+
 ### 8. 빈 후처리
 
 #### 8.1 BeanPostProcessor 인터페이스 구현을 통한 빈 후처리기 직접 생성
@@ -1442,6 +1444,8 @@ advisor1의 경우에는 메소드에 request, order, save가 존재하는 모�
 
 참고로 위의 예제에서는 Bean 중복을 막기 위해서 주석처리가 필요했다.
 
+***
+
 ### 9. @Aspect AOP
 
 Advisor 빈을 코드로 생성하는 방법 대신에 @Aspect 애노테이션을 활용해 선언적 방식으로 쉽게 만들 수 있다.
@@ -1486,6 +1490,7 @@ public class LogTraceAspect {
 
 만약 프록시 적용 대상이라면, 빈 객체를 프록시 빈 객체로 바꾸어서 컨테이너에 등록한다.
 
+***
 
 ### 10. 스프링 AOP 개념
 
@@ -1513,12 +1518,228 @@ AOP는 컴파일 시점, 클래스 로딩 시점, 런타임 3가지에 적용할
 + 어드바이저 : 하나의 포인트컷과 어드바이스로 구성됨
 + 위빙 : 조인 포인트에 어드바이스를 적용
 
+***
+
 ### 11. 스프링 AOP 구현
 
- 
+#### 11.1 V1. 포인트컷과 어드바이스가 함께 존재하는 구현
 
+아래와 같이 구현할 수 있다.
 
+```java
+@Aspect
+@Slf4j
+public class AspectV1 {
+    @Around("execution(* hello.aop.order..*(..))") // 포인트컷
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable { // 어드바이스
+        log.info("[log] {}", joinPoint.getSignature()); // join point 시그니처
+        return joinPoint.proceed();
+    }
+}
+```
 
+@Aspect를 통해 어드바이저를 선언하고, 그 안에 포인트컷과 어드바이스를 정의한다.
+
+#### 11.2 V2. 포인트컷과 어드바이스를 분리한 구현
+
+```java
+@Slf4j
+@Aspect
+public class AspectV2 {
+    @Pointcut("execution(* hello.aop.order..*(..))")
+    private void allOrder() {} // 포인트컷 시그니처
+
+    @Around("allOrder()")
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.info("[log] {}", joinPoint.getSignature());
+        return joinPoint.proceed();
+    }
+}
+```
+#### 11.3 V3. 여러 포인트컷을 조합한 구현
+
+```java
+@Slf4j
+@Aspect
+public class AspectV3 {
+    @Pointcut("execution(* hello.aop.order..*(..))")
+    private void allOrder() {} // 포인트컷 시그니처
+
+    // 클래스 이름 패턴이 *Service인 것에 적용
+    @Pointcut("execution(* *..*Service.*(..))")
+    private void allService() {}
+
+    @Around("allOrder()")
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.info("[log] {}", joinPoint.getSignature());
+        return joinPoint.proceed();
+    }
+
+    // hello.aop.order 패키지와 하위 패키지이면서 클래스 이름 패턴이 *Service
+    @Around("allService() && allOrder()")
+    public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+        try {
+            log.info("[트랜잭션 시작] {}", joinPoint.getSignature());
+            Object result = joinPoint.proceed();
+            log.info("[트랜잭션 커밋] {}", joinPoint.getSignature());
+            return result;
+        } catch(Exception e) {
+            log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+            throw e;
+        } finally {
+            log.info("[리소스 해제] {}", joinPoint.getSignature());
+        }
+    }
+}
+```
+
+#### 11.4 V4. 포인트컷 모듈화
+
+포인트컷을 따로 모아서 클래스로 생성한 후, 이를 여러 어드바이스에서 참조해서 사용할 수 있다.
+
+어드바이스에서 참조할 때는 포인트컷이 모여있는 클래스의 ```패키지명.클래스명.메소드()``` 형태로 사용한다.
+
+```java
+public class Pointcuts {
+    @Pointcut("execution(* hello.aop.order..*(..))")
+    public void allOrder() {} // 포인트컷 시그니처
+
+    // 클래스 이름 패턴이 *Service인 것에 적용
+    @Pointcut("execution(* *..*Service.*(..))")
+    public void allService() {}
+
+    @Pointcut("allOrder() & allService()")
+    public void orderAndService() {}
+}
+
+@Slf4j
+@Aspect
+public class AspectV4Pointcut {
+    @Around("hello.aop.order.aop.Pointcuts.allOrder()")
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.info("[log] {}", joinPoint.getSignature());
+        return joinPoint.proceed();
+    }
+
+    // hello.aop.order 패키지와 하위 패키지이면서 클래스 이름 패턴이 *Service
+    @Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+    public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+        try {
+            log.info("[트랜잭션 시작] {}", joinPoint.getSignature());
+            Object result = joinPoint.proceed();
+            log.info("[트랜잭션 커밋] {}", joinPoint.getSignature());
+            return result;
+        } catch(Exception e) {
+            log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+            throw e;
+        } finally {
+            log.info("[리소스 해제] {}", joinPoint.getSignature());
+        }
+    }
+}
+```
+
+#### 11.5 V5. 어드바이스 순서 적용
+
+하나의 Aspect 어드바이저 클래스 안의 여러 어드바이스는 순서가 보장되지 않는다.
+
+그러므로, 순서를 보장하기 위해서는 어드바이저마다 독립적인 클래스를 갖도록 하고, @Order를 사용하여 순서를 맞출 수 있다.
+
+```java
+@Slf4j
+public class AspectV5Order {
+    @Aspect
+    @Order(2)
+    public static class LogAspect {
+        @Around("hello.aop.order.aop.Pointcuts.allOrder()")
+        public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable {
+            log.info("[log] {}", joinPoint.getSignature());
+            return joinPoint.proceed();
+        }
+    }
+
+    @Aspect
+    @Order(1)
+    public static class TxAspect {
+        // hello.aop.order 패키지와 하위 패키지이면서 클래스 이름 패턴이 *Service
+        @Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+        public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+            try {
+                log.info("[트랜잭션 시작] {}", joinPoint.getSignature());
+                Object result = joinPoint.proceed();
+                log.info("[트랜잭션 커밋] {}", joinPoint.getSignature());
+                return result;
+            } catch(Exception e) {
+                log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+                throw e;
+            } finally {
+                log.info("[리소스 해제] {}", joinPoint.getSignature());
+            }
+        }
+    }
+}
+```
+
+#### 11.6 V6. Advice 종류에 따른 모듈화
+
+Advice는 5가지로 분류할 수 있다.
+
++ @Around : 메소드 전후로 수행. 가장 강력함
++ @Before : 조인트 포인트 이전에 실행
++ @AfterReturning : 조인트 포인트 이후에 실행
++ @AfterThrowing : 메소드가 예외를 던질 때 실행
++ @After : 정상, 에러와 관계없이 마지막에 실행
+
+아래의 코드를 참고하면 알 수 있다.
+
+```java
+@Slf4j
+@Aspect
+public class AspectV6Advice {
+    @Around("hello.aop.order.aop.Pointcuts.orderAndService()")
+    public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+        try {
+            // before
+            log.info("[트랜잭션 시작] {}", joinPoint.getSignature());
+            Object result = joinPoint.proceed();
+            // AfterReturning
+            log.info("[트랜잭션 커밋] {}", joinPoint.getSignature());
+            return result;
+        } catch(Exception e) {
+            // AfterThrowing
+            log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
+            throw e;
+        } finally {
+            // After
+            log.info("[리소스 해제] {}", joinPoint.getSignature());
+        }
+    }
+
+    @Before("hello.aop.order.aop.Pointcuts.orderAndService()")
+    public void doBefore(JoinPoint joinPoint) {
+        log.info("[before] {}", joinPoint.getSignature());
+    }
+    @AfterReturning(value="hello.aop.order.aop.Pointcuts.orderAndService()", returning = "result")
+    public void doReturn(JoinPoint joinPoint, Object result) {
+        log.info("[return] {} return={}", joinPoint.getSignature(), result);
+    }
+    @AfterThrowing(value="hello.aop.order.aop.Pointcuts.orderAndService()", throwing = "ex")
+    public void doThrowing(JoinPoint joinPoint, Exception ex) {
+        log.info("[ex] {} message={}", ex);
+    }
+    @After(value="hello.aop.order.aop.Pointcuts.orderAndService()")
+    public void doAfter(JoinPoint joinPoint) {
+        log.info("[after] {}", joinPoint.getSignature());
+    }
+}
+```
+
+@Around 어드바이스로 또 다른 어드바이스의 기능을 모두 커버할 수 있다.
+
+그럼에도 @Before, @AfterReturning, @AfterThrowing, @After를 사용하는 이유는 2가지가 있다.
+
++ @Around는 proceed()를 반드시 호출해야함. 그러므로, 이는 프로그래밍 실수를 유발할 수 있다.
++ 어드바이스 역할별로 제약이 존재한다. 이는 실수를 예방하고 다른 사람이 코드를 읽을 때 어드바이스의 역할을 명확히 파악할 수 있다.
 
 
 
