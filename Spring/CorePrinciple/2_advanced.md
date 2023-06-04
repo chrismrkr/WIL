@@ -1840,3 +1840,34 @@ pointcut.setExpression("within(hello.aop.member.MemberService");
 
 @target은 부모 클래스의 메소드까지 어드바이스를 적용하고, @within은 자기 자신 클래스의 메소드에만 어드바이스를 적용한다.
 
+#### 12.5 @annotation @args
+
+@annotation은 메소드가 특정 애노테이션을 가질 때 어드바이스를 적용하도록 한다.
+
+예를 들어, ```@annotation(hello.aop.member.annotation.MethodAop)```가 존재하면, @MethodAop가 적용된 메소드에 어드바이스를 등록한다.
+
+```java
+@Import(AtAnnotationTest.AtAnnotationAspect.class)
+@SpringBootTest
+@Slf4j
+public class AtAnnotationTest {
+    @Autowired
+    MemberService memberService;
+
+    @Test
+    void success() {
+        log.info("memberService Proxy={}", memberService.getClass());
+        memberService.hello("helloA");
+    }
+
+    @Slf4j
+    @Aspect
+    static class AtAnnotationAspect {
+        @Around("@annotation(hello.aop.member.annotation.MethodAop)")
+        public Object doAtAnnotation(ProceedingJoinPoint joinPoint) throws Throwable {
+            log.info("[@annotation] {}", joinPoint.getSignature());
+            return joinPoint.proceed();
+        }
+    }
+}
+```
