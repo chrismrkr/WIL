@@ -1742,6 +1742,77 @@ public class AspectV6Advice {
 + 어드바이스 역할별로 제약이 존재한다. 이는 실수를 예방하고 다른 사람이 코드를 읽을 때 어드바이스의 역할을 명확히 파악할 수 있다.
 
 
+***
+
+### 12. 스프링 AOP - 포인트컷
+
+포인트컷 표현식과 사용법에 대해서 설명한다.
+
+### 12.1 Expression
+
+스프링 AOP에서 가장 많이 사용되는 포인트컷이다. Expression 문법은 아래와 같다.
+
+``` execution(접근제어자(?) 반환타입 선언타입(?) 메소드명(파라미터) 예외(?))```
+
+(?)는 생략할 수 있다. 위의 문법을 활용한 포인트컷 예시는 아래와 같다.
+
+```java
+@Test
+void pointCutExample() {
+     AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+     Method helloMethod = MemberServiceImpl.class.getMethod("hello", String.class); // 리플렉션을 통해 클래스의 정적 정보를 가져온다.
+     
+     pointcut.setExpression("execution(public String hello.aop.member.MemberServiceImpl.hello(String))");
+     pointcut.setExpression("execution(* *(..))");
+     pointcut.setExpression("execution(* hello(..))");
+     pointcut.setExpression("execution(* hel*(..))")
+     pointcut.setExpression("execution(* *el*(..))");
+     pointcut.setExpression("execution(* hello.aop.member.MemberServiceImpl.hello(..))");
+     
+     pointcut.setExpression("execution(* hello.aop.member.*.*(..))");
+     
+     // hello.aop.hello 패키지 이하의 모든 클래스와 메소드에 AOP를 적용
+     pointcut.setExpression("execution(* hello.aop.member..*.*(..))");
+     // 부모 클래스 매칭도 허용
+     pointcut.setExpression("execution(* hello.aop.member.MemberService.*(..))");
+     
+     // (String), (String, xxx), (String, xxx, xxx) 파라미터로 갖는
+     // hello.aop.member 패키지와 그 하위 패키지에 존재하는 모든 클래스의 public 메소드에 AOP를 적용한다.
+     pointcut.setExpression("expression(public * hello.aop.member..*(String, ..))");
+}
+```
+파라미터 지정에서, ```*```은 아무 값이 와도 된다는 것을 의미하고, ```..```는 파라미터 타입과 수는 상관없다는 것을 의미한다.
+
+패키지 지정에서, ```.```는 정확하게 해당 위치의 패키지를 의미하고, ```..```는 해당 위치의 패키지와 그 하위 패키지를 포함하는 것을 의미한다.
+
+추가로 아래와 같은 예시에서 AOP를 적용할 때 주의해야 한다.
+
+```java
+public interface MemberService {
+    String hello(String param);
+}
+
+public class MemberServiceImpl implements MemberService {
+    @Override
+    public String hello(String param) {
+        return "ok;
+    }
+    public String internal(String param) {
+        return "ok";
+    }
+}
+```
+
+```java
+    pointcut.setExpression("execution(* hello.aop.member.MemberService.*(String, ..))");
+    Method helloMethod = MemberServiceImpl.class.getMethod("hello", String.class);
+    assertTrue(pointcut.matches(helloMethod, MemberServiceImpl.class));
+    
+    Method internalMethod = MemberServiceImpl.class.getMethod("internal", String.class);
+    assertFalse(pointcut.matches(internalMethod, MemberServiceImpl.class));
+```
+
+부모 타입을 expression에 포함시켜 특정 메소드에 AOP를 적용할 수 있지만, 만약 그 메소드가 부모 타입에 적용되어있는 것이 아니라면 AOP를 적용할 수 없다.
 
 
 
