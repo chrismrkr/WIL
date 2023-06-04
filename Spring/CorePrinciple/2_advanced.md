@@ -1748,7 +1748,7 @@ public class AspectV6Advice {
 
 포인트컷 표현식과 사용법에 대해서 설명한다.
 
-### 12.1 Expression
+#### 12.1 execution
 
 스프링 AOP에서 가장 많이 사용되는 포인트컷이다. Expression 문법은 아래와 같다.
 
@@ -1812,11 +1812,31 @@ public class MemberServiceImpl implements MemberService {
     assertFalse(pointcut.matches(internalMethod, MemberServiceImpl.class));
 ```
 
-부모 타입을 expression에 포함시켜 특정 메소드에 AOP를 적용할 수 있지만, 만약 그 메소드가 부모 타입에 적용되어있는 것이 아니라면 AOP를 적용할 수 없다.
+부모 타입을 execution에 포함시켜 특정 메소드에 AOP를 적용할 수 있지만, 만약 그 메소드가 부모 타입에 적용되어있는 것이 아니라면 AOP를 적용할 수 없다.
 
 
 
+#### 12.2 within
 
+execution 표현식의 패키지 타입을 체크하는 것만 사용하는 것과 같다. 예를 들어,
 
+```java
+pointcut.setExpression("execution(* hello.aop.member.MemberService.*(..))");
+```
 
+위는 아래로 변경할 수 있다.
+
+```java
+pointcut.setExpression("within(hello.aop.member.MemberService");
+```
+
+#### 12.3 args 
+
+파라미터 타입이 매칭되는 모든 메소드에 어드바이스를 적용한다.
+
+#### 12.4 @target @within
+
+@target과 @within은 execution 포인트컷과 반드시 함께 사용해야 한다.
+
+@target은 부모 클래스의 메소드까지 어드바이스를 적용하고, @within은 자기 자신 클래스의 메소드에만 어드바이스를 적용한다.
 
