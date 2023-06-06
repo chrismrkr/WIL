@@ -1842,7 +1842,7 @@ pointcut.setExpression("within(hello.aop.member.MemberService");
 
 #### 12.5 @annotation @args
 
-@annotation은 메소드가 특정 애노테이션을 가질 때 어드바이스를 적용하도록 한다.
+@annotation은 메소드가 특정 애노테이션을 가질 때 어드바이스를 적용하도록 만든다.
 
 예를 들어, ```@annotation(hello.aop.member.annotation.MethodAop)```가 존재하면, 
 
