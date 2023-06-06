@@ -1844,7 +1844,9 @@ pointcut.setExpression("within(hello.aop.member.MemberService");
 
 @annotation은 메소드가 특정 애노테이션을 가질 때 어드바이스를 적용하도록 한다.
 
-예를 들어, ```@annotation(hello.aop.member.annotation.MethodAop)```가 존재하면, @MethodAop가 적용된 메소드에 어드바이스를 등록한다.
+예를 들어, ```@annotation(hello.aop.member.annotation.MethodAop)```가 존재하면, 
+
+hello.aop.member.annotation 패키지에서 @MethodAop가 적용된 메소드에 어드바이스를 등록한다.
 
 ```java
 @Import(AtAnnotationTest.AtAnnotationAspect.class)
