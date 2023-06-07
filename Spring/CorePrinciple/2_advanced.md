@@ -1748,6 +1748,8 @@ public class AspectV6Advice {
 
 포인트컷 표현식과 사용법에 대해서 설명한다.
 
+execution, annotation, 매개변수 전달이 주로 사용된다.
+
 #### 12.1 execution
 
 스프링 AOP에서 가장 많이 사용되는 포인트컷이다. Expression 문법은 아래와 같다.
@@ -1873,3 +1875,29 @@ public class AtAnnotationTest {
     }
 }
 ```
+
+참고로 애노테이션 자체를 파라미터로 받으려면 아래와 같이 적용하면 된다.
+
+```java
+@Target(ElementType.METHOD)
+@Retention(RetetionPolicy.RUNTIME)
+public @interface DummyAnnotation {}
+
+@Slf4j
+@Aspect
+public class DummyAspect {
+    @Around(dummyAnnotation)
+    public Objecet doAdvice(ProceedingJoinPoint joinPoint, DummyAnnotation dummyAnnotation) {
+      log.info("do advice");
+      return joinPoint.proceed();  
+    }
+}
+```
+
+#### 12.6 bean
+
+스프링 컨테이너에 등록된 bean 이름을 기준으로 AOP를 적용하는 방법이다.
+
+#### 12.7 매개변수 전달
+
+
