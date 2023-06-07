@@ -1842,6 +1842,14 @@ pointcut.setExpression("within(hello.aop.member.MemberService");
 
 @target은 부모 클래스의 메소드까지 어드바이스를 적용하고, @within은 자기 자신 클래스의 메소드에만 어드바이스를 적용한다.
 
+```java
+// hello.aop 패키지에 있는 메소드 중, @ClassAop가 붙은 메소드에 AOP를 적용한다. 이때, 부모 클래스의 메소드까지 적용한다.
+@Around(execution(* hello.aop..*(..)) && @target(hello.aop.member.annotation.ClassAop)) 
+
+// hello.aop 패키지에 있는 메소드 중, @ClassAop가 붙은 메소드에 AOP를 적용한다. 이때, 부모 클래스의 메소드에는 적용하지 않는다.
+@Around(execution(* hello.aop..*(..)) && @within(hello.aop.member.annotation.ClassAop)) 
+```
+
 #### 12.5 @annotation @args
 
 @annotation은 메소드가 특정 애노테이션을 가질 때 어드바이스를 적용하도록 만든다.
@@ -1903,9 +1911,16 @@ public class DummyAspect {
 public Object advice(ProceedingJoinPoint joinPoint) { ... }
 ```
 
-#### 12.7 매개변수 전달
+#### 12.7 this, target
+
+#### 12.8 매개변수 전달
 
 어드바이스에 매개변수를 전달할 수 있는 포인트컷 표현식이다.
 
+아래는 매개변수 전달이 가능한 예시이다.
+
+```java
+
+```
 
 
