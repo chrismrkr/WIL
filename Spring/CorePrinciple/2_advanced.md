@@ -1898,6 +1898,14 @@ public class DummyAspect {
 
 스프링 컨테이너에 등록된 bean 이름을 기준으로 AOP를 적용하는 방법이다.
 
+```java
+@Around(bean(빈 이름))
+public Object advice(ProceedingJoinPoint joinPoint) { ... }
+```
+
 #### 12.7 매개변수 전달
+
+어드바이스에 매개변수를 전달할 수 있는 포인트컷 표현식이다.
+
 
 
