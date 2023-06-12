@@ -1913,14 +1913,37 @@ public Object advice(ProceedingJoinPoint joinPoint) { ... }
 
 #### 12.7 this, target
 
+this는 프록시 객체를 대상으로 포인트컷을 매칭하고, target은 실제 객체를 대상으로 포인트컷을 매칭한다.
+
+그러므로, JDK 동적 프록시 기반으로 AOP가 생성되었다면, 인터페이스에 포인트컷을 적용할 수 있지만 구체클래스에는 적용할 수 없다.
+
+반대로, CGLIB 기반으로 AOP가 생성되었다면, 인터페이스와 구체클래스 모두 포인트컷을 적용할 수 있다.
+
+this와 target은 파라미터 바인딩에 주로 사용된다.
+
 #### 12.8 매개변수 전달
 
-어드바이스에 매개변수를 전달할 수 있는 포인트컷 표현식이다.
+어드바이스에 매개변수를 전달할 수 있는 포인트컷 표현식이다. 매개변수 이름과 포인트컷을 매칭하여 전달한다.
 
 아래는 매개변수 전달이 가능한 예시이다.
 
-```java
+```
+@Before(args(arg, ..))
+void function(Object arg);
 
+@Before(this(arg))
+void function(MemberService arg);
+
+@Before(target(obj))
+void function(MemberServiceImpl arg);
+
+@Before(@target(annotation))
+void function(ClassAop annotation);
+@Before(@within(annotation))
+void function(ClassAop annotation);
+
+@Before(@annotation(annotation))
+void function(MethodAop annotation);
 ```
 
 ***
@@ -2041,6 +2064,6 @@ private final MemberSerivceImpl memberSerivce;
 
 스프링부트 2.0+ 부터는 1번과 2번 문제는 해결되었다. 3번은 AOP를 적용할 메소드에는 final이 일반적으로 적용되지 않으므로 무시할 수 있는 문제이다.
 
-결론 : 스프링부트2.0+ AOP는 CGLIB를 통한 프록시 생성을 기본 전략으로 하는 쪽으로 타협되었다.
+결론 : 스프링부트2.0+ AOP는 CGLIB를 통한 프록시 생성을 기본 전략으로 하는 쪽으로 타협
 
 
