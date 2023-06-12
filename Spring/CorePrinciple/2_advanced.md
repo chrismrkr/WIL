@@ -1927,7 +1927,7 @@ this와 target은 파라미터 바인딩에 주로 사용된다.
 
 아래는 매개변수 전달이 가능한 예시이다.
 
-```
+```java
 @Before(args(arg, ..))
 void function(Object arg);
 
