@@ -1927,8 +1927,120 @@ public Object advice(ProceedingJoinPoint joinPoint) { ... }
 
 ### 13. 스프링 AOP 주의사항
 
-#### 13.1 내부 호출 문제
+#### 13.1 프록시 내부 호출 문제
 
+AOP를 통해 어드바이스가 적용된 두가지 메소드가 있고, 프록시 내부 호출 문제는 아래와 같은 상황에서 문제가 발생한다.
 
+```java
+@Aspect
+@Slf4j
+public class LogAspect {
+    @Before("execution(* hello.aop..*.*(..))")
+    public void doTrace(JoinPoint joinPoint) {
+        log.info("[do Trace] {}", joinPoint.getSignature());
+    }
+}
+
+@Slf4j
+@Component
+public class Service {
+    public void external() {
+        log.info("external function calls");
+        internal();
+    }
+    public void internal() {
+       log.info("internal function calls");
+    }
+}
+
+@Test
+void test() {
+    service.external();
+}
+```
+
+테스트 결과는 아래와 같다. internal() 함수에 대한 어드바이스 로그가 나타나지 않는 문제가 발생한다. 
+
+```
+[do Trace] ...
+external function calls
+internal function calls
+````
+
+이러한 문제가 발생한 이유는 어드바이스가 적용된 프록시를 통해서 internal()을 호출하는 것이 아닌 실제 객체를 통해 internal()을 호출했기 때문에 문제가 발생했다.
+
+이는 자기 자신을 주입하거나 지연 조회를 하는 방법으로 해결할 수 있다. 그러나, 스프링부트 2.6+ 버전부터는 아래의 방법을 통한 순환 참조가 기본적으로 금지되었으므로 좋은 방법은 아니다.
+
+```java
+public class CallServiceV1 {
+    private CallServiceV1 callServiceV1;
+    @Autowired
+    public void setCallServiceV1(CallServiceV1 callServiceV1) {
+        // 스프링부트 2.6+ 버전부터 setter를 통한 순환참조가 금지됨.
+        // application.properties에서 spring.main.allow-circular-references=true로 변경해서 순환 참조시킬 수는 있음.
+        this.callServiceV1 = callServiceV1;
+    }
+}
+
+public class CallServiceV2 {
+//    private final ApplicationContext applicationContext;
+    private final ObjectProvider<CallServiceV2> callServiceProvider;
+    public void external() {
+        log.info("call external");
+//        CallServiceV2 callServiceV2 = applicationContext.getBean(CallServiceV2.class);
+        // 위 방식도 스프링부트 2.6+ 부터 기본적으로 순환참조가 불가능하므로 막혀있음.
+        CallServiceV2 callServiceV2 = callServiceProvider.getObject();
+        callServiceV2.internal();
+    }
+}
+```
+
+가장 좋은 대안은 위임을 통해 구조를 변경하는 것이다. 아래와 같이 구조를 변경하면 프록시 내부 호출 문제가 해결된다.
+
+```java
+@RequiredArgsConstructor
+public class Service {
+    private final InternalService internalService;
+    public void external() {
+        log.info("external call");
+        internalService.internal();
+    }
+}
+
+public class InternalService {
+    public void internal() {
+        log.info("internal call");
+    }
+}
+```
+
+#### 13.2 프록시 기술 한계와 극복
+
+JDK 동적 프록시는 인터페이스를 통해 프록시를 생성하고, CGLIB 프록시는 구체 클래스를 통해 프록시를 생성한다.
+
+그러므로, JDK 동적 프록시를 통한 AOP는 인터페이스로 캐스팅할 수 있지만 구체 클래스 타입으로는 캐스팅할 수 없다.
+
+하지만, CGLIB 프록시를 통한 AOP는 인터페이스 뿐만 아니라 구체 클래스 타입으로도 캐스팅할 수 있다.
+
+이러한 문제는 구체클래스에 의존관계를 주입할 때 문제가 발생한다.
+
+```java
+// MemberService가 JDK 동적 프록시를 통해 어드바이스가 적용되어 있다면 에러가 발생함.
+private final MemberSerivceImpl memberSerivce;
+```
+
+물론, DI를 잘 살린 구조라면 구체 클래스를 통해 의존관계를 주입받는 경우는 거의 없다.
+
+그러나, 테스트의 목적으로 구체 클래스를 통한 DI가 필요한 경우에는 문제가 발생한다.
+
+그렇다면 JDK 동적 프록시 대신에 CGLIB를 사용하면 위의 모든 문제가 해결되나, 아래의 문제가 발생한다.
+
++ 1. 대상 클래스 기본 생성자 필수
++ 2. 생성자 2번 호출(프록시 생성 시, proxy와 target 생성을 위해 2번 호출)
++ 3. final 상속 불가능
+
+스프링부트 2.0+ 부터는 1번과 2번 문제는 해결되었다. 3번은 AOP를 적용할 메소드에는 final이 일반적으로 적용되지 않으므로 무시할 수 있는 문제이다.
+
+결론 : 스프링부트2.0+ AOP는 CGLIB를 통한 프록시 생성을 기본 전략으로 하는 쪽으로 타협되었다.
 
 
