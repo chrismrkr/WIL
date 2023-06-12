@@ -1923,4 +1923,12 @@ public Object advice(ProceedingJoinPoint joinPoint) { ... }
 
 ```
 
+***
+
+### 13. 스프링 AOP 주의사항
+
+#### 13.1 내부 호출 문제
+
+
+
 
