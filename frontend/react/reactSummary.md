@@ -1,6 +1,6 @@
 # React
 
-React Document를 공부하여 정리한 내용이다.
+React Document를 읽어서 정리한 내용이다.
 
 ## 1. JSX
 
