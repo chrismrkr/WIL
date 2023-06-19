@@ -1350,7 +1350,7 @@ BeanPostProcessor 인터페이스 구현하여 클래스를 생성한 후, 이�
 빈 컨테이너에 등록한 후, 빈 후처리기가 Bean이 특정 조건을 만족한다면 빈 객체 대신에 프록시를 등록한다.
 
 ```java
-Slf4j
+@Slf4j
 @RequiredArgsConstructor
 public class PackageLogTracePostProcessor implements BeanPostProcessor {
     private final String basePackage;
