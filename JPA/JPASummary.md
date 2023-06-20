@@ -746,11 +746,18 @@ cascade 옵션으로는 persist, remove, 그리고 all이 있다.
 ***
 
 ## 5. 값 타입
+엔티티와 값 타입을 혼동해서는 안된다. 식별자를 통해 추적이 필요한 것은 엔티티이다. 
+
 ### 5.1 기본 값 타입
 기본 값 타입에는 int, double과 값은 기본 타입, Integer와 같은 래퍼 클래스, 그리고 String이 있다. 기본 값 타입은 공유되지 않는다.
 
 ### 5.2 임베디드(Embedded) 타입
 여러 클래스(엔티티)에서 공유하는 특성을 모아서 만든 값 타입이다. @Embeddable 애노테이션을 사용한다. **임베디드 타입에는 반드시 기본 생성자가 필요하다.**
+
+@Embedded 타입을 잘 활용하면 엔티티 더욱 객체지향적으로 설계가 가능하다. 잘 구현된 ORM 애플리케이션은 테이블보다 엔티티 클래스의 수가 더 많다.
+
+예를 들어, 아래의 Address @Embeddable 타입은 Member 엔티티 뿐만 아니라 다른 엔티티에도 사용될 수 있다. 사용 방법은 아래와 같다.
+
 ```java
 @Embeddable
 public class Address {
@@ -771,28 +778,35 @@ public class Member {
   }
 ```
 
+@Embeddable - @Embedded 타입은 연속적으로 연관관계를 맺으며 매핑될 수 있다. (ex. Zipcode Embedded in Address, Address Embedded in Member) 
+
  + @Embeddable과 @MappedSuperclass의 차이점은?
  
  위임(has)과 상속(is)의 차이이다. 기능 상 차이는 없지만 JPQL 호출 시 위임의 경우에 쿼리가 더 길어질 수 있다.
  
- + 동일한 @Embeddable 타입을 2개 이상 주입하려면? 오버라이딩을 통해 해결.
+ + 동일한 @Embeddable 타입을 2개 이상 오버라이딩을 통해 주입할 수 있다. 예를 들어, Member에 homeAddress, companyAddress가 embedded되는 경우 
 ```java
 @AttributeOverrides({
   @AttributeOverride(name="...", column=@Column(name="...")), 
   ...
   })
+  // 기본 칼럼명(name="...")을 column=@Column(name="...")으로 변경한다는 것을 의미한다.
 ```
 
 + @Embeddable 타입과 같은 특성을 가진 객체 타입을 공유하도록 만들면 위험하다.
  
 서로 다른 두 객체가 하나의 객체를 참조한다면, 한쪽에서 수정한다면 다른 쪽도 변경되는 문제가 발생한다.
 
-그러므로, 값 타입의 특성을 가진 객체 타입은 불변 객체로 만들어야한다. 불변 객체로 만들기 위해서는 Setter를 생성하지 않고 생성자를 통해서만 값을 설정하도록 한다.
+마찬가지로 @Embeddable 타입도 서로 다른 엔티티가 공유하면 동일한 문제가 발생한다.
+
+이러한 문제를 컴파일러 레벨에서 막을 방법은 없다.(MyClass a = b;와 같은 문법을 막을 수 없음)
+
+이를 해결하기 위해서 setter를 생성하지 않아서 객체를 불변상태로 만들면 된다.
 
 
 ### 5.3 값 타입 컬렉션
 
-값 타입을 한개 이상 저장하기 위해 사용되는 컬렉션(List, Set). @ElementCollection, @CollectionTable 애노테이션을 사용한다.
+동일한 타입의 값을 1개 이상 저장하기 위해서는 Java Collection(List, Set), @ElementCollection, @CollectionTable 애노테이션을 사용한다.
 
 값 타입 컬렉션은 엔티티의 키와 값 타입의 속성을 기본 키로 하는 새로운 테이블로 생성된다. 또한, CASCADE과 고아객체 특성을 갖는다.
 
@@ -801,7 +815,7 @@ public class Member {
 
 + 일대다 매핑과 값 타입 컬렉션의 차이점은? 
  
-앞서 값 타입 컬렉션을 수정하면, 다시 삽입을 위한 많은 쿼리가 발생한다는 것을 알았다. 그러므로, 저장된 정보가 많은 컬렉션은 일대다 매핑으로 전환할 것도 고려해야 한다.
+값 타입 컬렉션을 수정하면, 삽입을 위한 많은 쿼리가 발생한다는 것을 알았다. 그러므로, 저장된 정보가 많은 컬렉션은 일대다 매핑으로 전환할 것도 고려해야 한다.
   
 
 ***
