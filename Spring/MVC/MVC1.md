@@ -333,7 +333,7 @@ public class MemberSaveControllerV1 extends ControllerV1 {
 ```java 
 
 public class FrontControllerV3 extends HttpServlet {
-   private Mep<String, ControllerV3> controllerMap = new HashMap<>();
+   private Map<String, ControllerV3> controllerMap = new HashMap<>();
    
    ...
    
