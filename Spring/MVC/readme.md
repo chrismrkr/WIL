@@ -50,9 +50,19 @@ https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#2-%EA%B2%80%EC%A6%
 
 검증을 위해 BindingResult를 사용하지 않고 스프링에서 사용하는 Bean Validation Annotation에 대해 설명함.
 
-@ModelAttribute와 달리 @RequestBody는 개별 필드를 검증할 수 없음에 주의해야 한다. 
+@ModelAttribute와 달리 @RequestBody는 개별 필드를 검증할 수 없음에 주의해야함. 
 
 https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#3-%EA%B2%80%EC%A6%9D2---bean-validation
+
+### 4. 쿠키와 세션 
+
+https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#4-%EC%BF%A0%ED%82%A4%EC%99%80-%EC%84%B8%EC%85%98
+
+### 5. 필터와 인터셉터
+
+DisPatcherServlet(Front Controller)를 통과하기 전에 동작하는 것이 필터이고, 그 이후에 사용되는 것을 인터셉터라함.
+
+https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#5-%ED%95%84%ED%84%B0%EC%99%80-%EC%9D%B8%ED%84%B0%EC%85%89%ED%84%B0
 
 
 
