@@ -625,11 +625,11 @@ public String requesting2(@RequestParam Map<String, object> paramMap) {
 
 ### 5.5 Http Request Parameter: @ModelAttribute
 
-실제 개발 상황에서 Request 요청으로부터 파라미터(@RequestParam)를 받아 특정 객체에 바인딩한 후 비즈니스 로직을 처리한다.
-
 매번 @RequestParam을 통해 파라미터를 받은 후 객체에 바인딩하는 번거로운 작업을 줄이기 위해서 @ModelAttribute 사용해 자동화할 수 있다.
 
-즉, Model에 담긴 attribute를 가져오기 위해 @ModelAttribute를 사용할 수 있다.
+Model에 담긴 attribute를 가져오기 위해 @ModelAttribute를 사용할 수 있다. 
+
+또는 Http 요청의 Query String을 객체에 바인딩할 수 있다.
 
 ```java
 @Data
@@ -650,7 +650,7 @@ public String modelAttribute(@ModelAttribute Member member) {
 
 클래스에 @Data Annotation 선언 시, @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 자동 적용된다.
 
-@ModelAttribute는 member 객체의 **Setter**를 호출해 적절한 파라미터를 바인딩한다.
+@ModelAttribute는 member 객체의 **생성자 또는 Setter**를 호출해 파라미터를 바인딩한다.
 
 ### 5.6 Http Request Message: 단순 텍스트
 
@@ -698,13 +698,13 @@ HttpServlet, InputStream, HttpEntity, @RequstBody, 총 4가지 방법으로 mess
 
 **@RequestBody가 가장 많이 사용되는 방법이다.**
 
-### 5.7 Http Request Message: JSON
-
-Json 형식의 데이터를 조회하는 것이 Http API에서 주로 사용되는 방식이다.
+### 5.7 Http Request Message: @RequestBody를 사용한 JSON 변환
 
 단순 텍스트와 마찬가지로 HttpServletRequest, InputStream, @RequestBody와 ObjectMapper를 사용해 객체에 바인딩해서 사용할 수 있다.
 
-그러나, @ModelAttribute처럼 한번에 Json형식을 객체에 바인딩하는 방법도 존재한다.
+그러나, @RequestBody를 통해 Json형식을 데이터를 객체로 변환하는 방법도 존재한다.
+
+변환되는 객체는 getter 또는 setter가 반드시 정의되어야 한다. 
 
 ```java
 @ResponseBody
@@ -766,7 +766,7 @@ public String responseviewController(Model model) {
 
 핸들러(컨트롤러)를 실행하기 위해서는 핸들러 어댑터가 필요했다. 그러나, 핸들러(컨트롤러)를 생성하면 이에 맞는 어댑터가 자동으로 매핑되었다.
 
-어떤 메커니즘으로 이것이 가능할까? 답은 @RequestMapping Annotation에 있다.
+@RequestMapping Annotation의 숨은 메커니즘을 통해 자동으로 어댑터를 매핑할 수 있었다.
 
 
 핸들러 어댑터는 다양한 종류의 핸들러(컨트롤러)를 실행하기 위해서 필요하다.
@@ -775,7 +775,7 @@ public String responseviewController(Model model) {
 
 HandlerMethodArgumentResolver를 호출해 핸들러(컨트롤러)가 필요로 하는 파라미터 값을 생성해 바인딩한다.
 
-그러므로, 사용자가 직접 ArgumentResolver의 인터페이스를 확장할 수 있다.
+물론, 사용자가 직접 ArgumentResolver의 인터페이스를 확장할 수 있다.
 
 
 ***
