@@ -198,11 +198,11 @@ HTML 작성에서의 서블릿의 한계를 극복하기 위해 등장한 템플
 
 ***
 
-## 3. MVC 프레임워크
+## 3. MVC 패턴
 
 MVC는 각각 M(Model), V(View), C(Controller)를 의미한다. Controller은 Request 받아 비즈니스 로직을 처리한다. 
 
-Controller를 통해 생성한 정보를 담아두는 곳이 Model이다. View에서는 Model을 받아 웹 페이지를 띄우게 된다.
+Controller를 통해 생성한 정보를 담아두는 곳이 Model이다. Model을 View에 전달하여 웹 페이지를 띄우게 된다.
 
 ### 3.1 Controller V1: 프론트 컨트롤러
 
