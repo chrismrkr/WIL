@@ -1,6 +1,6 @@
 # Contents 
 
-### 1. Spring Directory
+### Spring Directory
 세부 디렉토리별로 목차가 있으므로 참고하여 내용을 확인할 수 있음
 
 #### CorePrinciple
@@ -13,10 +13,14 @@ Spring MVC 내용을 담은 하위 디렉토리
 Effective Java를 읽어가며 정리한 하위 디렉토리
 
 #### SpringSecurity
-Spring Security를 학습하며 정리한 하위 디렉토리
+Spring Security를 학습하여 정리한 하위 디렉토리
+
+***
+
+### JPA Directory
+Java ORM인 JPA를 학습하여 정리한 내용을 담은 디렉토리
 
 
-### 2. JPA Directory
 
 
 
