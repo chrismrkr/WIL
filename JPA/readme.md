@@ -29,3 +29,11 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#4-%ED%94%84%EB%A1%9
 JPA에서 사용하는 값 타입에 대한 설명
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#5-%EA%B0%92-%ED%83%80%EC%9E%85
+
+### 6. JPQL
+
+객체지향쿼리인 JPQL 사용법에 대한 설명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#6-jpql
+
+
