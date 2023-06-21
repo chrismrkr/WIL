@@ -469,7 +469,7 @@ public class Book extends Item {
 
 + @MappedSuperclass
 
- 공통의 애트리뷰트를 다른 엔티티(테이블)에 주입(상속)할 수 있도록 만들어진 클래스이다. 실제 데이터베이스의 테이블로 저장되는 클래스는 아니다.
+ 공통의 애트리뷰트를 다른 엔티티(테이블)에 전달하는 용도로 만들어진 클래스이다. @MappedSuperClass는 데이터베이스의 테이블로 저장되지 않는다.
 
 ```java
   @MappedSuperclass
@@ -487,8 +487,10 @@ public class Book extends Item {
     public class Member extends BaseEntity {
       ...
     }
-    
  ```
+
+@MappedSuperClass 정보를 오버라이딩하려면 @AttributeOverrides, @AttributeOverride를 사용하면 된다.
+
  
  **@MappedSuperClass와 @Embeddable의 차이점은?**
  
@@ -497,7 +499,7 @@ public class Book extends Item {
  전자는 상속을 통해서 사용되고, 후자는 위임을 통해 사용되는 방식이다.
  
  ### 3.6 복합 키 
- **복합 키란 2개 이상의 애트리뷰트로 이루어진 기본 키를 의미한다.**
+ 복합 키란 2개 이상의 애트리뷰트로 이루어진 기본 키를 의미한다. @IdClass, 또는 @Embeddable로 구현할 수 있다.
  
 + 복합키 생성 방법
 ```java
@@ -535,8 +537,6 @@ public class Member {
   
 ```
 
-**물론, @EmbeddedId를 통해 더 객체지향적인 방법으로 설계가 가능하다.**
-
   ```java
 @Embeddable // <-----
 public class MemberId implements Serializable {
@@ -567,11 +567,17 @@ public class Member {
   }
 ```
 
-복합 키 생성 시 어떤 방식을 사용해도 문제 없다. 그러나, @EmbeddableId에서 JPQL이 더욱 길어질 수 있다. 
+@IdClass는 DB지향적인 복합키 생성이다. 왜냐하면, 엔티티에서 PK가 무엇인지 바로 알 수 있기 때문이다.
+
+@Embeddable은 객체지향적인 복합키 생성이다. 왜냐하면, PK가 클래스 객체로 되어 있기 때문이다.
+
+복합 키 생성 시 어떤 방식을 사용해도 문제 없다.
+
+그러나, @EmbeddableId에서 JPQL이 더욱 길어질 수 있다. 왜냐하면, PK로 조인할 때, 경로 표현식을 통해 PK(객체)를 참조해야 하기 때문이다.
 
 + **왜 equals(), hashCode() 멤버함수를 구현해야 할까?**
 
-기본적으로 equals() 멤버함수는 **동일성(==) 비교**를 한다. 즉, 개발자가 Override하지 않으면 값이 아닌 주소 비교를 하게 되므로, 값이 같아도 false를 반환하게 된다.
+기본적으로 equals() 멤버함수는 동일성(==) 비교를 한다. 개발자가 Override하지 않으면 값이 아닌 주소 비교를 하게 되므로 값이 같아도 false를 반환하게 된다.
 
 따라서, **동등성 비교(값이 같은지를 비교)** 를 위해서 equals()와 hashCode() 멤버함수를 생성하는 것이 필요하다.
 
@@ -579,7 +585,7 @@ public class Member {
 ### 3.7 식별관계 매핑
 **식별관계란 부모로부터 상속받은 기본키(외래키)를 자식에서 기본 키로 사용하는 관계를 의미하고, 비식별관계란 부모로 부터 상속받은 기본키를 외래키로만 사용하는 관계를 의미한다. 식별관계 매핑을 통해 상속 관계를 표현할 수 있다.**
 
-복합 키를 갖는 식별관계를 어떻게 매핑할 것인지 알아본다. 부모, 자식, 손자 엔티티가 있다고 하자. 부모의 기본 키는 부모id, 자식의 기본 키는 (부모 id, 자식 id), 손자의 기본 키는 (부모 id, 자식id, 손자id)라고 하자. 아래와 같이 @IdClass를 통해 표현할 수 있다.
+복합 키를 갖는 식별관계를 어떻게 매핑할 것인지 알아본다. 부모, 자식, 손자 엔티티가 있다고 하자. 부모의 기본 키는 (부모id), 자식의 기본 키는 (부모 id, 자식 id), 손자의 기본 키는 (부모 id, 자식id, 손자id)라고 하자. 아래와 같이 @IdClass를 통해 표현할 수 있다.
 
 ```java
 @Entity 
@@ -631,9 +637,37 @@ public class GrandChildId implements Serializable {
   }
 ```
 
-유사한 방법으로 @EmbeddedId를 통해서도 구현이 가능하다. 그러나, 식별 관계 매핑보다는 비식별 관계 매핑이 더욱 선호된다.
+유사한 방법으로 @EmbeddedId(PK)와 @MapsId(FK)를 통해서도 구현이 가능하다. 
+
+```java
+@Entity
+public class Child {
+  @EmbeddedId
+  private ChildId childId;
+
+  @MapsId("parentId")
+  @ManyToOne
+  @JoinColumns(name = "PARENT_ID")
+  private Parent parent;
+}
+
+@Entity
+public class Parent {
+  @Id
+  @Column(name = "PARENT_ID")
+  private Long id;
+}
+```
+
+그러나, 식별 관계 매핑보다는 비식별 관계 매핑이 더욱 선호된다.
 + 식별 관계 사이에 조인해야 할 기본 키가 불필요하게 많아 질 수 있다.
 + 자식 엔티티가 존재하기 위해서는 반드시 부모 엔티티가 존재해야 한다. 왜냐하면 기본 키에 Null이 존재할 수 없기 때문이다. 그러나, 비즈니스 로직이 변화함에 따라 테이블 구조는 유연하게 변화할 수 있어야 한다.
+
+### 3.8 조인 테이블
+
+엔티티 테이블 간 조인을 위해서는 조인 칼럼을 사용하는 방법도 있지만, 조인 테이블을 사용할 수 있다. 주로 N:N 관계에서 많이 사용된다.
+
+
 
 
 ***
