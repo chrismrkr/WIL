@@ -667,7 +667,36 @@ public class Parent {
 
 엔티티 테이블 간 조인을 위해서는 조인 칼럼을 사용하는 방법도 있지만, 조인 테이블을 사용할 수 있다. 주로 N:N 관계에서 많이 사용된다.
 
++ 1:1 관계 조인 테이블(ex. 학생과 사물함)
+```java
+@Entity
+public class Member {
+  @Id @Column(name = "MEMBER_ID")
+  private Long id;
 
+  @OneToOne
+  @JoinTable(name = "MEMBER_LOCKER"
+        JoinColumns = @JoinColumn(name = "MEMBER_ID"),
+        InverseJoinColumns = @JoinColumn(name = "LOCKER_ID)
+  )
+  private Locker locker;
+}
+```
+
++ N:N 관계 조인 테이블(ex. 회원이 여러 팀에 소속될 수 있음)
+```java
+public class Member {
+  @Id @Column(name = "MEMBER_ID)
+  private Long id;
+
+  @ManyToMany
+  @JoinTable(name = "MEMBER_TEAM",
+          JoinColumns = @JoinColumn(name = "MEMBER_ID"),
+          InverseJoinColumns = @JoinColumn(name = "TEAM_ID)
+  )
+  private List<Team> teamList = new ArrayList<>();
+}
+```
 
 
 ***
