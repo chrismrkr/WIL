@@ -37,3 +37,10 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#5-%EA%B0%92-%ED%83%
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#6-jpql
 
 
+### 7. Spring Data JPA
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#7-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%8D%B0%EC%9D%B4%ED%84%B0-jpa
+
+### 8. 트랜잭션과 락, 2차 캐시
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#8-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98%EA%B3%BC-%EB%9D%BD-2%EC%B0%A8-%EC%BA%90%EC%8B%9C
