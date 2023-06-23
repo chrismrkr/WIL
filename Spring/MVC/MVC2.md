@@ -1244,8 +1244,8 @@ public class WebConfig implements WebMvcConfigurer {
 
 ```
 컨트롤러(예외 발생) --> 인터셉터 --> 서블릿 DisPatcher --> 필터 --> WAS(예외 받음)
-WAS --> Exception 타입 확인 ----오류 페이지가 없는 경우----> return 오류 타입
-                            ----오류 페이지가 설정된 경우----> 오류 페이지 컨트롤러(response.send()) -> return view     
+WAS --> Exception 타입 확인 --오류 페이지가 없는 경우--> return 오류 타입
+                            --오류 페이지가 설정된 경우--> 오류 페이지 컨트롤러(response.send()) -> return view     
 ```
 
 
