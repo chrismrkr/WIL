@@ -1242,9 +1242,9 @@ public class WebConfig implements WebMvcConfigurer {
 
 ### 6.1 스프링 부트에서의 서블릿 예외처리
 
-애플리케이션에서 예외 발생 시, 흐름은 아래와 같다.
+Java 서블릿에서의 예외 발생은 ```throw Exception``` 또는 ```response.sendError("/error-controller-url")```이다.
 
-예외 발생이란 ```throw Exception``` 또는 ```response.sendError("/error-controller-url")을 의미한다.
+애플리케이션에서 예외 발생 시, 흐름은 아래와 같다.
 
 ```
 컨트롤러(예외 발생) --> 인터셉터 --> 서블릿 Dispatcher --> 필터 --> WAS(예외 받음)
@@ -1284,9 +1284,38 @@ template에 /error/404.html 등으로 저장되어 있으면, 예외 발생시 �
 오류 페이지를 렌더링하는 과정은 아래와 같다.
 
 ```
-
+WAS -> 필터 -> Dispatcher Servlet -> 인터셉터 -> 컨트롤러 -> 뷰
 ```
 
+오류 페이지를 렌더링하는 과정에서 필터와 인터셉터를 거칠 필요는 없다.
 
+에러페이지 요청 시 필터와 인터셉터를 건너뛰기 위해서는 WebMvcConfigurer 인터페이스를 구현하면 된다.
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+  @Override
+  publd void addInterceptors(InterceptorRegistry registry) {
+    registry.add(new LogInteceptor())
+            .order(1)
+            .addPathPatterns("/**")
+            .excludePathPatterns("/error/**"); // 이 부분을 추가하여 인터셉터를 건너뜀
+  }
+
+  @Bean
+  public FilterRegistrationBean logFilter() {
+    FilterRegistrationBean<Filter> regBean = new FilterRegistrationBean<>();
+    regBean.setFilter(new LogFilter());
+    regBean.setOrder(1);
+    regBean.addUrlPatterns("/*");
+    regBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR); // 이 부분을 추가하여 필터를 건너뜀
+    return regBean;
+  }
+}
+```
+
+***
+
+## 7. API 예외처리
 
 
