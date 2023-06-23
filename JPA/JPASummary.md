@@ -677,7 +677,7 @@ public class Member {
   @OneToOne
   @JoinTable(name = "MEMBER_LOCKER"
         JoinColumns = @JoinColumn(name = "MEMBER_ID"),
-        InverseJoinColumns = @JoinColumn(name = "LOCKER_ID)
+        InverseJoinColumns = @JoinColumn(name = "LOCKER_ID")
   )
   private Locker locker;
 }
@@ -686,13 +686,13 @@ public class Member {
 + N:N 관계 조인 테이블(ex. 회원이 여러 팀에 소속될 수 있음)
 ```java
 public class Member {
-  @Id @Column(name = "MEMBER_ID)
+  @Id @Column(name = "MEMBER_ID")
   private Long id;
 
   @ManyToMany
   @JoinTable(name = "MEMBER_TEAM",
           JoinColumns = @JoinColumn(name = "MEMBER_ID"),
-          InverseJoinColumns = @JoinColumn(name = "TEAM_ID)
+          InverseJoinColumns = @JoinColumn(name = "TEAM_ID")
   )
   private List<Team> teamList = new ArrayList<>();
 }
