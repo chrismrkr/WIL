@@ -1240,12 +1240,53 @@ public class WebConfig implements WebMvcConfigurer {
 
 ## 6. 예외처리와 오류 페이지
 
+### 6.1 스프링 부트에서의 서블릿 예외처리
+
 애플리케이션에서 예외 발생 시, 흐름은 아래와 같다.
 
+예외 발생이란 ```throw Exception``` 또는 ```response.sendError("/error-controller-url")을 의미한다.
+
 ```
-컨트롤러(예외 발생) --> 인터셉터 --> 서블릿 DisPatcher --> 필터 --> WAS(예외 받음)
+컨트롤러(예외 발생) --> 인터셉터 --> 서블릿 Dispatcher --> 필터 --> WAS(예외 받음)
 WAS --> Exception 타입 확인 --오류 페이지가 없는 경우--> return 오류 타입
                             --오류 페이지가 설정된 경우--> 오류 페이지 컨트롤러(response.send()) -> return view     
 ```
+
+아래와 같이 Java 코드로 구현할 수 있다.
+
+스프링 부프를 사용하지 않는 경우 web.xml을 사용한다고 하는데 자세한 것은 생략한다.
+
+```java
+@Controller
+public class ErrorHandleController {
+  @GetMapping("/error/404")
+  public void error404(HttpServletRequest req, HttpServletResponse res) {
+      response.sendError(404);
+  }
+}
+
+@Component
+public class WebErrorHandleConfig implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
+  @Override
+  public void customize(ConfigurableWebServerFactory factory) {
+    ErrorPage error404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error/404");
+    factory.addErrorPages(error404);
+  }
+}
+```
+
+물론, 스프링 부트에서는 위와 같이 구현하지 않아도 된다. 
+
+template에 /error/404.html 등으로 저장되어 있으면, 예외 발생시 자동으로 이를 찾아서 렌더링한다.
+
+### 6.2 오류 페이지 렌더링 시, 필터 및 인터셉터 제외
+
+오류 페이지를 렌더링하는 과정은 아래와 같다.
+
+```
+
+```
+
+
 
 
