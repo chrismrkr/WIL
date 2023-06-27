@@ -44,3 +44,9 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#7-%EC%8A%A4%ED%94%8
 ### 8. 트랜잭션과 락, 2차 캐시
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#8-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98%EA%B3%BC-%EB%9D%BD-2%EC%B0%A8-%EC%BA%90%EC%8B%9C
+
+### 9. 영속성 컨텍스트 관리
+
+트랜잭션과 영속성 컨텍스트 사이의 동작 과정, 이를 활용하는 방법에 대명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#9-%EC%98%81%EC%86%8D%EC%84%B1-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-%EA%B4%80%EB%A6%AC
