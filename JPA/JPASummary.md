@@ -1127,6 +1127,25 @@ for(Member member : members) {
 public interface MemberRepository extends JpaRepository<Member, Long> { }
 ```
 
+### 7.1 쿼리 메소드 기능
+
+#### 7.1.1 메소드 이름으로 쿼리 생성
+
+엔티티 필드 이름을 이용하여 쿼리를 생성할 수 있다.
+
+예를 들어, 회원 이름(필드명 : username)을 기준으로 회원 엔티티를 조회하는 JPA 쿼리는 아래와 같다.
+
+```java
+List<Member> findByUsername(String username) {
+  return em.createQuery("select m from Member m where m.username = :username", Member.class).getResultList();
+}
+```
+
+만약 스프링 데이터 JPA를 사용하면 아래처럼 간략하게 나타낼 수 있다. 이를 스프링 데이터 JPA의 메소드 이름을 통한 쿼리 생성 기능이라고 한다.
+```java
+List<Member> findByUsername(String username);
+```
+
 ***
 
 ## 8. 트랜잭션과 락, 2차 캐시
