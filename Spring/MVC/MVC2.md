@@ -1318,4 +1318,38 @@ public class WebConfig implements WebMvcConfigurer {
 
 ## 7. API 예외처리
 
+예외 발생 시 오류 페이지를 반환하기 위해서는 WebServerFactoryCustomizer를 구현하는 것이 필요했다.
+
+WebServerFactoryCustomizer 구현 클래스에서 status - controller를 매핑하여 저장하는 방식으로 되어 있다.
+
+### 7.1 기본 API 예외 처리
+
+만약 아래와 같이 WebServerFactoryCustomizer가 구현되어 있다면,
+
+```java
+@Component
+public class WebErrorHandleConfig implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
+  @Override
+  public void customize(ConfigurableWebServerFactory factory) {
+    ErrorPage error404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error-404");
+    factory.addErrorPages(error404);
+  }
+}
+```
+
+/error-404에 해당되는 오류 페이지를 컨트롤러를 통해 렌더링한다. 하지만, 아래와 같이 Json API 형태로 렌더링할 수 있다.
+
+```java
+@RequestMapping(value = "/error-400", produes = MediaType.APPLICATION_JSON_VALUE)
+public ResponseEntity<Map<String, Object>> errorPage400(HttpServletRequest req, HttpServletResponse res) {
+  Map<String, Object> result = new HashMap<>();
+  Exception e = (Exception)req.getAttribute(ERROR_EXCEPTION);
+  result.put("status", req.getAttribute(ERROR_STATUS_CODE);
+  result.put("message", ex.getMessage());
+
+  Integer statusCode = (Integer)req.getAttribute(ERROR_STATUS_CODE);
+  return new ResponseEntity(result, HttpStatus.valueOf(statusCode));
+}
+```
+
 
