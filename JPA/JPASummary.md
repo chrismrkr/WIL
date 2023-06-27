@@ -1146,6 +1146,51 @@ List<Member> findByUsername(String username) {
 List<Member> findByUsername(String username);
 ```
 
+이외에도 다양한 방법을 통해 메소드 이름을 통한 쿼리 생성이 가능하다.
+
+참고 공식 문서 : https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation
+
+```java
+List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
+```
+
+### 7.1.2 @Query를 통한 쿼리 직접 정의
+
+메소드 이름을 통한 쿼리 생성 기능은 조건이 많아질수록 메소드 이름이 길어지는 단점이 있다.
+
+그 대신에 @Query를 사용할 수 있다.
+
+```java
+@Query(value = "select m from Member m where m.username = :username and m.age > :age)
+List<Member> findByUsernameAndAge(@Param("username") String username, @Param("age") int age);
+```
+
+메소드 이름을 통한 쿼리 생성, @Query 모두 컴파일 시점에 SQL 문법 오류를 찾을 수 있는 것이 장점이다.
+
+### 7.1.3 유연한 반환 타입
+
+동일한 JPQL도 객체, 컬렉션, Optional로 다양하게 결과를 return 받을 수 있다.
+
+다만, JPQL 조회 결과가 0건이고 컬렉션 반환 타입인 경우에는 null이 아닌 빈 컬렉션이 반환되므로 주의한다.
+
+### 7.1.4 순수 JPA 페이징과 정렬
+
+페이징이란 limit(한 페이지에 보여줄 데이터 수)와 offset(원하는 페이지 번호)을 이용하여,
+
+대용량의 데이터를 조각으로 불러오는 기술이다. 게시판 블로그 기능에서 사용된다.
+
+주로 정렬 기능과 함께 사용되며 순수 JPQL로 작성하는 예시는 아래와 같다.
+
+```java
+List<Member> findMemberByPage(int age, int offset, int limit) {
+  return em.createQuery("select m from Member m where m.age = :age order by m.username desc")
+            .setParameter("age", age)
+            .setFirstResult(offset).setMaxResults(limit).getResultList();
+}
+```
+
+### 7.1.5 스프링 데이터 JPQ 페이징과 정렬 
+
 ***
 
 ## 8. 트랜잭션과 락, 2차 캐시
