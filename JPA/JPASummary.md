@@ -1121,7 +1121,11 @@ for(Member member : members) {
 
 ## 7. 스프링 데이터 JPA
 
-스프링 데이터 JPA는 데이터 접근 계층 클래스에서의 반복되는 CRUD를 해결하는 기술이다. 아래와 같이 인터페이스를 완성해서 
+스프링 데이터 JPA는 데이터 접근 계층 클래스에서의 반복되는 CRUD를 해결하는 기술이다. 아래와 같이 인터페이스를 구현해서 완성할 수 있다.
+
+```java
+public interface MemberRepository extends JpaRepository<Member, Long> { }
+```
 
 ***
 
