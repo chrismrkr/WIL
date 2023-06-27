@@ -1154,7 +1154,7 @@ List<Member> findByUsername(String username);
 List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 ```
 
-### 7.1.2 @Query를 통한 쿼리 직접 정의
+#### 7.1.2 @Query를 통한 쿼리 직접 정의
 
 메소드 이름을 통한 쿼리 생성 기능은 조건이 많아질수록 메소드 이름이 길어지는 단점이 있다.
 
@@ -1167,13 +1167,13 @@ List<Member> findByUsernameAndAge(@Param("username") String username, @Param("ag
 
 메소드 이름을 통한 쿼리 생성, @Query 모두 컴파일 시점에 SQL 문법 오류를 찾을 수 있는 것이 장점이다.
 
-### 7.1.3 유연한 반환 타입
+#### 7.1.3 유연한 반환 타입
 
 동일한 JPQL도 객체, 컬렉션, Optional로 다양하게 결과를 return 받을 수 있다.
 
 다만, JPQL 조회 결과가 0건이고 컬렉션 반환 타입인 경우에는 null이 아닌 빈 컬렉션이 반환되므로 주의한다.
 
-### 7.1.4 순수 JPA 페이징과 정렬
+#### 7.1.4 순수 JPA 페이징과 정렬
 
 페이징이란 limit(한 페이지에 보여줄 데이터 수)와 offset(원하는 페이지 번호)을 이용하여,
 
@@ -1189,7 +1189,7 @@ List<Member> findMemberByPage(int age, int offset, int limit) {
 }
 ```
 
-### 7.1.5 스프링 데이터 JPQ 페이징과 정렬 
+#### 7.1.5 스프링 데이터 JPQ 페이징과 정렬 
 
 ***
 
