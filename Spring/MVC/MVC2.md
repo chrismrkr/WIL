@@ -1387,5 +1387,3 @@ public class WebConfig implements WebMvcConfigurer {
 
 
 
-### 7.3 HandlerExceptionResolver 활용
-
