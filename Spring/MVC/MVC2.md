@@ -1340,8 +1340,8 @@ public class WebErrorHandleConfig implements WebServerFactoryCustomizer<Configur
 /error-404에 해당되는 오류 페이지를 컨트롤러를 통해 렌더링한다. 하지만, 아래와 같이 Json API 형태로 렌더링할 수 있다.
 
 ```java
-@RequestMapping(value = "/error-400", produes = MediaType.APPLICATION_JSON_VALUE)
-public ResponseEntity<Map<String, Object>> errorPage400(HttpServletRequest req, HttpServletResponse res) {
+@RequestMapping(value = "/error-404", produes = MediaType.APPLICATION_JSON_VALUE)
+public ResponseEntity<Map<String, Object>> errorPage404(HttpServletRequest req, HttpServletResponse res) {
   Map<String, Object> result = new HashMap<>();
   Exception e = (Exception)req.getAttribute(ERROR_EXCEPTION);
   result.put("status", req.getAttribute(ERROR_STATUS_CODE);
@@ -1352,4 +1352,26 @@ public ResponseEntity<Map<String, Object>> errorPage400(HttpServletRequest req, 
 }
 ```
 
+스프링 부트에서는 오류 처리를 위한 BasicErrorController가 존재한다.
 
+BasicController는 HTTP Request Accept가 text/html인 경우 에러 페이지를 렌더링하고, 그 이외의 경우에는 JSON API로 응답한다.
+
+### 7.2 HandlerExceptionResolver
+
+HandlerExceptionResolver 인터페이스는 컨트롤러(핸들러) 밖으로 예외가 던져지면, 예외를 처리하고 동작을 재정의할 수 있는 기능을 제공한다.
+
+```java
+public interface HandlerExceptionResolver {
+  ModelAndView resolveException(HttpServletRequest req, HttpServletResponse res, Object handler, Exception ex);
+}
+```
+
++ 빈 ModealAndView를 return : 뷰를 렌더링하지 않고 정상 흐름으로 서블릿 리턴
++ ModelAndView return : Model과 View를 지정하여 뷰 렌더링
++ null return : 다음 HandlerExceptionResolver를 찾아서 실행
+
+HandlerExceptionResolver도 WebConfig를 아래와 같이 수정하여 사용한다. WebConfig는 WebMvcConfigurer 구현체로 필터 및 인터셉터 설정을 담당한다.
+
+```java
+
+```
