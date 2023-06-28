@@ -1209,7 +1209,38 @@ Page<T> 반환은 count 쿼리와 페이지 쿼리가 함께 발생한다.
 
 Slice<T> 반환은 페이지 쿼리만 발생하지만, 내부적으로 limit+1 만큼의 데이터를 반환한다. (모바일 리스트 \<더보기> 기능에 활용) 
 
-추가적으로 map을 통해 page 쿼리 결과를 DTO에 바ㅣ
+추가적으로 map을 통해 page 쿼리 결과를 DTO에 바인딩하고, count 쿼리를 직접 작성할 수도 있다.
+
+```java
+Page<Member> members = memberRepository.findByUsername("member", pageRequest);
+Page<MemberDto> memberDtos = members.map(m -> new MemberDto()); // DTO 바인딩
+```
+
+```java
+@Query(value = "select m from Member m", countQuery = "select count(m) from Member m")
+Page<Member> findAll(Pageable pageable)
+```
+
+### 7.1.6 벌크성 수정 쿼리
+
+순수 JPA를 사용한 벌크성 수정 쿼리, Spring data JPA를 사용한 벌크성 수정 쿼리는 각각 아래와 같다.
+
+```java
+public int bulkAgePlus(int age) { // 순수 JPA
+  return em.createQuery("update Member m set m.age = m.age+1 where m.age >= :age")
+            .setParameter("age", age).executeUpdate();
+}
+
+@Modifying(clearingAutomatically = true)
+@Query("update Member m set m.age = m.age+1 where m.age >= :age")
+int bulkAge(int age);
+```
+
+Spring Data JPA에서의 벌크성 수정, 삭제 쿼리는 반드시 @Modifying이 필요하고,
+
+영속성 컨텍스트에 남기지 않고 직접 DB를 조작하므로 dirty check에 유의해야 한다.
+
+(벌크성 쿼리 이후에는 영속성 컨텍스트를 초기화 하는 것이 안전하다.)
 
 ***
 
