@@ -1325,6 +1325,100 @@ public class MemberRepository extends JpaRepository<Member, Long>, MemberCustomR
 
 사용자 정의 리포지토리 대신에 새로운 레포지토리를 생성하여 이를 Bean으로 등록하여 사용하는 방법도 있다.
 
+### 7.2.2 Auditing
+
+모든 엔티티에 공통 필드를 적용할 때 사용한다.
+
+예를 들어, 엔티티 변경 이력 추적을 위해 등록 시간, 변경 시간을 모든 엔티티 필드에 저장해야 한다고 하자.
+
+#### 1. 순수 JPA에서는 아래와 같이 구현할 수 있다.
+
+```java
+@MappedSuperClass
+public class BaseEntity {
+	@Column(updatable = false)
+	private LocalDateTime createdTime;
+	private LocalDateTime updatedTime;
+	
+	@PrePersist
+	public void prePersist() {
+		LocalDateTime now = LocalDateTime.now();
+		this.createdTime = now;
+		this.updatedTime = now;
+	}
+	@PreUpdate
+	public void preUpdate() {
+		this.updatedTime = LocalDateTime.now();
+	}
+  // @PostPersist, @PostUpdate도 존재함.
+}
+
+@Entity
+public class Member extends BaseEntity { // 상속
+}
+```
+#### 2. Spring Data Jpa에서는 아래와 같이 사용한다
+
+```java
+@MappedSuperClass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+public class BaseEntity {
+	@CreatedDate
+	@Column(updatable = false)
+	private LocalDateTime createdTime;
+	@LastModifiedDate
+	private LocalDateTime lastModifiedDate;
+}
+```
+
+Spring Data Jpa에서는 @CreatedDate(등록일), @LastModifiedDate(수정일) 뿐만 아니라 @CreatedBy(등록자), @LastModifiedBy(수정자)도 제공한다.
+
+```java
+@MappedSuperClass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+public class BaseEntity {
+	@CreatedDate
+	@Column(updatable = false)
+	private LocalDateTime createdTime;
+	@LastModifiedDate
+	private LocalDateTime lastModifiedDate;
+
+	@CreatedBy @Column(updateable = false)
+	private String createdBy;
+	@LastModifiedBy
+	private String lastModifiedBy;
+}
+```
+
+**Spring Data Jpa Auditing 기능을 사용하려면 Main에 반드시 @EnableJpaAuditing을 등록해야한다.**
+
+```java
+@SpringBootApplication
+@EnableJpaAuditing
+public class Application {
+	public static void main(String[] args) { ...}
+}
+```
+
+등록자, 수정자 기능도 사용하려면 아래와 같이 Bean으로 등록한다. @SpringBootApplication에도 Bean을 등록이 가능하다.
+
+```java
+@EnableJpaAuditing
+@SpringBootApplication
+public class DatajpaApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(DatajpaApplication.class, args);
+	}
+
+	@Bean
+	public AuditorAware<String> auditorProvider() {
+		return () -> Optional.of(UUID.randomUUID().toString());
+	}
+}
+```
+
 
 
 ***
