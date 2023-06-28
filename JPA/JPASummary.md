@@ -1242,6 +1242,91 @@ Spring Data JPA에서의 벌크성 수정, 삭제 쿼리는 반드시 @Modifying
 
 (벌크성 쿼리 이후에는 영속성 컨텍스트를 초기화 하는 것이 안전하다.)
 
+### 7.1.7 엔티티 그래프
+
+EntityGraph란 연관된 엔티티를 한번에 조회하는 방법이다.
+
+fetch join을 통해서 Lazy Loading에서 연관된 엔티티를 불러올 수 있다.
+
+즉, EntityGraph는 left fetch join을 내부적으로 사용하므로 fetch join의 간편 버전이라고 봐도 된다.
+
+```java
+// Spring data jpa 공통 메소드 오버라이드
+@Override
+@EntityGraph(attributePaths = {"team"})
+List<Member> findAll();
+
+// JPQL + Entity Graph
+@Query("select m from Member m")
+@EntityGraph(attributePaths = {"team"})
+List<Member> findAllMemberByEntityGraph();
+
+// spring data jpa 메소드 이름 쿼리 + Entity Graph
+@EntityGraph(attributePaths = {"team"})
+List<Member> findByUsername(String username);
+```
+
+### 7.1.8 JPA Hint & Lock
+
+JPA 구현체에게 제공하는 힌트와 트랜잭션 락 기능을 제공한다.
+
+힌트는 대표적으로 readOnly가 있고, 락은 비관적 락과 낙관적 락을 제공한다.
+
+트랜잭션 락에 대한 자세한 내용은 아래를 참고한다
+
+https://github.com/chrismrkr/WIL/blob/main/CS/database.md#3-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98-%EA%B4%80%EB%A6%AC
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#8-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98%EA%B3%BC-%EB%9D%BD-2%EC%B0%A8-%EC%BA%90%EC%8B%9C
+
+```java
+// readonly는 영속성 컨텍스트를 생성하지 않음
+@QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = true)) 
+Member findReadOnlyByUsername(String username);
+```
+
+락 기능은 @Lock으로 제공된다. 
+
+## 7.2 확장 기능
+
+### 7.2.1 사용자 정의 레포지토리
+
+JpaRepository는 인터페이스이므로 메소드를 직접 구현하려면 너무 많은 기능을 구현해야 한다.
+
+그래서, 사용자 정의 레포지토리가 필요하며 사용자 정의 메소드를 구현하는 경우는 아래와 같다.
+
++ JDBC API 사용
++ JPA 직접 사용
++ MyBatis 사용
++ QueryDsl 사용
+
+사용자 정의 메소드를 구현하는 방법은 아래와 같다.
+
+1. 인터페이스에 사용자 정의 메소드를 정의한다.
+
+```java
+public interface MemberCustomRepository { ... }
+```
+
+2. 정의한 메소드를 구현한 사용자 정의 클래스를 생성한다.
+
+```java
+public class MemberCustomRepositoryImpl implements MemberCustomRepository { ... }
+```
+
+3. JPARepository에 인터페이스를 상속한다.
+
+```java
+public class MemberRepository extends JpaRepository<Member, Long>, MemberCustomRepository { ... }
+```
+
+**사용자 정의 클래스 이름은 항상 '리포지토리 인터페이스 이름' + 'impl'이 되어야한다.**
+
+추가로 항상 사용자 정의 레포지토리가 필요한 것은 아니다.
+
+사용자 정의 리포지토리 대신에 새로운 레포지토리를 생성하여 이를 Bean으로 등록하여 사용하는 방법도 있다.
+
+
+
 ***
 
 ## 8. 트랜잭션과 락, 2차 캐시
