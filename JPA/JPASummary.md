@@ -1189,7 +1189,27 @@ List<Member> findMemberByPage(int age, int offset, int limit) {
 }
 ```
 
-#### 7.1.5 스프링 데이터 JPQ 페이징과 정렬 
+#### 7.1.5 스프링 데이터 JPA 페이징과 정렬 
+
+Pageable, Sort 인터페이스를 통해 페이징 및 정렬 기능을 사용할 수 있다. 예시는 아래와 같다. 
+
+```java
+Page<Member> findByUsername(String username, Pageable pageable); // count 쿼리 사용
+Slice<Member> findByUsername(String username, Pageable pageable); // count 쿼리 사용 안함
+```
+
+페이지당 데이터를 3개씩 갖고, 0번째 페이지를 가져오는 코드는 아래와 같다.
+
+```java
+PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+Page<Member> members = memberRepository.findByUsername("member", pageRequest);
+```
+
+Page<T> 반환은 count 쿼리와 페이지 쿼리가 함께 발생한다.
+
+Slice<T> 반환은 페이지 쿼리만 발생하지만, 내부적으로 limit+1 만큼의 데이터를 반환한다. (모바일 리스트 \<더보기> 기능에 활용) 
+
+추가적으로 map을 통해 page 쿼리 결과를 DTO에 바ㅣ
 
 ***
 
