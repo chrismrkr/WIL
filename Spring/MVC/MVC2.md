@@ -1356,7 +1356,7 @@ public ResponseEntity<Map<String, Object>> errorPage404(HttpServletRequest req, 
 
 BasicController는 HTTP Request Accept가 text/html인 경우 에러 페이지를 렌더링하고, 그 이외의 경우에는 JSON API로 응답한다.
 
-### 7.2 HandlerExceptionResolver
+### 7.2 HandlerExceptionResolver 기본
 
 HandlerExceptionResolver 인터페이스는 컨트롤러(핸들러) 밖으로 예외가 던져지면, 예외를 처리하고 동작을 재정의할 수 있는 기능을 제공한다.
 
@@ -1365,13 +1365,27 @@ public interface HandlerExceptionResolver {
   ModelAndView resolveException(HttpServletRequest req, HttpServletResponse res, Object handler, Exception ex);
 }
 ```
+resolveException 메소드의 return은 아래와 같다.
 
-+ 빈 ModealAndView를 return : 뷰를 렌더링하지 않고 정상 흐름으로 서블릿 리턴
++ 빈 ModealAndView를 return : 뷰를 렌더링하지 않고 정상 흐름으로 서블릿 리턴. response.send(상태코드) 또는 response.getWriter().write(...)를 사용한다.
 + ModelAndView return : Model과 View를 지정하여 뷰 렌더링
 + null return : 다음 HandlerExceptionResolver를 찾아서 실행
 
 HandlerExceptionResolver도 WebConfig를 아래와 같이 수정하여 사용한다. WebConfig는 WebMvcConfigurer 구현체로 필터 및 인터셉터 설정을 담당한다.
 
 ```java
-
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+  @Override
+  public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+    resolvers.add(new MyHandlerExceptionResolver());
+  }
+}
 ```
+
+### 7.3 HandlerExceptionResolver 활용
+
+
+
+### 7.3 HandlerExceptionResolver 활용
+
