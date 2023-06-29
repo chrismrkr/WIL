@@ -1419,6 +1419,34 @@ public class DatajpaApplication {
 }
 ```
 
+### 7.2.3 Web 확장 도메인 클래스 컨버터
+
+Http Request Parameter로 넘어온 변수를 컨트롤러에서 이용해 엔티티를 바로 불러올 수 있다.
+
+코드는 아래와 같다.
+
+```java
+@RestController
+@RequiredArgsConstructor
+public class MemberController {
+	private final MemberRepository memberRepository;
+
+	@GetMapping("/members1/{id}") // 기존 코드
+	public String getMember(@PathVariable("id") Long id) {
+		return memberRepository.findById(id).get().getUsername();
+	}
+
+	@GetMapping("/members2/{id}") // Web 확장 도메인 클래스 컨버터
+	public String getMember2(@PathVariable("id") Member member) {
+		return member.getUsername();
+	}
+}
+```
+도메인 클래스 컨버터로 조회시 영속성 컨텍스트는 생성되지 않으므로 주의한다.
+
+### 7.2.4 Web 확장 페이징과 정렬
+
+
 
 
 ***
