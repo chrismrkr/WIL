@@ -1446,8 +1446,15 @@ public class MemberController {
 
 ### 7.2.4 Web 확장 페이징과 정렬
 
+Spring Data JPA 페이징 및 정렬 기능을 Web(컨트롤러)에 확장하여 사용할 수 있다.
 
+```java
 
+@GetMapping("/members"
+public String getUsername(Pageable pageable) {
+
+}
+```
 
 ***
 
