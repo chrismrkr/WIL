@@ -1449,14 +1449,59 @@ public class MemberController {
 Spring Data JPA 페이징 및 정렬 기능을 Web(컨트롤러)에 확장하여 사용할 수 있다.
 
 ```java
-
-@GetMapping("/members"
-public String getUsername(Pageable pageable) {
-
+@GetMapping("/members")
+public Page<Member> getUsername(Pageable pageable) {
+	Page<Member> m = memberRepository.findAll(pageable);
+	return m;
 }
 ```
 
-***
+#### 1. Http 요청 파라미터를 통해 Pageable에 파라미터를 전달할 수 있다.
+
++ page : 가져올 페이지 번호(0부터 시작함)
++ size : 한 페이지당 데이터 수
++ sort : 정렬 조건 정의
+
+예를 들어, GET /members?page=0&size=20&sort=id, desc&sort=username,desc와 같이 작성하여 페이징 기능을 사용할 수 있다.
+
+
+#### 2. 페이징 기본값 설정도 가능하다.
+
+Application 전역으로 기본값 설정을 원하는 경우, 설정 파일(.yml, .properties)을  아래와 같이 변경한다.
+
+spring.data.web.pageable.default-page-size=20
+spring.data.web.pageable.max-page-size=2000
+
+메소드 별로 기본값 설정을 원하는 경우, @PageableDefault 어노테이션을 사용한다.
+
+```java
+public String list(@PageableDefault(size = 12, sort = "username", direction = Sort.Direction.DESC) Pageable pageable) {
+...
+}
+```
+
+페이징 정보가 2개 이상이라면 @Qualifier에 접두사를 추가한다. 
+
+```java
+public String list(@Qualifiter("member") Pageable memberPageable, @Qualifier("order") Pageable orderPageable) {
+...
+}
+```
+
+페이징 정보를 전달하기 위해서는 아래와 같이 쿼리 파라미터를 사용한다.
+
+GET /members?member_page=0&order_page=1
+
+
+
+#### 3. 페이징 결과를 DTO로 map을 통해 변환할 수 있다.
+
+```java
+    public Page<MemberDto> list(Pageable pageable) {
+        return memberRepository.findAll(pageable).map(MemberDto::new);
+    }
+```
+
 
 ## 8. 트랜잭션과 락, 2차 캐시
 
