@@ -451,3 +451,86 @@ public class Item implements Persistable<String> {
 	}
 }
 ```
+
+***
+
+## 4. 나머지 기능
+
+### 4.1 Projections
+
+엔티티 전체가 아닌 일부 필드(ex. member.username) 또는 DTO를 조회하고 싶을 때 사용하는 기능이다.
+
+#### 4.1.1 인터페이스 기반 closed Projections
+
+```java
+public interface UsernameOnly {
+	String getUsername();
+}
+
+public MemberRepository extends JpaRepository<Member, Long> {
+	List<UsernameOnly> findMemberUsernameByUsername(String username)
+}
+```
+위의 findMemberUsernameByUsername 메소드를 실행하면 아래와 같이 쿼리된다.
+
+```sql
+SELECT m.username FROM member m WHERE m.username = ?
+```
+
+#### 4.1.2 인터페이스 기반 open Projections
+
+DB 테이블에서 모든 필드(ex. member 관련 모든 필드 )를 조회한 후, 결과(ex. usernme + ' ' + teamName)를 계산한다.
+
+그러므로, JPQL SELECT절 최적화가 안된다는 단점이 있다.
+
+```java
+public interface UsernameOnlyOpenProjections {
+	@Value("#{target.useranme + ' ' + target.team.name}")
+	String getUsername();
+}
+```
+
+#### 4.1.3 클래스 기반 Projections
+
+DTO를 통해 원하는 필드만을 Projection할 수 있다.
+
+```java
+public class UsernameOnlyDto {
+	private String username;
+	public UsernameOnlyDto(String username) {
+		this.username = username;
+	}
+}
+
+public MemberRepository extends JpaRepository<Member, Long> {
+	List<UsernameOnlyDto> findUsernameOnlyDtoByUsername(String username)
+}
+```
+
+#### 4.1.4 동적 Projections
+
+제네릭을 사용하면 인터페이스 기반 Projection, 클래스 기반 Projection이 모두 가능하다.
+
+```java
+<T> List<T> findGenericProjectionByUsername(String username, Class<T> type);
+```
+
+프로젝션 대상이 root(ex. member)라면 유용하나, root가 아닌 경우(ex. member.team)에는 JPQL SELECT 최적화할 수 없다.
+
+QueryDSL을 통해 이러한 문제를 해결할 수 있다.
+
+### 4.2 네이티브 쿼리
+
+가급적 사용하지 않는 것이 좋으나 정말 어쩔 수 없는 경우에 사용한다.
+
+어플리케이션 실행 시점에 문법을 확인할 수 없다는 단점이 있기 때문에 사용에 유의해야 한다.
+
+그러므로, 통계성 쿼리 같이 어쩔 수 없는 경우에는 네이티브 쿼리 대신 사용자 정의 레포지토리를 통해 JDBCTemplate 또는 MyBatis를 사용하는 것이 좋다.
+
+굳이 사용해야 한다면 DTO나 Projection을 반환 값으로 사용한다.
+
+```java
+@Query(value = "SELECT m.member_id as id, m.username, t.name as teamName " +
+		"FROM member m LEFT JOIN team t ON m.team_id = t.team_id", nativeQuery = true)
+...
+```
