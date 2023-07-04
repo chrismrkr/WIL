@@ -68,3 +68,19 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#1-%EC%BF%
 사용자 정의 레포지토리, Auditing, Web 확장 기능(페이징, 파라미터 바인딩)에 대한 설명
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#2-%ED%99%95%EC%9E%A5-%EA%B8%B0%EB%8A%A5
+
+### 3. 구현체
+스프링 데이터 JPA 구현체 및 save 메소드에 대한 설명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#3-spring-data-jpa-%EB%B6%84%EC%84%9D
+
+### 4. 부가기능
+스프링 데이터 JPA 프로젝션과 네이티브 쿼리에 대한 설명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#4-%EB%82%98%EB%A8%B8%EC%A7%80-%EA%B8%B0%EB%8A%A5
+
+***
+
+## QueryDSL
+
+
