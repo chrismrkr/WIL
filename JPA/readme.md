@@ -1,5 +1,9 @@
 # Contents
 
+## JPA Summary
+
+Java ORM JPA 내용 요약
+
 ### 1. JPA 소개
 
 JPA 특징과 영속성 컨텍스트에 대한 설명
@@ -36,17 +40,31 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#5-%EA%B0%92-%ED%83%
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#6-jpql
 
-
-### 7. Spring Data JPA
-
-https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#7-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%8D%B0%EC%9D%B4%ED%84%B0-jpa
-
-### 8. 트랜잭션과 락, 2차 캐시
+### 7. 트랜잭션과 락, 2차 캐시
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#8-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98%EA%B3%BC-%EB%9D%BD-2%EC%B0%A8-%EC%BA%90%EC%8B%9C
 
-### 9. 영속성 컨텍스트 관리
+### 8. 영속성 컨텍스트 관리
 
 트랜잭션과 영속성 컨텍스트 사이의 동작 과정, 이를 활용하는 방법에 대한 설명
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#9-%EC%98%81%EC%86%8D%EC%84%B1-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-%EA%B4%80%EB%A6%AC
+
+***
+
+## Spring Data JPA
+
+### 1. 쿼리 메소드 기능
+
+Spring Data JPA에서 제공하는 쿼리 메소드 기술에 대한 설명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#1-%EC%BF%BC%EB%A6%AC-%EB%A9%94%EC%86%8C%EB%93%9C-%EA%B8%B0%EB%8A%A5
+
+
+### 2. 확장 기능
+
+레포지토리 계층에서 제공하는 쿼리 메소드 기능 뿐만 아니라 
+
+사용자 정의 레포지토리, Auditing, Web 확장 기능(페이징, 파라미터 바인딩)에 대한 설명
+
+https://github.com/chrismrkr/WIL/blob/main/JPA/SpringDataJpaSummary.md#2-%ED%99%95%EC%9E%A5-%EA%B8%B0%EB%8A%A5
