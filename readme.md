@@ -25,8 +25,13 @@ Spring Security를 학습하여 정리한 디렉토리
 ## JPA Directory
 Java ORM인 JPA를 학습하여 정리한 내용을 담은 디렉토리
 
-### JPA 관련 토이 프로젝트
+### JPA
+JPA 핵심 개념에 대한 설명
 
+### Spring Data JPA
+Java ORM 데이터 접근 기술 Spring Data JPA에 대한 설명 
+
+### JPA 관련 토이 프로젝트
 + 1. 상품 광고 플랫폼 : https://github.com/chrismrkr/toyProject-advertisingPlatform
 
 ***
