@@ -382,3 +382,72 @@ GET /members?member_page=0&order_page=1
         return memberRepository.findAll(pageable).map(MemberDto::new);
     }
 ```
+
+***
+
+## 3. Spring Data JPA 분석
+
+### 3.1 구현체 분석
+
+Spring Data JPA 구현체와 save 메소드는 아래와 같다.
+
+```java
+@Repository
+@Transactional(readOnly = true)
+public class SimpleJpaRepository<T, ID> ... {
+
+	@Transactional
+	public <S extends T> S save(S entity) {
+		if(entityInformation.isNew(entity) {
+			em.persist(entity);
+			return entity;
+		}
+		else {
+			return em.merge(entity);
+		}
+	}
+}
+```
+
+특징을 정리하면 아래와 같다.
+
++ 1. @Repository가 적용되었으므로 JPA Exception을 Spring Exception으로 변환함
++ 2. @Transactional이 적용되었으므로 Spring Data JPA를 사용할 때는 해당 어노테이션 생략 가능
++ 3. @Transactional(readOnly = true) 옵션을 사용하면 조회성 쿼리는 flush가 발생하지 않으므로 성능 향상
+
+
+### 3.2 새로운 엔티티 구별 방법
+
+위의 save 메소드는 신규 엔티티인 경우에는 em.persist를 호출하고, 그렇지 않은 경우는 em.merge를 호출한다.
+
+전자는 flush될 때 update 쿼리를 보내고, 후자는 select + update 쿼리를 보내므로 merge가 성능이 더 나쁘다.
+
+@Id(식별자) 어노테이션을 통해서 엔티티 신규 여부를 확인할 수 있는데, 
+
+식별자(@Id)를 @GeneratedValue를 통한 자동 할당 방식을 사용하는 대신에 직접 할당 방식을 사용한다면,
+
+이미 @Id가 할당되었으므로 신규 생성이더라도 em.merge(select + update)가 발생한다.
+
+그러므로, Id를 직접 할당하는 경우에 Persistable 인터페이스를 구현하는 것이 필요하다. 아래와 같이 CreatedDate를 기준으로 하여 신규 생성 여부를 확인할 수 있다.
+
+```java
+@Entity
+@EntityListener(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Item implements Persistable<String> {
+	@Id
+	private String id;
+
+	@CreatedDate
+	private LocalDateTime createdTime;
+
+	@Override // Persistable 인터페이스 메서드 구현
+	public String getId() {
+		return this.id;
+	}
+	@Override // Persistable 인터페이스 메서드 구현
+	public boolean isNew() {
+		return this.createdDate == null;
+	}
+}
+```
