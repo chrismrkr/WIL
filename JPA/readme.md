@@ -47,6 +47,6 @@ https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#8-%ED%8A%B8%EB%9E%9
 
 ### 9. 영속성 컨텍스트 관리
 
-트랜잭션과 영속성 컨텍스트 사이의 동작 과정, 이를 활용하는 방법에 대명
+트랜잭션과 영속성 컨텍스트 사이의 동작 과정, 이를 활용하는 방법에 대한 설명
 
 https://github.com/chrismrkr/WIL/blob/main/JPA/JPASummary.md#9-%EC%98%81%EC%86%8D%EC%84%B1-%EC%BB%A8%ED%85%8D%EC%8A%A4%ED%8A%B8-%EA%B4%80%EB%A6%AC
