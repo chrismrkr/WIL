@@ -127,7 +127,7 @@ Obj newObj = em.merge(obj);
   + nullable= : null값 가능 여부 지정(기본 값 false)
   + length= : 변수가 String일 때, varchar 길이를 지정함.(기본 값 255)
 + @Enumerated(Type.String | Type.Ordinal): @Entity로 관리되는 클래스에 Enum 타입의 변수를 테이블에 매핑한다.
-  + Type을 반드시 String으로 설정해야 하는 이유는 무엇인가? ~~타입이 Ordinal일 때 Enum 클래스의 변수가 추가되면 문제됨~~
+  + Type을 반드시 String으로 설정해야 하는 이유는 무엇인가? ~~타입이 Ordinal일 때 Enum 클래스의 변수가 추가되면 문제됨. 기존에 1인 칼럼이 2가 될 수 있음.~~
 + @Temporal: Java의 날짜 타입 객체를 매핑할 때 사용함.
 + @Lob: Lob(String) 타입을 지정함.
 + @Transient: @Entity로 관리되는 클래스 내의 변수(속성)을 데이터베이스 테이블에 매핑하지 않고자 할 때 사용함.
