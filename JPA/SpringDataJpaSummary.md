@@ -40,7 +40,7 @@ List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 그 대신에 @Query를 사용하여 쿼리를 직접 정의할 수 있다.
 
 ```java
-@Query(value = "select m from Member m where m.username = :username and m.age > :age)
+@Query(value = "select m from Member m where m.username = :username and m.age > :age")
 List<Member> findByUsernameAndAge(@Param("username") String username, @Param("age") int age);
 ```
 
