@@ -532,9 +532,7 @@ public class Member {
   private String id2;
   
   ...
-  
   }
-  
 ```
 
   ```java
@@ -855,6 +853,8 @@ public class Member {
   })
   // 기본 칼럼명(name="...")을 column=@Column(name="...")으로 변경한다는 것을 의미한다.
 ```
+
+물론, embedded되는 필드의 칼럼명을 임의로 변경이 필요할 때도 @AttributeOverrides와 @AttributeOverride를 사용할 수 있다.
 
 + @Embeddable 타입과 같은 특성을 가진 객체 타입을 공유하도록 만들면 위험하다.
  
