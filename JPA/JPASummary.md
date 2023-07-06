@@ -841,11 +841,13 @@ public class Member {
 
 @Embeddable - @Embedded 타입은 연속적으로 연관관계를 맺으며 매핑될 수 있다. (ex. Zipcode Embedded in Address, Address Embedded in Member) 
 
- + @Embeddable과 @MappedSuperclass의 차이점은?
+ + **@Embeddable과 @MappedSuperclass의 차이점은?**
  
- 위임(has)과 상속(is)의 차이이다. 기능 상 차이는 없지만 JPQL 호출 시 위임의 경우에 쿼리가 더 길어질 수 있다.
+ 위임(has)과 상속(is)의 차이이다. 기능 상 차이는 없지만 JPQL 호출 시 위임(@Embedded)은 쿼리가 더 길어질 수 있다.
  
- + 동일한 @Embeddable 타입을 2개 이상 오버라이딩을 통해 주입할 수 있다. 예를 들어, Member에 homeAddress, companyAddress가 embedded되는 경우 
+ + **동일한 @Embeddable 타입을 2개 이상 오버라이딩을 통해 주입할 수 있다.**
+
+예를 들어, Member에 homeAddress, companyAddress가 embedded되는 경우 
 ```java
 @AttributeOverrides({
   @AttributeOverride(name="...", column=@Column(name="...")), 
@@ -856,7 +858,7 @@ public class Member {
 
 물론, embedded되는 필드의 칼럼명을 임의로 변경이 필요할 때도 @AttributeOverrides와 @AttributeOverride를 사용할 수 있다.
 
-+ @Embeddable 타입과 같은 특성을 가진 객체 타입을 공유하도록 만들면 위험하다.
++ **@Embeddable 타입과 같은 특성을 가진 객체 타입을 공유하도록 만들면 위험하다.**
  
 서로 다른 두 객체가 하나의 객체를 참조한다면, 한쪽에서 수정한다면 다른 쪽도 변경되는 문제가 발생한다.
 
