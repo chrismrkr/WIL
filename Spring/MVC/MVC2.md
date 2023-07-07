@@ -1331,17 +1331,20 @@ WebServerFactoryCustomizer 구현 클래스에서 status - controller를 매핑�
 public class WebErrorHandleConfig implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
   @Override
   public void customize(ConfigurableWebServerFactory factory) {
-    ErrorPage error404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error-404");
-    factory.addErrorPages(error404);
+    ErrorPage error404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error-404"); 
+    ErrorPage error404Api = new ErrorPage(IllegalArgumentStateException.class, "/error-404");
+    factory.addErrorPages(error404, error404Api);
   }
 }
 ```
 
-/error-404에 해당되는 오류 페이지를 컨트롤러를 통해 렌더링한다. 하지만, 아래와 같이 Json API 형태로 렌더링할 수 있다.
+HttpStatus.NotFound이거나 IllegalArgementException이 발생했을 때, GET /error-404를 호출한다.
+
+만약 요청이 application-json이라면 sendError404Api 컨트롤러를 호출하고, 그렇지 않은 경우는 sendError404를 호출한다.
 
 ```java
-@RequestMapping(value = "/error-404", produes = MediaType.APPLICATION_JSON_VALUE)
-public ResponseEntity<Map<String, Object>> errorPage404(HttpServletRequest req, HttpServletResponse res) {
+@RequestMapping(value = "/error-404", produces = MediaType.APPLICATION_JSON_VALUE)
+public ResponseEntity<Map<String, Object>> sendError404Api(HttpServletRequest req, HttpServletResponse res) {
   Map<String, Object> result = new HashMap<>();
   Exception e = (Exception)req.getAttribute(ERROR_EXCEPTION);
   result.put("status", req.getAttribute(ERROR_STATUS_CODE);
@@ -1349,6 +1352,11 @@ public ResponseEntity<Map<String, Object>> errorPage404(HttpServletRequest req, 
 
   Integer statusCode = (Integer)req.getAttribute(ERROR_STATUS_CODE);
   return new ResponseEntity(result, HttpStatus.valueOf(statusCode));
+}
+
+@RequestMapping(value = "/error-404")
+public void sendError404Page(HttpServletRequest req, HttpServletResponse res) {
+  res.sendError(404);
 }
 ```
 
@@ -1358,7 +1366,7 @@ BasicController는 HTTP Request Accept가 text/html인 경우 에러 페이지�
 
 ### 7.2 HandlerExceptionResolver 기본
 
-HandlerExceptionResolver 인터페이스는 컨트롤러(핸들러) 밖으로 예외가 던져지면, 예외를 처리하고 동작을 재정의할 수 있는 기능을 제공한다.
+HandlerExceptionResolver 인터페이스는 컨트롤러(핸들러) 밖으로 예외가 던져지면, 예외 처리 및 동작 재정의 기능을 제공한다.
 
 ```java
 public interface HandlerExceptionResolver {
