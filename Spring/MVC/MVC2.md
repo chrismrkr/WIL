@@ -1375,11 +1375,32 @@ public interface HandlerExceptionResolver {
 ```
 resolveException 메소드의 return은 아래와 같다.
 
-+ 빈 ModealAndView를 return : 뷰를 렌더링하지 않고 정상 흐름으로 서블릿 리턴. response.send(상태코드) 또는 response.getWriter().write(...)를 사용한다.
-+ ModelAndView return : Model과 View를 지정하여 뷰 렌더링
-+ null return : 다음 HandlerExceptionResolver를 찾아서 실행
++ **return new ModelAndView() : 뷰를 렌더링하지 않고 정상 흐름으로 서블릿 리턴. 예를 들어, response.send(상태코드) 또는 response.getWriter().write(...)를 사용한다.**
 
-HandlerExceptionResolver도 WebConfig를 아래와 같이 수정하여 사용한다. WebConfig는 WebMvcConfigurer 구현체로 필터 및 인터셉터 설정을 담당한다.
++ **return ModelAndView : Model과 View를 지정하여 뷰 렌더링**
+
++ **return null : 다음 HandlerExceptionResolver를 찾아서 실행**
+
+예시는 아래와 같다.
+
+```java
+public class CustomHandlerExceptionResolver implements HandlerExceptionResolver {
+  @Override
+  public ModelAndView resolveException(HttpServletRequest req, HttpServletResponse res, Object handler, Exception ex) {
+    try {
+      if(ex instance of IllegalArgumentException) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage()); // 에러더라도 정상 서블릿 API 호출
+        return new ModelAndView(); // 비어있는 ModelAndView 반환
+      }
+    } catch(IOException e) {
+      log.error(e);
+    }
+    return null; // 다음 HandlerExceptionResolver 확인
+  }
+}
+```
+
+WebConfig를 아래와 같이 수정하여 HandlerExceptionResolver를 등록한다. WebConfig는 WebMvcConfigurer 구현체로 커스텀 필터 및 인터셉터 설정도 담당한다.
 
 ```java
 @Configuration
