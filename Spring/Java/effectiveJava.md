@@ -128,11 +128,13 @@ public void main() {
 
 ### 2.1 람다식과 함수형 인터페이스
 
-람다식은 함수형 인터페이스로 참조할 수 있다.
+람다식은 함수형 인터페이스로 참조한다. 
 
-람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다. override, static, default 메소드는 제외한다.
+람다식을 다루기 위해서는 1개의 일반 메소드가 선언된 인터페이스가 필요하고, 이를 함수형 인터페이스라고 한다. (override, static, default 메소드는 제외됨)
 
-@FunctionalInterface를 붙여서 컴파일 시점에 확인할 수 있다.
+람다식과 함수형 인터페이스를 통해 스크립트 언어와 유사하게 Java에서도 함수형 프로그래밍이 가능하다.
+
+@FunctionalInterface를 붙여서 컴파일 시점에 함수형 인터페이스인지 아닌지를 확인할 수 있다.
 
 예를 들어서, 아래 코드를 실행하고자 한다면,
 
@@ -157,17 +159,34 @@ void runLambda(Lambda lambda) {
 
 람다식 사용하면서도 코드의 가독성이 떨어지면 메소드 참조(ex. Integer::parseInt)를 사용하자.
 
-Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아래와 같다.
+Java8 이상에서 기본적으로 제공하는 함수형 인터페이스와 예시는 아래와 같다.
 
 + Runnable의 void run() : 매개변수 X, 반환 X
+```java
+() -> System.out.println("run! notihing returned"); 
+```
 + Supplier\<T> T get() : 매개변수 X, 반환 O
+```java
+() -> { return "it will be returned"; }
+() -> "it will be returned"
+```
 + Consumer\<T> void accept(T t) : 매개변수 O, 반환 X
+```java
+(o1) -> System.out.println("o1 consumed : " + o1)
+(o1, o2) -> { System.out.println("o1, o2 consumed : " + o1 + ", " + "o2");}
+```
 + Function\<T, R> R apply(T t) : 매개변수 O, 반환 O
+```java
+(o1) -> o1.getReturn()
+(o1) -> { return o1.getReturn(); }
+```
 + Predicate\<T> boolean test(T t) : 매개변수 O, 반환 O
-
+```java
+(o1) -> o1 == 1;
+```
 이외에도 여러가지가 있다. 예를 들어, long을 받아 int를 반환하는 함수형 인터페이스는 LongToIntFunction이다.
 
-이처럼, 직관적인 이름을 가진 표준 함수형 인터페이스가 java.util.function에 많으므로 참고하도록 한다.
+직관적인 이름을 가진 표준 함수형 인터페이스가 **java.util.function**에 있으므로 필요할 때 참고한다.
 
 주의할 점은 박싱된 기본 타입(Long, Integer 등)을 함수형 인터페이스에 사용하면 성능이 많이 느려질 수 있다는 것이다.
 
@@ -176,7 +195,7 @@ Java8 이상에서 기본적으로 제공하는 함수형 인터페이스는 아
 Comparator\<T>는 ToIntBiFunction\<T, U>와 동일한 형태이다.
 
 ```java
-Collections.sort(arr, new Comparator<Integer>((o1, o2) -> return o1 < o2) );
+Collections.sort(arr, new Comparator<Integer>((o1, o2) -> o1 < o2 );
 ```
 
 그럼에도 Comparator를 사용하는 이유는 이름이 용도를 잘 설명하여 가독성을 높이기 때문이다. 또한, 해당 인터페이스에서 유용한 디폴트 메소드를 제공한다.
@@ -220,12 +239,20 @@ Stream의 특징은 아래와 같다.
 
 stream으로 변환된 collection을 다루기 위해서 가장 중요한 연산이다.
 
-자주 쓰이는 것은 아래와 같다.
+예를 들어, ```stream = arrayList.stream();```이 존재할 때, 자주 쓰이는 것은 아래와 같다.
   
 + 스트림 자르기 : skip(long n), limit(long maxSize)
+
+
 + 요소 걸러내기 : filter(Predicate\<T> predicate), distinct()
+
+  
 + 정렬          : sorted(Comparater\<T> comparater)
+
+  
 + 변환          : map(Function\<T, R> mapper), 원하는 필드만 뽑아내기 위해 사용
+
+
 + 조회          : peek((obj) -> System.out.println(obj.getAttr())
 
 mapToInt(), mapToDouble(), mapToLong()도 존재하고 각각 IntStream, DoubleStream, LongStream을 반환한다.
