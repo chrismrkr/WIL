@@ -218,6 +218,8 @@ Stream의 특징은 아래와 같다.
 
 #### 2.2.2 스트림의 중간연산
 
+stream으로 변환된 collection을 다루기 위해서 가장 중요한 연산이다.
+
 자주 쓰이는 것은 아래와 같다.
   
 + 스트림 자르기 : skip(long n), limit(long maxSize)
