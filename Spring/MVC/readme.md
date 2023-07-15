@@ -64,6 +64,17 @@ DisPatcherServlet(Front Controller)를 통과하기 전에 동작하는 것이 �
 
 https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#5-%ED%95%84%ED%84%B0%EC%99%80-%EC%9D%B8%ED%84%B0%EC%85%89%ED%84%B0
 
+### 6. 에외처리와 오류 페이지
+
+ModelAndView를 반환하는 컨트롤러에서의 에러 처리와 오류 페이지를 내리는 방법을 다룸(SSR에서의 예외처리)
+
+https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#6-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC%EC%99%80-%EC%98%A4%EB%A5%98-%ED%8E%98%EC%9D%B4%EC%A7%80
+
+### 7. API 예외처리
+
+API 형태로 응답하는 컨트롤러에서의 예외처리 방법을 다룸(CSR에서의 예외처리)
+
+https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#7-api-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC
 
 
 
