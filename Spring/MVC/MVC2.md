@@ -1414,5 +1414,53 @@ public class WebConfig implements WebMvcConfigurer {
 
 ### 7.3 HandlerExceptionResolver 활용
 
+```response.sendError()```를 호출하면 WAS에 GET /error를 다시 호출한다. 
+
+요청에 대한 예외 처리를 위해 다시 WAS에 요청하는 것을 다소 비효율적이다. 이를 해결하기 위해 HandlerExceptionResolver를 이전과는 다른 방식으로 구현하면 된다.
+
+HandlerExceptionResolver에서 response.sendError를 호출하면 다시 WAS에 요청하므로 이것만 수정하면 된다.
+
+```java
+public class UserHandlerExceptionResolver implements HandlerExceptionResolver {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        try {
+            if(ex instanceof UserException) {
+                String acceptHeader = request.getHeader("accept");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                if(acceptHeader.equals("application/json")) {
+                    // APPLICATION/JSON
+                    Map<String, Object> errorResult = new HashMap<>();
+                    errorResult.put("ex", ex.getClass());
+                    errorResult.put("message", ex.getMessage());
+                    String result = objectMapper.writeValueAsString(errorResult);
+
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("utf-8");
+                    response.getWriter().write(result);
+                    return new ModelAndView();
+                } else {
+                    // TEXT/HTML
+                    return new ModelAndView("error/500");
+                }
+            }
+        } catch(IOException e) {
+            log.error("resolver ex", e);
+        }
+        return null;
+    }
+}
+```
+
+```response.getWriter()```와 objectMapper를 통해 직접 API를 반환할 수 있다.
+
+### 7.4 스프링에서 제공하는 ExceptionResolver
+
+예외처리가 필요할 때마다 HandlerExceptionResolver를 구현하는 것은 다소 복잡한 감이 있다. 
+
+그래서 스프링에서 제공하는 ExceptionResolver가 몇가지 있다.
 
 
