@@ -40,7 +40,7 @@ https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#1-%EB%A9%94%EC%84%
 
 ### 2. Validation1
 
-Http Request의 RequestParam, PathVariable, 또는 RequestBody의 파라미터 값이 유효한지를 검증하기 위해 사용함.
+Http Request의 RequestParam, PathVariable 등 파라미터 값이 유효한지를 검증하기 위해 사용함.
 
 BindingResult를 사용하는 방식에 대해서 설명함.
 
@@ -50,7 +50,7 @@ https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#2-%EA%B2%80%EC%A6%
 
 검증을 위해 BindingResult를 사용하지 않고 스프링에서 사용하는 Bean Validation Annotation에 대해 설명함.
 
-@ModelAttribute와 달리 @RequestBody는 개별 필드를 검증할 수 없음에 주의해야함. 
+@RequestBody는 @Valid 어노테이션을 통해서 검증할 수 있음.
 
 https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#3-%EA%B2%80%EC%A6%9D2---bean-validation
 
@@ -72,7 +72,7 @@ https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#6-%EC%98%88%EC%99%
 
 ### 7. API 예외처리
 
-API 형태로 응답하는 컨트롤러에서의 예외처리 방법을 다룸(CSR에서의 예외처리)
+API로로 응답하는 컨트롤러에서의 예외처리 방법을 다룸
 
 https://github.com/chrismrkr/WIL/blob/main/Spring/MVC/MVC2.md#7-api-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC
 
