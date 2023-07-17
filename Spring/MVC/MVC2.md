@@ -1463,4 +1463,11 @@ public class UserHandlerExceptionResolver implements HandlerExceptionResolver {
 
 그래서 스프링에서 제공하는 ExceptionResolver가 몇가지 있다.
 
+#### 7.4.1 ResponseStatusExceptionResolver
+
+#### 7.4.2 DefaultHandlerExceptionResolver
+
+#### 7.4.3 ExceptionHandlerExceptionResolver
+
+API 예외처리를 위해 가장 많이 사용되는 ExceptionResolver이며 @ExceptionHandler를 사용한다.
 
