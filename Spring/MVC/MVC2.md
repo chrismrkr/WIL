@@ -1605,7 +1605,7 @@ API 형태로 에러를 응답하는 경우에는 @ExceptionHandler를 사용한
 
 https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-rest-exceptions.html
 
-### 7.5 예외 처리 컨트롤러 분리 : @ControllerAdvice
+### 7.5 예외 처리 컨트롤러 분리 : @ControllerAdvice, @RestControllerAdvice
 
 컨트롤러에서 API 예외처리하는 부분을 AOP와 유사한 방법으로 분리할 수 있다.
 
@@ -1641,6 +1641,7 @@ public class ExControllerAdvice {
 방법은 아래와 같으나, 마찬가지로 공식문서를 통해 확인할 수 있다.
 
 ```java
-@ControllerAdvice(annotations = RestController.class)
-@ControllerAdvice("패키지명")
+@ControllerAdvice(annotations = RestController.class) // @RestController 어노테이션이 붙은 클래스에 적용
+@ControllerAdvice("패키지명") // 특정 패키지에 적용
+@ControllerAdvice(assignableTypes = {MyController.class}) // 특정 컨트롤러에 적용
 ```
