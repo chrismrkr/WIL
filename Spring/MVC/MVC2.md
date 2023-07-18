@@ -1645,3 +1645,8 @@ public class ExControllerAdvice {
 @ControllerAdvice("패키지명") // 특정 패키지에 적용
 @ControllerAdvice(assignableTypes = {MyController.class}) // 특정 컨트롤러에 적용
 ```
+
+***
+
+## 8. Validation과 @ExpcetionHandler를 활용한 API 예외처리
+
