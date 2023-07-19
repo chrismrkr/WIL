@@ -1650,3 +1650,55 @@ public class ExControllerAdvice {
 
 ## 8. Validation과 @ExpcetionHandler를 활용한 API 예외처리
 
+@Valid와 @ExceptionHandler를 활용하여 FieldError를 더 쉽게 처리할 수 있다. 
+
+예를 들어, 아래와 같이 UserController와 UserDto가 존재할 때,
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDto {
+    @NotBlank(message = "회원명을 입력해주세요.")
+    @Pattern(regexp = "^[a-z]{1}[a-z0-9]{5,10}+$"
+            , message = "영문으로 시작하고, 소문자 영문 숫자 조합 6-11자리만 허용합니다.")
+    private String username;
+
+    @NotBlank(message = "회원 종류를 선택해주세요.")
+    private String userType;
+}
+
+@PostMapping("/user")
+public UserDto createUser(@Valid @RequestBody UserDto userDto);
+```
+
+UserDto의 Bean Validation을 통해 예외가 발생한다면, 
+
+MethodArgumentNotValidException이 발생하고, Bean Validation에 대한 내용은 FieldError로 저장된다.
+
+그러므로, MethodArgumentNotValidException을 잡아내는 @ExceptionHandler를 생성하여 아래와 같이 FieldError를 조작할 수 있다.
+
+```java
+@RestControllerAdvice(assignableTypes = {UserController.class})
+public class UserApiExceptionAdvice {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public UserApiExceptionResult methodArgNotValidException(MethodArgumentNotValidException e) {
+        UserApiExceptionResult exceptionResult = new UserApiExceptionResult("INVALID_ARGUMENT");
+        e.getFieldErrors().stream().forEach(fieldError -> {
+            String fieldName = fieldError.getField();
+            String message = fieldError.getDefaultMessage();
+            exceptionResult.getMessages().put(fieldName, message);
+        });
+        return exceptionResult;
+    }
+}
+```
+
+물론, FieldError 이외에도 전역적인 Error 처리가 필요할 수도 있다.
+
+전역적인 Error 처리를 위해서 스프링 AOP를 활용할 수 있다. 
+
+
+
+
