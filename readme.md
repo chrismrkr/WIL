@@ -35,7 +35,7 @@ Java ORM 데이터 접근 기술 Spring Data JPA에 대한 설명
 JPQL 빌더 역할인 QueryDSL에 대한 설명
 
 ### JPA 관련 토이 프로젝트
-+ 1. 상품 광고 플랫폼 : https://github.com/chrismrkr/toyProject-advertisingPlatform
++ 1. 회원-상품-프로모션 구현 예제 : https://github.com/chrismrkr/toyproject-user-item-promotion-example
 
 ***
 
