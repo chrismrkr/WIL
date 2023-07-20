@@ -1695,10 +1695,44 @@ public class UserApiExceptionAdvice {
 }
 ```
 
-물론, FieldError 이외에도 전역적인 Error 처리가 필요할 수도 있다.
+물론, FieldError 이외에도 Global Error 처리가 필요할 수도 있다.
 
 전역적인 Error 처리를 위해서 스프링 AOP를 활용할 수 있다. 
 
+예를 들어, Dto에 startDate, endDate가 존재하고 startDate가 endDate보다 느릴 때,
 
+Global 에러를 발생시켜야 한다면 아래와 같이 AOP를 활용할 수 있다.
 
+```java
+    @CheckDisplayDate
+    public Item create(ItemDto itemDto) { ... }
 
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface CheckDisplayDate { }
+
+    @Componen
+    @Aspect
+    public class CheckDisplayDateAspect {
+    @Around("@annotation(springjpaexercise.useritempromotionexample.annotation.CheckDisplayDate)")
+    public Object doAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object[] args = joinPoint.getArgs();
+        ItemDto itemDto = null;
+        for(Object arg : args) {
+            if(arg instanceof ItemDto) {
+                itemDto = (ItemDto)arg;
+                break;
+            }
+        }
+        LocalDate startDate = LocalDate.parse(itemDto.getStartDate(), DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate endDate = LocalDate.parse(itemDto.getEndDate(), DateTimeFormatter.ISO_LOCAL_DATE);
+        if(startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("StartDate is after EndDate.");
+        }
+        return joinPoint.proceed();
+    }
+```
+
+***정리하자면, API 예외처리시, 필드 에러의 경우는 Bean Validation과 @ExceptionHandler를 활용하고,
+
+그 이외의 GlobalError는 추가적인 메소드 또는 AOP와 @ExceptionHandler를 사용하면 된다.***
