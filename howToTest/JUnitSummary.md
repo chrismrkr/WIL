@@ -313,7 +313,7 @@ public class RepositoryTest {
 }
 ```
 
-+ @SpringBootTest :
++ @SpringBootTest : 실제 어플리케이션과 동일하게 의존관계를 주입하는 annotation
 
 
 ### 13.2 비즈니스 계층
@@ -324,5 +324,24 @@ public class RepositoryTest {
 
 프레젠테이션 계층(controller 계층)에서 단위 테스트할 때는 MockMvc를 사용한다.
 
+```java
+@SpringBootTest
+@AutoConfigurationMockMvc
+public class PresentationTest {
+    @Autowired MockMvc mockMvc;
+
+    @Test
+    void test() throws Exception {
+        ...
+        // when
+        MvcResult result = mockMvc.perform(get("/item/{itemId}", save.getId())
+                        .contentType("application/json")
+                        )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    } 
+}
+```
 
 
