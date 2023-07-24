@@ -300,7 +300,29 @@ public class SlowTestSamples {
 
 ## 13. 단위 테스트 Tip
 
-1. 엔티티, repository 테스트는 DB와 실제로 연동하여 테스트한다.
-2. 서비스, 프레젠테이션 계층 테스트는 각각 repository, service를 Mocking하여 테스트한다.
+### 13.1 영속 계층
+
+영속 계층(repository 계층)에서 단위 테스트를 할 때는 repository와 EntityManager 의존관계를 주입하여 테스트한다.
+
+```java
+@SpringBootTest
+@Transactional
+public class RepositoryTest {
+    @Autowired EntityManager em;
+    @Autowired ObjectRepository objectRepository;
+}
+```
+
++ @SpringBootTest :
+
+
+### 13.2 비즈니스 계층
+
+비즈니스 계층(service 계층)에서 단위 테스트할 때는 repository를 Mocking하고 action을 stubbing한다.
+
+### 13.3 프레젠테이션 계층
+
+프레젠테이션 계층(controller 계층)에서 단위 테스트할 때는 MockMvc를 사용한다.
+
 
 
