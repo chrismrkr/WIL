@@ -135,7 +135,7 @@ class App extends React.Component {
   }
 }
 ```
-만약 e.preventDefault()가 없다면, 특정 url로 redirect한다. 그러므로, 해당 작업을 원하지 않으면 e.prevnetDefault가 필요하다.
+만약 e.preventDefault()가 없다면, 특정 url로 redirect한다. 그러므로, 해당 작업을 원하지 않으면 e.preventDefault가 필요하다.
 
 ### e.stopPropagation()
 
@@ -147,7 +147,7 @@ class App extends React.Component {
 
 일반함수에서의 this는 전역객체를 바인딩하므로 중괄호를 통해 이벤트 함수를 전달할 때는 반드시 this 바인딩을 명시적으로 해야 한다.
 
-그렇지 않은 경우에는 화살표 함수를 통해 이벤트 함수를 전달할 수 있으나, 이벤트 함수가 다른 함수를 호출 할 수 있으므로 명시적인 this 바인딩을 사용하자.
+또는 arrow 함수를 통해 함수를 전달한다. arrow 함수에서의 this는 상위 스코프이기 때문에 명시적인 this 바인딩이 필요하지 않다.
 
 ```jsx
   class Toggle extends React.Component {
@@ -161,6 +161,7 @@ class App extends React.Component {
     }
     render() {
       return <button onClick={click}> {this.state.isToggle ? "ON" : "OFF"} </button>;
+      // return <button onClick={ () => click() }> {this.state.isToggle ? "ON" : "OFF"} </button>;
     }
   }
 ```
