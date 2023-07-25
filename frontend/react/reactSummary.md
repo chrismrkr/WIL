@@ -201,6 +201,8 @@ export default Comp;
 
 추가로, 리액트 훅에서는 useState를 사용할 수 있다. useState는 컴포넌트 내 필드(상태 값)의 getter, setter 역할을 한다.
 
+클래스형 컴포넌트에서의 props 대신에 사용하는 것이라고 생각하면 된다.
+
 ```jsx
 import React, {useState} from 'react';
 const Comp = () => {
