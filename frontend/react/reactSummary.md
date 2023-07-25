@@ -37,7 +37,7 @@ root.render(element);
 + 컴포넌트 이름은 항상 대문자이어야 한다.
 + 컴포넌트는 합성 및 추출할 수 있다. 추출은 컴포넌트의 여러 개의 작은 컴포넌트로 나누는 것을 의미한다.
 + props는 읽기 전용이며, 부모에서 자식 컴포넌트로 값을 전달할 때 사용하기도 한다.
-+ **props는 읽기 전용(display 목적)이므로 수정되면 안된다. react가 감지할 수 없기 때문이다.**
++ **props는 읽기 전용(display 목적)이므로 수정되면 안된다.**
 
 
 ## 4. state와 생명주기
@@ -147,9 +147,8 @@ class App extends React.Component {
 
 일반함수에서의 this는 전역객체를 바인딩하므로 중괄호를 통해 이벤트 함수를 전달할 때는 반드시 this 바인딩을 명시적으로 해야 한다.
 
-또는 arrow 함수를 통해 함수를 전달한다. arrow 함수에서의 this는 상위 스코프이기 때문에 명시적인 this 바인딩이 필요하지 않다.
-
 ```jsx
+  // 클래스형 컴포넌트
   class Toggle extends React.Component {
     constructor(props) {
       super(props);
@@ -160,17 +159,67 @@ class App extends React.Component {
       this.setState({isToggle: !this.isToggle});
     }
     render() {
-      return <button onClick={click}> {this.state.isToggle ? "ON" : "OFF"} </button>;
-      // return <button onClick={ () => click() }> {this.state.isToggle ? "ON" : "OFF"} </button>;
+      return <button onClick={this.click}> {this.state.isToggle ? "ON" : "OFF"} </button>;
     }
   }
 ```
 
-## 6. 조건부 렌더링
+또는 arrow 함수를 통해 함수를 전달한다. arrow 함수에서의 this는 상위 스코프이기 때문에 명시적인 this 바인딩이 필요하지 않다.
+
+```jsx
+  // 클래스형 컴포넌트
+  class Toggle extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {isToggle : true};
+    }
+    click = () => {
+      this.setState({isToggle: !this.isToggle});
+    }
+    render() {
+      return <button onClick={this.click}> {this.state.isToggle ? "ON" : "OFF"} </button>;
+    }
+  }
+```
+
+## 6. 함수형 컴포넌트
+
+앞서 제시된 컴포넌트를 클래스형 컴포넌트라고 한다. 그러나, 클래스형 컴포넌트는 this 바인딩, 생성자 등으로 코드가 길어진다는 단점이 있다.
+
+이를 해결하기 위해 함수형 컴포넌트가 등장했고, 이를 함수형 컴포넌트(리액트 훅)이라고 한다. 생성 방법은 아래와 같다.
+
+```jsx
+// 변수 이름과 파일 이름은 동일하게 만드는 것이 좋다.(const Comp이면 Comp.jsx로 만들기)
+import React from 'react';
+const Comp = () => {
+    return (
+      <div> Hello React Hook </div>
+    );
+}
+export default Comp;
+```
+
+추가로, 리액트 훅에서는 useState를 사용할 수 있다. useState는 컴포넌트 내 필드(상태 값)의 getter, setter 역할을 한다.
+
+```jsx
+import React, {useState} from 'react';
+const Comp = () => {
+  const [count, setCount] = userState(0); 
+  const counter = () => { setCount(count+1); }
+  return (
+    <div>
+      <button onClick = {counter}>click</button>
+      <div>{count}</div>
+    </div>
+  );
+}
+```
+
+## 7. 조건부 렌더링
 
 자바스크립트 조건문을 렌더링에도 사용할 수 있다. 
 
-## 7. 리스트와 key
+## 8. 리스트와 key
 
 자바스크립트에서의 리스트 변환 방법은 아래와 같다.
 
@@ -215,7 +264,7 @@ class NumberList extends React.Component {
 }
 ```
 
-## 8. Form
+## 9. Form
 
 \<form> element는 다른 React DOM element와 달리 내부 상태를 갖는다.
 
@@ -268,7 +317,7 @@ class InputButton extends React.Component {
 
 form 태그와 관련된 Formik 라이브러리에 대해서도 알아보면 좋다.
 
-## 9. state 끌어올리기
+## 10. state 끌어올리기
 
 동일한 데이터의 변경사항을 여러 컴포넌트에 반영해야 하는 경우도 있다. 
 
@@ -311,7 +360,7 @@ this.state는 데이터의 변경사항을 반영하기 위해 사용된다. (�
 
 배열이 변경될 때 배열의 길이는 항상 변화하므로, 데이터의 정합성이 깨질 위험성이 있기 때문이다.
 
-## 10. 합성과 상속
+## 11. 합성과 상속
 
 ### 컴포넌트를 다른 컴포넌트에 담기
 
@@ -344,7 +393,7 @@ class Border extends React.Component {
 
 구체적인 컴포넌트가 일반적인 컴포넌트를 렌더링 하는 방식으로 합성이 일어난다.
 
-## 11. React로 생각하기
+## 12. React로 생각하기
 
 백엔드 API 서버로부터 내려 받은 데이터로 프론트엔드를 구성한다고 하자. 고려해야할 단계별 과정은 아래와 같다.
 
