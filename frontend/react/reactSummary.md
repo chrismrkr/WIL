@@ -102,7 +102,7 @@ react element는 자바스크립트 함수 자체 이벤트 핸들러를 전달�
 <button onClick={activatefunction}> BUTTON </button>
 ```
 ```html
-<button onclick="activateFunction()"> BUTTON </button>
+<button onClick="activateFunction()"> BUTTON </button>
 ```
 
 이벤트 처리시, 아래의 3가지를 주의한다.
