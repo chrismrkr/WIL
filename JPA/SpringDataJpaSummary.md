@@ -68,32 +68,41 @@ List<Member> findMemberByPage(int age, int offset, int limit) {
 }
 ```
 
+특정 나이를 갖는 회원 데이터를 username 칼럼으로 내림차순 정렬하여 반환하는 페이징 쿼리이다.
+
 ### 1.5 스프링 데이터 JPA 페이징과 정렬 
 
 Pageable, Sort 인터페이스를 통해 페이징 및 정렬 기능을 사용할 수 있다. 예시는 아래와 같다. 
 
+특정 나이를 갖는 회원 데이터를 username 칼럼을 기준으로 내림차순으로 반환하는 페이징 쿼리이다. 
+
 ```java
-Page<Member> findByUsername(String username, Pageable pageable); // count 쿼리 사용
-Slice<Member> findByUsername(String username, Pageable pageable); // count 쿼리 사용 안함
+// memberRepository
+Page<Member> findByAge1(int age, Pageable pageable); // count 쿼리 사용
+Slice<Member> findByAge2(int age, Pageable pageable); // count 쿼리 사용 안함
+@Query(value = "SELECT m FROM Member m WHERE m.age = :age")
+Page<Member> findByAge3(@Param("age") int age, Pageable pageable);
 ```
 
-페이지당 데이터를 3개씩 갖고, 0번째 페이지를 가져오는 코드는 아래와 같다.
+예를 들어, 페이지당 데이터를 3개씩 갖고 0번째 페이지를 가져오는 코드는 아래와 같다.
 
 ```java
 PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
-Page<Member> members = memberRepository.findByUsername("member", pageRequest);
+Page<Member> members = memberRepository.findByAge(23, pageRequest);
 ```
 
 Page<T> 반환은 count 쿼리와 페이지 쿼리가 함께 발생한다.
 
 Slice<T> 반환은 페이지 쿼리만 발생하지만, 내부적으로 limit+1 만큼의 데이터를 반환한다. (모바일 리스트 \<더보기> 기능에 활용) 
 
-추가적으로 map을 통해 page 쿼리 결과를 DTO에 바인딩하고, count 쿼리를 직접 작성할 수도 있다.
+추가적으로 map을 통해 page 쿼리 결과를 DTO에 바인딩할 수 있다.
 
 ```java
 Page<Member> members = memberRepository.findByUsername("member", pageRequest);
 Page<MemberDto> memberDtos = members.map(m -> new MemberDto()); // DTO 바인딩
 ```
+
+Page\<T>를 반환하는 쿼리는 count 쿼리가 발생하는데, 아래와 같이 count 쿼리를 직접 작성할 수도 있다.
 
 ```java
 @Query(value = "select m from Member m", countQuery = "select count(m) from Member m")
