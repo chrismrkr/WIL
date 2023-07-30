@@ -164,7 +164,7 @@ class App extends React.Component {
   }
 ```
 
-또는 arrow 함수를 통해 함수를 전달한다. arrow 함수에서의 this는 상위 스코프이기 때문에 명시적인 this 바인딩이 필요하지 않다.
+또는 **arrow 함수를 이벤트 함수로 전달한다.** arrow 함수에서의 this는 상위 스코프이기 때문에 this 바인딩이 필요하지 않다.
 
 ```jsx
   // 클래스형 컴포넌트
@@ -184,8 +184,20 @@ class App extends React.Component {
 
 ### 파라미터 전달
 
+이벤트 함수에 파라미터를 전달하기 위해서는 아래와 같이 사용하면 된다.
 
+```jsx
+  <button onClick={(e)=>{invokeEvent("param1", e)}}></button>
+```
 
+위와 같이 파라미터를 전달받는 이벤트 함수는 아래와 같이 정의된다.
+
+```jsx
+  const invokeEvent = (param, e) => {
+    // param : 사용자 정의 파라미터, e : onClick 이벤트에서 전달한 파라미터
+    ...
+  };
+```
 
 ## 6. 함수형 컴포넌트
 
