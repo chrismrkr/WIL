@@ -387,10 +387,22 @@ GET /members?member_page=0&order_page=1
 #### 3. 페이징 결과를 DTO로 map을 통해 변환할 수 있다.
 
 ```java
+   // 람다식 사용
+    public Page<MemberDto> list(Pageable pageable) {
+        return memberRepository.findAll(pageable).map((member) -> {
+		return new MemberDto(member);
+	});
+    }
+```
+
+```java
+   // 메소드 축약형 사용
     public Page<MemberDto> list(Pageable pageable) {
         return memberRepository.findAll(pageable).map(MemberDto::new);
     }
 ```
+
+
 
 ***
 
