@@ -94,15 +94,16 @@ state는 비동기적으로 변화할 수 있고, 생성자에서 정의한다.
 
 ## 5. 이벤트 처리하기
 
-DOM element와 React element의 이벤트 처리방식은 유사하다.
+DOM element와 React element의 이벤트 처리방식은 유사하지만 전달 방법이 다르다.
 
-react element는 자바스크립트 함수 자체 이벤트 핸들러를 전달한다.
+react element는 자바스크립트 함수 자체 이벤트 핸들러로 전달해야 한다.
 
 ```jsx
+// React에서 사용하는 방법
 <button onClick={activatefunction}> BUTTON </button>
 ```
 ```html
-<button onClick="activateFunction()"> BUTTON </button>
+<button onclick="activateFunction()"> BUTTON </button>
 ```
 
 이벤트 처리시, 아래를 참고하도록 한다.
