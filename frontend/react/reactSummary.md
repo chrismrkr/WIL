@@ -237,7 +237,33 @@ const Comp = () => {
 
 ## 7. 조건부 렌더링
 
-자바스크립트 조건문을 렌더링에도 사용할 수 있다. 
+자바스크립트 조건문을 렌더링에도 사용할 수 있다. 예를 들어, 아래와 같이 switch-case를 사용할 수 있다.
+
+### 함수형 컴포넌트
+
+```jsx
+const ContentsMain = (props) => {
+    switch(props.tabSelector) {
+        case "SELECT":
+            return (
+                <div className={styles.div_box}>
+                    <Table data={props.list}></ItemTable>
+                    <NavigationBar changePage={props.changePage} pageNumber={props.pageNumber} totalPage={props.totalPage}></NavigationBar>
+                </div>
+            );
+        
+        case "REGISTER":
+            return (
+                <div className={styles.div_box}>
+                    <RegisterForm></RegisterForm>
+                </div>
+            );
+
+        default:
+            return null;
+    }
+};
+```
 
 ## 8. 리스트와 key
 
