@@ -1710,7 +1710,7 @@ Global 에러를 발생시켜야 한다면 아래와 같이 AOP를 활용할 수
     @Retention(RetentionPolicy.RUNTIME)
     public @interface CheckDisplayDate { }
 
-    @Componen
+    @Component
     @Aspect
     public class CheckDisplayDateAspect {
     @Around("@annotation(springjpaexercise.useritempromotionexample.annotation.CheckDisplayDate)")
@@ -1732,6 +1732,8 @@ Global 에러를 발생시켜야 한다면 아래와 같이 AOP를 활용할 수
     }
 ```
 
-***정리하자면, API 예외처리시, 필드 에러의 경우는 Bean Validation과 @ExceptionHandler를 활용하고,
+**정리하자면 API 예외처리시,**
 
-그 이외의 GlobalError는 추가적인 메소드 또는 AOP와 @ExceptionHandler를 사용하면 된다.***
+**필드 에러의 경우는 Bean Validation과 @ExceptionHandler를 활용하고,**
+
+**그 이외의 GlobalError는 추가적인 메소드, 또는 AOP와 @ExceptionHandler를 사용하면 된다.**
