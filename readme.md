@@ -36,7 +36,7 @@ JPQL 빌더 역할인 QueryDSL에 대한 설명
 
 ### JPA 관련 토이 프로젝트
 + 1. 회원-상품-프로모션 API 구현 예제 : https://github.com/chrismrkr/toyproject-user-item-promotion-example
-+ 2. 상품-장바구니 웹 페이지 예제 : https://github.com/chrismrkr/toyproject-shoppingcartexample
++ 2. 상품-장바구니 웹 페이지 예제 : https://github.com/chrismrkr/toyproject-shoppingcartexample 
 ***
 
 ## devops
