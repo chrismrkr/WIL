@@ -39,3 +39,19 @@ chmod -x kafka_start.sh
 ```
 
 ### 1.3. 환경설정 
+
+로그파일 저장 위치를 변경하는 방법은 아래와 같다.
+
+```shell
+vi zookeeper.properties
+```
+
+```shell
+dataDir=[로그파일 저장 경로]
+```
+
+kafka 로그파일 저장 경로도 동일한 방법으로 변경할 수 있다.
+
+## 2. Kafka Topic, Producer, Consumer 이해 및 Command Line Interface 실습
+
+
