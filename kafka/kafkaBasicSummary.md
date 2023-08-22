@@ -136,6 +136,36 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic multipart-parti
 **sticky-partition**: 특정 batch가 다 찰 때까지 message를 채우는 방식(batch.size, linger.ms 사용). kafka 2.4 이상 버전에서 채택한 방법.
 
 
+### 2.3 Consumer-group 
+
+consumer-group이란 1개 이상의 consumer로 구성된 집합이다.
+
+동일 consumer-group 내에서 consumer들은 서로 독립적인 partition을 할당받는다. 동일 그룹 내의 consumer들은 동일한 partition을 할당받을 수 없다.
+
+반대로 서로 다른 consumer-group의 consumer는 동일한 partition을 할당받을 수 있다.
+
+이상적인 consumer-group에서는 partition-consumer가 일대일로 할당된다. 그러나, consumer가 더 적은 경우에는 rebalancing된다.
+
+#### consumer-group 생성
+consumer 생성시 group을 지정하면 자동으로 consumer-group이 생성된다.
+
+```shell
+kafka-console-consumer --bootstrap-server localhost:9092 --group [그룹명] --topic [토픽명]
+```
+
+#### consumer-group과 consumer, 그리고 partition, Lag 관련 정보 조회하기
+```shell
+kafka-console.consumer --bootstrap-server localhost:9092 --list
+kafka-console-consumer --bootstrap-server localhost:9092 --describe --group [그룹명]
+```
+
+#### consumer-group 삭제하기
+
+consumer-group 내 consumer가 모두 삭제되더라도 일정 기간동안 group은 존재한다. 강제로 group을 삭제하는 방법은 아래와 같다.
+```shell
+# consumer-group 내 모든 consumer는 종료되어야 한다.
+kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그룹명]
+```
 
 
 
