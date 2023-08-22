@@ -60,7 +60,7 @@ kafka 로그파일 저장 경로도 동일한 방법으로 변경할 수 있다.
 
 메세지를 생성하는 주체. 메세지를 생성하여 어느 Broker의 Partition으로 전달할지를 결정한다.
 
-Command Line Interface는 아래와 같다.
+producer 생성을 위한 Command Line Interface는 아래와 같다.
 
 ```shell
 kafka-console-producer --bootstrap-server localhost:9092 --topic test_topic_01
@@ -70,7 +70,7 @@ kafka-console-producer --bootstrap-server localhost:9092 --topic test_topic_01
 
 메세지를 읽는 주체. 어떤 Broker의 Partition에서 메세지를 읽을지를 결정한다. 
 
-Command Line Interface는 아래와 같다.
+Consumer 생성을 위한 Command Line Interface는 아래와 같다.
 
 ```shell
 kafka-console-consumer --bootstrap-server localhost:9092 --topic test_topic_01 [--from-beginning]
@@ -99,4 +99,40 @@ kafka-topics --bootstrap-server locahlost:9092 --delete --topic test_topic_01
 ```
 
 Topic 생성시 만들어지는 Partition 개수의 기본 값은 server.properties에서 변경할 수 있다.
+
+### 2.2 Topic, Producer, Topic 예제
+
+#### key 값이 존재하는 메세지를 여러 Partition을 갖는 Topic으로 Produce 및 consume하기
+
+```shell
+# 3개의 partition을 갖는 Topic 생성
+kafka-topics --bootstrap-server localhost:9092 --create --topic multi-partition-topic --partitions 3
+```
+
+```shell
+# key가 존재하는 메세지를 생성하는 producer 실행
+kafka-console-producer --bootstrap-server localhost:9092 --topic multi-partition-topic \
+--property key.seperator=: --property parse.key=true
+```
+
+```shell
+# 위에서 생성된 Topic의 메세지를 읽는 consumer 실행
+kafka-console-consumer --bootstrap-server localhost:9092 --topic multipart-topic \
+--property print.partition=true --from-beginning
+```
+
+예제 결과: 동일한 key를 갖는 메세지는 동일한 partition으로 push된다. 이에 따라, consumer가 메세지를 읽을 때 순서를 지킬 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
