@@ -102,28 +102,38 @@ Topic 생성시 만들어지는 Partition 개수의 기본 값은 server.propert
 
 ### 2.2 Topic, Producer, Topic 예제
 
-#### key 값이 존재하는 메세지를 여러 Partition을 갖는 Topic으로 Produce 및 consume하기
+#### key 값이 존재하는 메세지를 여러 Partition을 갖는 Topic에 Produce하고 consume하기
 
 ```shell
 # 3개의 partition을 갖는 Topic 생성
 kafka-topics --bootstrap-server localhost:9092 --create --topic multi-partition-topic --partitions 3
 ```
-
 ```shell
 # key가 존재하는 메세지를 생성하는 producer 실행
 kafka-console-producer --bootstrap-server localhost:9092 --topic multi-partition-topic \
 --property key.seperator=: --property parse.key=true
 ```
-
 ```shell
 # 위에서 생성된 Topic의 메세지를 읽는 consumer 실행
 kafka-console-consumer --bootstrap-server localhost:9092 --topic multipart-topic \
 --property print.partition=true --from-beginning
 ```
+**결과**: 동일한 key를 갖는 메세지는 동일한 partition으로 push된다. 이에 따라, consumer가 메세지를 읽을 때 순서를 지킬 수 있다.
 
-예제 결과: 동일한 key를 갖는 메세지는 동일한 partition으로 push된다. 이에 따라, consumer가 메세지를 읽을 때 순서를 지킬 수 있다.
+#### key 값을 가지지 않는 메세지를 여러 Partition을 갖는 Topic에 Produce하고 consume하기
 
+```shell
+# Producer 생성
+kafka-console-producer --bootstrap-server localhost:9092 --topic multi-partition-topic
+```
+```shell
+# Consumer 생성
+kafka-console-consumer --bootstrap-server localhost:9092 --topic multipart-partition-topic
+```
+**결과**: partition batch가 다 차거나 일정 시간이 지나면 partition에 저장함. round-robin, 또는 stick-partition 전략으로 배분함.
 
+**round-robin**: batch에 순서대로 message를 채우는 방식
+**sticky-partition**: 특정 batch가 다 찰 때까지 message를 채우는 방식(batch.size, linger.ms 사용). kafka 2.4 이상 버전에서 채택한 방법.
 
 
 
