@@ -5,9 +5,9 @@ Spring Security는 웹 서비스에 대한 인증과 인가 기능을 제공하�
 
 ## 1. 기본 API 및 Filter의 이해
 
-Spring Security를 사용하기 위해서는 Spring boot의 Dependency에 아래를 추가해야 한다.
+Spring Security를 사용하기 위해서 Spring boot의 Dependency에 아래를 추가한다
 
-Maven Project일 때, pom.xml에 아래를 추가하도록 한다. 물론, start.spring.io에서도 추가할 수 있다.
+Maven Project의 pom.xml에 아래를 추가한다. start.spring.io에서도 추가할 수 있다.
 
 ```xml
   <dependency>
@@ -18,7 +18,7 @@ Maven Project일 때, pom.xml에 아래를 추가하도록 한다. 물론, start
 
 ### 1.1 Filter의 이해
 
-스프링 시큐리티의 기본 API를 이해하기 전에 Filter에 대해서 이해해야 한다.
+스프링 시큐리티를 학습하려면 Filter에 대해서 이해해야 한다.
 
 MVC 디자인 패턴이란 프론트 컨트롤러로 Http Request를 보내면, 이에 맞는 핸들러 어댑터를 불러온 후, 핸들러 어댑터를 통해 Request에 대한 컨트롤러(핸들러)를 실행한 후, Model에 필요한 파라미터들을 저장한 후, View로 반환하는 것을 의미한다.
 
@@ -53,7 +53,7 @@ public class FilterImpl implements Filter {
 }
 ```
 
-Filter를 Chain으로 연결해서 사용하는 클래스를 아래와 같이 스프링 빈으로 등록해서 싱글톤으로 사용할 수 있다.
+Filter를 Chain으로 연결해서 아래와 같이 사용할 수 있다.
 
 ```java
 @Configuration
@@ -77,7 +77,7 @@ public class WebConfig {
 
 스프링 시큐리티의 HttpSecurity 클래스에서는 인증 및 인가 API를 제공한다.
 
-WebSecurityConfigureAdapter 클래스를 상속한 후, HttpSecurity를 이용해서 기본적인 보안 기능을 제공하는 객체를 생성할 수 있다.
+WebSecurityConfigureAdapter 클래스를 상속한 후, HttpSecurity를 이용해서 기본적인 보안 기능을 제공할 수 있다.
 
 ```java
 @Configuration
@@ -172,7 +172,7 @@ AbstractAuthenticationProcessingFilter.class, UsernamePasswordAuthenticationFilt
 
 ### 1.5 LogoutFilter
 
-Logout API를 이해하기 전에 **쿠키, 세션, 그리고 토큰**에 대해서 정리해보도록 하자.
+Logout API를 이해하기 전에 **쿠키, 세션, 그리고 토큰**을 아래와 같이 정리하였다.
 
 + <b>쿠키</b>: 세션에 접근하기 위해 Local에 존재하는 key
 + <b>세션</b>: 서버 메모리에 저장된 정보
@@ -214,7 +214,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-자세한 것을 알아보기 위해 스프링 시큐리티의 **LogoutFilter.class** 파일을 분석해보도록 하자.
+더 자세히 알기 위해서는 스프링 시큐리티의 **LogoutFilter.class**를 분석하면 된다.
 
 (IntelliJ에서 Shift+Shift 단축키로 찾아볼 수 있다.)
 
