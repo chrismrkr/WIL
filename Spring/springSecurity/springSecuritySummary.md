@@ -635,13 +635,13 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
 
 ### 2.7 FilterSecurityInterceptor, Authorization
 
-FilterSecurityInterceptor는 HTTP GET /** 등으로 리소스에 접근할 때 거치게되는 Filter 클래스이다.
+FilterSecurityInterceptor는 HTTP Request로 리소스에 접근할 때 마지막으로 거치는 Filter이다.
 
-SecurityFilterChain의 마지막에 위치하고, 요청의 승인/거부를 최종적으로 결정한다.
+요청의 승인/거부를 최종적으로 결정한다.
 
 AbstractSecurityInteceptor -> FilterSecurityInterceptor 순서로 상속하여 커스터마이징할 수 있다.
 
-FilterSecurityInterceptor를 상속하여 PermitAllFilter를 구현한 것을 예제로 살펴보자.
+아래는 FilterSecurityInterceptor를 상속하여 PermitAllFilter를 구현한 예시이다.
 
 ```java
 @Slf4j
@@ -694,7 +694,7 @@ SecurityMetadataSource에는 ```LinkedHashMap<RequestMatcher, List<ConfigAttribu
 
 ```this.obtainSecurityMetadataSource().getAttributes(object)```를 이용해 인증 객체의 권한과 일치하는 정보를 가져온다.
 
-예를 들어, HTTP 요청은 GET /home이고 인가 정보에는 { GET /home -> ROLE_USER,  GET /user -> ROLE_USER, GET /manager -> ROLE_MANAGER }가 있다면, 위 메소드를 통해 {GET /home -> ROLE_USER}를 인가정보로 가져온다.
+예를 들어, HTTP 요청은 GET /home이고 등록된 인가 목록이 { GET /home -> ROLE_USER,  GET /user -> ROLE_USER, GET /manager -> ROLE_MANAGER }이면, 위 메소드를 통해 {GET /home -> ROLE_USER}를 가져온다.
 
 SecurityMetadataSource에 대해서는 이후에 더 자세히 다루도록 한다.
 
