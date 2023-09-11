@@ -39,3 +39,65 @@ cgroup은 cpu, 메모리, I/O Bandwidth 등 하드웨어 리소스 사용량을 
 예를 들어, cgroup은 특정 컨테이너의 메모리를 2GB까지 사용할 수 있도록 제한할 수 있다.
 
 namespace는 컨테이너(프로세스)를 다른 컨테이너와 격리시키는 기술을 의미한다. 두가지 모두 리눅스 OS에서 사용할 수 있다.
+
+
+## 2. Docker 기본 명령어
+
+### 컨테이너 내려받기
+```shell
+# docker pull [id]/[repository]:tag
+docker pull myId/myRepository:latest
+```
+
+### 컨테이너 실행
+```shell
+# docker run [OPTION] IMAGE[:tag] [COMMAND]
+docker run -i -t ubuntu:16.04 /bin/bash
+## ubuntu:16.04 컨테이너를 실행한 후 /bin/bash를 실행하라는 명령어
+# -i : 표준 입출력 사용 옵션
+# -t : tty 할당
+# --name [이름]: 실행할 컨테이너에 이름을 할당하는 옵션
+# -p : 포트 포워딩 옵션 
+```
+
+### 컨테이너 종료
+```shell
+exit
+```
+
+### 컨테이너 종료하지 않고 나오기
+```shell
+Ctrl + P + Q
+```
+
+### 컨테이너 목록 확인
+```shell
+docker ps # 실행 중인 컨테이너 목록
+docker ps -a # 모든 컨테이너 목록 
+```
+
+### 컨테이너 시작
+```shell
+docker start [컨테이너_이름]
+```
+
+### 컨테이너 중지
+```shell
+docker stop [컨테이너_이름]
+```
+
+### 컨테이너 삭제
+```shell
+docker rm [컨테이너_이름]
+docker rm -f [컨테이너_이름] # 정지 및 삭제
+```
+
+###  이미지 목록
+```shell
+docker images
+```
+
+### 이미지 삭제
+```shell
+docker rmi [이미지_이름]
+```
