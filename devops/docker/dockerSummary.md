@@ -101,3 +101,28 @@ docker images
 ```shell
 docker rmi [이미지_이름]
 ```
+
+### 이미지 생성
+
+아래는 Dockerfile을 이용해서 .jar 파일을 docker image로 생성하는 방법이다.
+```Dockerfile
+## Dockerfile 생성
+FROM openjdk:11
+ARG JAR_FILE=[src file name(ex .jar etc)]
+COPY ${JAR_FILE} ../../docker-images/[image file name]
+ENTRYPOINT ["java","-jar","/[src file name]"]
+```
+```shell
+docker built -t [id/repository:tag] .
+```
+
+### 이미지 docker hub 저장
+
+```shell
+docker login
+docker push [id/image:tag]
+```
+
+## 3. docker-compose
+
+
