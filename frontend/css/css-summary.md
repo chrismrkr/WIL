@@ -127,6 +127,14 @@ html, body { margin: 0; padding: 0; }
   text-transform: [capitalize | uppercase | lowercase];
 ```
 
+```css
+  overflow: [visible | hidden | scroll | auto]; /* 텍스트가 박스를 넘어갈 때 어떻게 처리할지를 결정 */
+```
+
+```css
+  text-overflow: ..; /* 텍스트가 줄바꿈 없이 가로로 넘쳤을 때의 대응 방법을 결정*/
+```
+
 ### 2.2 목록 스타일
 
 아래의 태그로 스타일을 지정한다.
@@ -153,7 +161,6 @@ html, body { margin: 0; padding: 0; }
 /* 테두리 합성 속성 */
   border-collpase: collapse | seperate;
 ```
-
 ***
 
 ## 3. CSS 레이아웃
@@ -212,6 +219,11 @@ position: sticky; /* 원래 위치(static)에 있다가 스크롤이 움직이�
   top: 100px;
   left: 100px;
 }
+```
+
++ overflow: 내용물이 요소를 넘었을 때 적용되는 속성
+```css
+overflow: hidden;
 ```
 
 + 여백 관련 속성
@@ -273,43 +285,86 @@ justify-content: flex-start | flex-end | center | space-between | space-around |
 align-items: flex-start | flex-end | center | space-between | space-around | space-even;
 ```
 
++ flex-wrap: 정렬된 요소들의 총 width가 부모 width보다 큰 경우에 다음 줄에 이어서 나열하는 기능
+```css
+flex-wrap: wrap;
+```
+
++ align-content: 두 줄 이상의 align-items를 어떻게 배치할 것인지를 결정하는 속성
+```css
+align-content: flex-start | flex-end | center | space-between | space-around | space-even;
+```
+
+자세한 flex 관련 속성은 MDM을 참고하면 된다.
 
 ### 3.4 grid 레이아웃
 
+```display: grid;``` 속성을 이용하여 레이아웃을 만드는 방법이다.
+
+grid 레이아웃은 큰 규모의 레이아웃이 명확히 결정되었을 때 사용하는 방법이다.
+
++ grid-template-rows: grid-container의 행의 개수와 크기를 결정하는 속성
+```css
+grid-template-rows: 1fr 2fr 1fr 1fr; /* 1:2:1:1 비율로 총 4개의 행을 가진 그리드 생성 */
+grid-template-rows: 200px 1fr 2fr; /* 200px, 1:2 비율로 총 3개의 행을 가진 그리드 생성 */ 
+grid-template-rows: 200px repeat(2, 1fr); /* 200px, 1:1 비율로 총 3개의 행을 가진 그리드 생성 */
+```
+
++ grid-template-columns: grid-container의 열의 개수와 크기를 결정하는 속성
+```css
+grid-template-columns: ...; /* grid-template-rows와 동일하게 지정할 수 있음 */
+```
+
++ grid-row, grid-col : grid-item의 크기를 지정하는 속성
+```css
+/* (1행-3행), (2열-3열)을 1칸의 grid-item으로 설정한다. */
+grid-row: 1/3;
+grid-col: 2/3;
+```
+
+grid 레이아웃 예시는 아래와 같다. item1은 (2행-3행), (1열-3열)에 배치된다.
+
+```css
+.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr 2fr);
+    grid-template-rows: repeat(4, 100px);
+    grid-gap: 5px;
+}
+.item1 {
+  grid-row: 2/3;
+  grid-column: 1/3;
+}
+```
 
 ***
 
-## 4. 이미지와 그라데이션 효과로 배경 꾸미기
+## 4. 배경 관련 속성
 
-웹 페이지의 배경화면을 꾸미는 것에 대해서 배워보도록 한다.
++ **background**: 단축 속성
+```css
+background: color image repeat position size attachment;
+```
++ background-color: 배경색을 지정하는 속성 
 
-### 4.1 배경색 배경범위 지정
++ background-clip: 배경 범위를 지정하는 속성
+```css
+background-clip: border-box; /* 외곽 테두리까지 적용 */
+background-clip: padding-box; /* 패딩 범위까지 적용 */
+background-clip: content-box; /* 패딩을 제외한 컨텐츠 영역에만 적용 */
+```
 
-배경색은 background-color 속성을 이용해서 적용하면 된다.
-
-배경범위는 background-clip 속성을 이용해서 적용하면 된다. 배경범위는 3가지가 있다.
-
-+ border-box: 외곽 테두리까지 적용
-+ padding-box: 패딩 범위까지 적용
-+ content-box: 패딩을 제외한 컨텐츠 영역에만 적용
-
-***
-
-### 4.2 배경 이미지 지정하기
-
-배경 이미지를 불러오고, 배경 이미지를 반복하거나 위치를 조정하는 등 여러 속성이 있다. 하나씩 살펴보도록 하자.
-
-#### 4.2.1 background-image: 배경 이미지 삽입
++ background-image: 배경 이미지를 삽입하는 속성
 ```css
 background-image: url(...);
 ```
 
-#### 4.2.2 background-repeat: 배경 이미지 반복
-
++ background-repeat: 배경 이미지 반복
 ```css
 background-repeat: repeat; /* repeat, repeat-x, repeat-y, no-repeat 존재 */
 ```
-#### 4.2.3 background-position: 배경 이미지 위치 조절
+
++ background-position: 배경 이미지 위치 조절
 
 이미지의 수평 또는 수직 위치를 지정한다. 
 
@@ -318,15 +373,15 @@ left(top), center, right(bottom), <백분율>, <길이 값>으로 지정할 수 
 background-position: <수평위치> <수직위치>;
 ```
 
-#### 4.2.4 background-origin: 배경 이미지 적용 범위 조정
++ background-origin: 배경 이미지 적용 범위 조정
 
 centent-box, border-box, padding-box 총 3가지가 있다.
 
-#### 4.2.5 background-attachment: 배경 이미지 고정
++ background-attachment: 배경 이미지 고정
 
-scroll, fixed 두가지 속성이 있다. 전자는 이미지가 함께 스크롤되고, 후자는 이미지는 고정된다.
+scroll, fixed, local 3가지 속성이 있다. scroll은 이미지가 함께 스크롤되고, fixed는 스크롤 시 이미지는 고정된다. 
 
-#### 4.2.6 background-size: 배경 이미지 크기 조절
++ background-size: 배경 이미지 크기 조절
 
 배경 이미지가 필요보다 작거나 클 경우 조절할 수 있다.
 
@@ -334,163 +389,112 @@ auto, contain, cover, <크기>, <백분율> 총 5가지 방법이 있다.
 
 contain은 요소 안에 배경 이미지가 다 들어오도록 하고, cover는 배경 이미지로 요소를 모두 덮도록 한다.
 
-***
++ object-fit: \<img> 태그를 통해 설정한 배경의 속성을 변경할 때 사용함.
+```css
+object-fit: cover; /* <img> 배경을 컴포넌트에 꽉 채운다. */
+```
 
-### 4.3 그라데이션 효과로 배경 꾸미기
 
-...
-
-***
 ***
 
 ## 5. CSS 고급 선택자
 
-항상 id와 class를 지정하고 기억하여 스타일을 적용하는 것을 쉽지 않다.
+항상 id와 class를 지정하고 기억하여 스타일을 적용하는 것 외 다른 방법도 있다.
 
-그러므로, 연결 선택자와 속성 선택자를 사용해서 특정 요소를 쉽게 선택에서 스타일을 적용하는 방법에 대해서 알아보도록 하자.
++ **사용자 동작에 반응하는 가상 클래스**
 
-### 5.1 연결 선택자
+1. :link; 방문하지 않은 링크에 스타일 적용
+2. :visited; 방문한 링크에 스타일 적용
+3. :hover; 마우스 포인터를 올려놓으면 스타일 적용
+4. :active; 웹 요소를 활성화 했을 때 스타일 적용(ex. 클릭)
+5. :focus; 웹 요소에 초점이 맞추어져 있을 때 스타일 적용
 
-둘 이상의 선택자를 연결해서 스타일이 적용될 요소가 어느 부분인지 지정하는 것을 연결 선택자라고 한다.
+**link -> visited -> hover -> active 순서로 적용하지 않으면 제대로 작동하지 않음에 주의하자!**
+(LoVe HAte로 외우자)
 
-##### 5.1.1 하위 선택자와 자식 선택자
++ **가상 요소 선택자**
 
-하위 선택자란 상위 요소에 포함된 모든 하위 요소를 지정하는 선택자이다.
+html 컴포넌트에 또 다른 컴포넌트가 존재하는 것 같은 효과를 준다.
 
+예를 들어, box1 클래스를 가진 컴포넌트의 끝에 새로운 컴포넌트가 있도록 하려면 아래와 같이 만들면 된다.
+```css
+box1::after {
+  background: rgba(0,0,0,0.2);
+}
+```
+
+가상 요소 선택자 예시는 아래와 같다.
+```
+::before
+::after
+::first-letter
+::first-line
+::selection
+::slotted()
+::cue
+::cue-region
+```
+
+
++ 하위 선택자: 상위 요소에 포함된 모든 하위 요소를 지정하는 선택자이다.
 ```css
   body p { ... } / * <body> 태그 안의 모든 <p> 태그에 스타일을 적용한다. */
 ```
 
-자식 선택자란 모든 하위 요소가 아닌 바로 아래의 자식 요소만을 지정하는 선택자이다.
-
++ 자식 선택자: 모든 하위 요소가 아닌 바로 아래의 자식 요소만을 지정하는 선택자이다.
 ```css
   body > p { ... } /* <body> 태그 바로 밑의 <p> 태그에만 스타일을 적용한다. */
 ```
 
-#### 5.1.2 인접 형제 선택자와 형제 선택자
 
-부모 요소가 같은 요소의 경우 형제 요소라고 하자. 먼저 나오는 요소를 형 요소, 나중에 나오는 요소를 동생 요소라고 하겠다.
-
-**인접형제 선택자**란 형제 요소 중 첫번째 동생 요소만을 선택하는 것을 의미한다.
-
++ 인접형제 선택자: 형제 요소 중 첫번째 동생 요소만을 선택하는 것을 의미한다.
 ```css
   h1 + p { ... }; /* <h1> 태그 바로 뒤에 나오는 <p> 태그에만 스타일을 적용한다. */
 ```
 
-**형제 선택자**란 인접형제 선택자와 달리 모든 형제 요소를 선택하는 것을 의미한다.
++ 형제 선택자: 인접형제 선택자와 달리 모든 형제 요소를 선택하는 것을 의미한다.
 
 ```css
   h1 ~ p { ... }; /* <h1> 태그와 형제인 모든 <p> 태그에 스타일을 적용한다. */
 ```
 
-***
-
-### 5.2 속성 선택자
-
-태그 안의 속성 **값**에 따라서 다르게 선택해야 하는 경우가 있다. 이때 속성 선택자를 사용한다.
-
-#### 5.2.1 \[속성] 선택자
-
-예제로 바로 살펴보자.
-
++ \[속성] 선택자
 ```css
 a[href] { ... } /* <a> 태그 중, href 속성이 있는 요소에 스타일을 적용한다. */
 ```
 
-#### 5.2.2 \[속성 = 속성값] 선택자
-
-예제로 바로 살펴보자.
-
++ \[속성 = 속성값] 선택자
 ```css
 a[target = "blank"] { ... } /* 속성이 속성값과 일치하는 <a> 태그에만 스타일을 적용한다. */
 ```
 
-#### 5.2.3 \[속성 ~= 값] 선택자
-
-예제로 바로 살펴보자.
-
++ \[속성 ~= 값] 선택자
 ```css
 [class ~= button] { ... } /* 여러 속성값 중에서 해당 속성값이 포함된 요소를 선택한다. */
 ```
 
-속성값이 **포함**되는 요소를 선택하므로 반드시 일치해야 선택되는 것은 아니다.
-
-
-#### 5.2.4 \[속성 |= 값] 선택자
-
-예제로 바로 살펴보자.
-
++ \[속성 |= 값] 선택자
 ```css
 a[title |= us] { ... } /* 특정 속성 값이 포함된 <a> 태그에 스타일을 적용한다. */
 ```
 
 \[속성 ~= 값]]과 다른 점은 ~= 에서는 하이픈(-)를 인식하지 못한다.
 
-#### 5.2.5 \[속성 ^= 값]
-
-예제로 바로 살펴보자.
-
++ \[속성 ^= 값]
 ```css
 a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a> 태그에 스타일을 적용한다. */
 ```
 
-#### 5.2.6 \[속성 $= 값]
-
-예제로 바로 살펴보자.
-
++ \[속성 $= 값]
 ```css
 [href $= xls] { ... } /* href 속성 중, 값이 xls로 끝나는 태그들에 스타일을 적용한다. */
 ```
 
-#### 5.2.7 \[속성 \*= 값] 
-
-예제로 바로 살펴보자.
-
++ \[속성 \*= 값] 
 ```css
 [href *= w3] { ... } /* href 속성 중, 값에 "w3"가 포함된 태그들에 스타일을 적용한다. */
 ```
 
-***
-
-### 5.3 가상 클래스와 가상 요소
-
-앞서 살펴본 선택자로도 스타일을 지정할 수 없는 경우가 있다. 이것에 대해서 알아보도록 하자.
-
-#### 5.3.1 사용자 동작에 반응하는 가상 클래스
-
-+ :link; 방문하지 않은 링크에 스타일 적용
-+ :visited; 방문한 링크에 스타일 적용
-+ :hover; 마우스 포인터를 올려놓으면 스타일 적용
-+ :active; 웹 요소를 활성화 했을 때 스타일 적용(ex. 클릭)
-+ :focus; 웹 요소에 초점이 맞추어져 있을 때 스타일 적용
-
-**link -> visited -> hover -> active 순서로 적용하지 않으면 제대로 작동하지 않음에 주의하자!**
-(LoVe HAte로 외우자)
-
-#### 5.3.2 요소 상태에 따른 가상 클래스
-
-요소의 상태에 따라 스타일을 달리 적용할 수 있다.
-
-아래 예제는 Anchor 기능을 통해 웹 페이지의 다른 위치로 이동하기 수월하게 만드는 방법이다.
-```html
-<style>
-  #intro:target {
-    color: #fff;
-  }
-</style>
-
-<ul>
-  <li><a href=#intro>Anchor</a></li>
-</ul>
-
-<div id="intro">
-  ...
-</div>
-```
-
-이것 뿐만 아니라, 가상 요소와 클래스는 다양하므로 잘 찾아서 쓰자.
-
-***
 ***
 
 ## 6. 트랜지션과 애니메이션
@@ -641,25 +645,5 @@ animiation-name 뿐만 아니라 다른 속성은 아래와 같다.
 ```
 
 가급적이면 <link ... >를 쓰자. IE에서는 @import 보다 javascript를 먼저 받기 때문에 에러가 날 수 있다. 
-
-***
-
-### 7.3 그리드 레이아웃 
-
-그리드 레이아웃이란 화면 너비에 따라 웹 문서 요소를 재배치가 필요할 때 사용하는 기능이다.
-
-그리드 레이아웃을 사용하면 안정된 디자인을 수립하고, 유지보수 하는데 편리하다.
-
-**플렉서블 박스 레이아웃**, 그리고 **CSS 그리드 레이아웃** 2가지가 있다.
-
-***
-
-### 7.4 플렉서블 박스 레이아웃
-
-
-
-***
-
-### 7.5 CSS 그리드 레이아웃
 
 
