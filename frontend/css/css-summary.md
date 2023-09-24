@@ -7,7 +7,6 @@ HTML 문서를 꾸미기 위해 존재하는 웹 표준 기술
 ### 1.1 웹 문서에 디자인 입히기
 
 CSS는 웹 문서에 디자인을 적용하는 기술이다.
-***
 
 ### 1.2 스타일과 스타일 시트
 
@@ -49,8 +48,6 @@ body의 태그에 직접 스타일을 적용하는 방법이다.
   <link rel="stylesheet" href="3css/style.css">
 ```
 
-***
-
 ### 1.3 CSS 기본 선택자
 
 ```css
@@ -74,19 +71,17 @@ html, body { margin: 0; padding: 0; }
 ```css
 #아이디명 { 스타일 규칙; }
 ```
-
-***
-
 ### 1.4 Cascading
 
 둘 이상의 스타일을 적용할 때, 우선순위에 따라 적용할 스타일을 결정한다. 이것이 캐스케이딩이다.
 
 + 자식에게 상속되는 속성: color, font-family, font-size
 + 자식에게 상속되지 않는 속성: padding, margin
-***
-***
 
-## 2. 텍스트 관련 스타일
+***
+## 2. 기본 스타일 속성
+
+### 2.1 텍스트 관련 속성
 
 이름으로 속성 유추가 가능하다.
 
@@ -132,205 +127,156 @@ html, body { margin: 0; padding: 0; }
   text-transform: [capitalize | uppercase | lowercase];
 ```
 
-***
-
-### 2.4 목록 스타일
-
-메뉴 항목은 대부분 목록과 링크를 결합하여 만든다. 목록에 적용하는 스타일에 대해서 알아보도록 하자.
-
-#### 2.4.1 불릿 모양과 번호 스타일을 지정하는 속성
+### 2.2 목록 스타일
 
 아래의 태그로 스타일을 지정한다.
 
 ```css
   list-style-type: [none|decimal|...];
+  list-style-image: ...; /* 불릿 모양 지정 가능*/
+  list-style: ...(단축 속성 사용 가능);
 ```
 
-또한 list-style-image 태그를 통해서도 불릿 모양을 지정할 수 있다.
-
-#### 2.4.2 목록 스타일을 한꺼번에 지정하는 속성
+### 2.3 기타 스타일
 
 ```css
-  list-style: ...(원하는 스타일 모두 적으면 한꺼번에 지정 가능);
+  caption-side: top | bottom; /* 제목 위치를 지정하는 CSS*/
 ```
-
-***
-
-### 2.5 표 스타일
-
-#### 2.5.1 표 제목 위치를 지정하는 속성
-
-아래의 속성을 사용하면 된다.
-
 ```css
-  caption-side: top | bottom;
+  border: 1px solid black; /* 테두리 관련 CSS */
 ```
-
-#### 2.5.2 표 테두리를 그리는 속성
-
-아래의 속성을 사용하면 된다.
-
 ```css
-  border: 1px solid black; /* 1px의 검은색 실선으로 테두리 표기 */
+/* 셀 사이 여백 지정 속성: 한 셀의 수평거리와 수직거리를 지정함 */
+  border-spacing: 수평거리 수직거리; 
 ```
-
-#### 2.5.3 셀 사이의 여백을 지정하는 속성
-
-아래의 속성을 사용하면 된다.
-
 ```css
-  border-spacing: 수평거리 수직거리; /* 한 셀의 수평거리와 수직거리를 지정함 */
-```
-
-#### 2.5.4 표와 셀 테두리를 합쳐주는 속성
-
-아래의 속성을 사용하면 된다.
-
-```css
+/* 테두리 합성 속성 */
   border-collpase: collapse | seperate;
 ```
 
 ***
-***
 
-## 3. 레이아웃을 구성하는 CSS 박스 모델(중요!)
+## 3. CSS 레이아웃
 
-박스 모델은 레이아웃의 기본이므로 반드시 이해해야 한다.
+### 3.1 블록 요소
 
-### 3.1 CSS 박스 모델
+#### 블록 요소와 인라인 요소
 
-CSS 박스 모델은 웹 문서의 내용을 논리적인 박스 형태로 정의하는 방법이다. 컨텐츠, 패딩, 테두리, 마진으로 구성된다.
++ 블록 요소: 한 줄을 차지하는 width: 100%의 요소. (ex. div)
 
-#### 3.1.1 블록 레벨 요소와 인라인 레벨 요소
++ 인라인 요소: 한 줄을 차지하지 않음. (ex. p, li)
 
-블록 레벨 요소란 혼자 한 줄을 차지하는 width: 100%의 요소를 의미한다.
+#### 블록 요소 관련 속성
 
-인라인 레벨 요소로는 반면에 한 줄을 자지하지 않는다. 
++ display: 블록 요소 타입을 결정함(ex. block, inline, flex, grid)
 
-예를 들어, ul 태그의 li를 inline으로 지정하면 한 줄에 모든 li 요소가 나타난다.
++ width: 너비를 지정함. px이나 %로 지정한다.
 
-반면에 block으로 지정하면, 한 줄씩 li 요소가 나타난다. float과 block을 사용하면 한줄로 나타낼 수 있다.
++ height: 높이를 지정함. px이나 %로 지정한다.
 
-#### 3.1.2 박스 모델의 기본 구성
++ box-sizing: 블록 요소의 범위를 결정함. 
 
-블록 레벨 요소는 모두 박스 형태이다. 이 요소를 **박스 모델 요소**라고 한다.
+boxing-size을 디폴트로 하거나 content-box로 하면 width, height는 **컨텐츠 영역의 크기**이다.
 
-박스 모델은 \<div> 태그로 구성되고 콘텐츠, 패딩, 테두리, 마진으로 구성된다.
+boxing-size을 border-box로 지정하면 width와 height는 **border, padding, 컨텐츠 영역을 합한 영역 크기**이다.
 
-#### 3.1.3 콘텐츠 크기를 지정하는 속성
-
-width: 박스의 너비를 지정한다. px이나 %로 지정한다.
-
-height: 박스의 높이를 지정한다. px이나 %로 지정한다.
-
-
-#### 3.1.4 박스 모델의 크기를 계산하는 속성
-
-boxing-size 속성을 디폴트로 하거나 content-box로 하면 width와 height는 오직 **컨텐츠 영역의 크기**이다.
-
-boxing-size 속성을 border-box로 지정하면 width와 height는 **테두리 두께, 패딩, 마진을 모두 포함한 박스 모델의 크기**
-이다.
-
-이에 주의하도록 하자.
-
-***
-
-### 3.2 테두리 스타일 지정하기
-
-#### 3.2.1 박스 모델 방향
-
-박스 모델에 스타일을 지정한다고 하자. 상하좌우로 방향이 4개가 있으므로 속성을 최대 4가지를 적어야 한다.
-
-이때, 위 -> 오른쪽 -> 아래 -> 왼쪽 순서로 스타일을 적용한다. 
-
-하나가 생략된다면, 대칭 방향의 스타일을 따라간다. 오직 하나만 적용되면 나머지도 동일하게 된다.
-
-#### 3.2.2 테두리 스타일 종류
-
-박스 모델의 스타일의 종류는 아래를 참고하도록 한다.
++ border 관련 속성
 
 ```css
-border-style: ...; /* 테두리 스타일을 지정한다. */
 border-width: ...; /* 테두리 두께를 지정한다. */
+border-style: ...; /* 테두리 스타일을 지정한다. */
 border-color: ...; /* 테두리 색깔을 지정한다. */
-border: ...; /* 테두리 스타일, 두께, 색깔을 한꺼번에 지정할 수 있다. */
+border: width style color; /* border 단축 속성 */
 border-radius: ...; /* 둥근 테두리를 지정할 수 있다. 꼭짓점마다 다르게 지정할 수 있다. */
+/* example*/
+border: 1px solid red;
 ```
 
-***
++ position 관련 속성
 
-### 3.3 여백을 조절하는 속성
+```css
+position: static; /* 컴포넌트의 원래 흐름에 맞게 배치(default) */
+position: relative; /* relative가 적용된 컴포넌트 다음으로 등장하는 컴포넌트가 위치를 임의로 조정할 수 있게 함 */
+position: absolute; /* 특정 컴포넌트의 절대 좌표를 기준으로 위치를 조절하도록 함 */
+position: fixed; /* viewport를 기준으로 위치 설정(스크롤과 무관) */
+position: sticky; /* 원래 위치(static)에 있다가 스크롤이 움직이면 fixed처럼 동작함 */
+```
 
-마진은 두 박스 모델 사이의 여백을 의미하고, 패딩은 테두리와 컨텐츠 사이의 여백을 의미한다.
+예를 들어, .parent를 기준으로 .child를 배치하려면 아래와 같이 CSS를 작성하면 된다.
+```css
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+}
+```
 
-아래의 코드를 통해 속성을 사용하는 방법에 대해서 알아보도록 하자.
++ 여백 관련 속성
+
+margin은 두 박스 모델 사이의 여백을 의미하고, padding 테두리와 컨텐츠 사이의 여백을 의미한다.
 
 ```css
   margin: ...; /* px로 조절하고, top -> right -> bottom -> left를 사용해서 특정 방향만 지정할 수 있다.*/
   margin: 10px auto /* 상단과 하단에 10px 마진을 주고, 좌우를 자동(auto)으로 대칭을 맞춘다. */
 ```
 
-***
+### 3.2 float 레이아웃
 
-### 3.4 웹 페이지 레이아웃 구성
+float 레이아웃이란 컴포넌트를 좌측 또는 우측에 띄우는 레이아웃이다.
 
-웹 문서의 전반적인 레이아웃을 어떻게 구성할 것인지에 대한 방법을 제시한다.
+```css
+float: left;
+float: right;
+```
 
-레이아웃 구성을 위해서 사용되는 css 속성은 display와 float가 있다.
+다음 컴포넌트가 이전 컴포넌트의 float 속성에 영향을 받으므로 주의해야 한다.
 
-#### 3.4.1 display
+float 속성을 해제하려면 clear 속성을 사용한다.
+```css
+clear: left;
+clear: right;
+```
 
-display는 block 또는 inline으로 지정할 수 있으며 전자는 블록 모델로, 후자는 인라인 모델로 변환한다.
+다음 컴포넌트에 필요한 경우 매번 clear 속성을 지정하는 것을 번거롭다.
 
-대표적인 블록 모델로는 \<div> 태그가 있다.
+그러므로, 아래와 같이 .clearfix 클래스를 생성하여, 필요한 경우 사용하도록 한다.
+```css
+.clearfix { clear: both; }
+```
+```html
+  <div class="float-left">left</div>
+  <div class="clearfix"></div>
+  <div> i'm free </div>
+```
 
-**블록 모델**은 width와 height로 사용자가 지정한 만큼 레이아웃 크기를 결정한다.
+### 3.3 flex 레이아웃
 
-기본적으로 하나의 블록이 선언되면 다음 블록은 그 아래 줄에 생성된다. 물론, float 속성을 통해서 바꿀 수 있다.
+```display: flex``` 속성을 이용하여 레이아웃을 만드는 방법이다.
 
-margin, padding 속성을 사용할 수 있다.
+viewport는 device마다 다르므로 이에 유동적으로 대응하여 레이아웃을 만드는 방법이다.
 
-**인라인 모델**은 텍스트의 크기와 길이에 의해 레이아웃의 크기가 자동으로 결정되낟.
++ flex-direction: 하위 컴포넌트를 어느 방향으로 배치할지 결정하는 속성
+```css
+flex-direction: row | column;
+```
 
-inline-block은 두가지 모델의 기능을 함께 사용할 수 있으므로 margin과 padding 속성을 사용할 수 있다.
++ justify-content: 하위 컴포넌트를 어떻게 정렬할 것인지를 결정하는 속성
+```css
+justify-content: flex-start | flex-end | center | space-between | space-around | space-even;
+```
 
-float는 왼쪽(left)이나 오른쪽(right)로 모델을 배치한다. 일반적으로 margin 속성을 함께 사용할 수 있다.
-
-**레이아웃을 구성하기 위해서는 먼저 간략하게 레이아웃을 그려놓고 시작하는게 좋다.**
-
-***
-
-### 3.5 웹 요소 위치 지정
-
-웹 페이지에 요소를 적절한 위치에 넣기 위해 필요하다. position 속성과 top, right, bottom, left 속성들을 이용하면 만들 수 있다.
-
-top, right, bottom, left 속성은 마찬가지로 픽셀(px)로 조정하면 된다.
-
-어느 위치를 기준으로 top, right, bottom, left를 적용할 것인지를 결정해야 한다.
-
-이를 위해 position 속성에 대해서 알아보자.
-
-+ **static**
-
-문서의 흐름에 맞게 배치한다. 기본 값이다.
-
-예를 들어, \<div>가 3개가 있으면 각 태그당 한 줄씩 차지하며 위치한다.
-
-+ **relative**
-
-문서 흐름에 맞게 배치하되, 위치 조정을 할 수 있다.
-
-
-+ **absolute**
-
-relative 속성을 사용한 가장 가까운 부모를 기준으로 위치를 조정한다.
++ align-items : 하위 컴포넌트를 배치 방향의 수직 기준으로 어떻게 정렬할 것인지 결정하는 속성
+```css
+align-items: flex-start | flex-end | center | space-between | space-around | space-even;
+```
 
 
-+ **fixed**
- 
-브라우저 창을 기준으로 위치를 고정함.
+### 3.4 grid 레이아웃
 
-***
+
 ***
 
 ## 4. 이미지와 그라데이션 효과로 배경 꾸미기
