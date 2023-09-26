@@ -161,6 +161,20 @@ html, body { margin: 0; padding: 0; }
 /* 테두리 합성 속성 */
   border-collpase: collapse | seperate;
 ```
+
+### 2.4 단위
+
+#### 절대단위
++ px: 픽셀
++ pt: 인쇄시 사용하기 위한 단위
+
+#### 상대단위
++ \%: 부모 컴포넌트 속성에 비례하여 적용
++ em: 자신 컴포넌트 font-size에 비례하여 적용(1em = font-size * 16)
++ rem: 최상위 html 컴포넌트 font-size에 비례하여 적용(1rem = font-size * 16) 
++ vw: 10vw = width * 0.1
++ vh: 10hw = height * 0.1
+
 ***
 
 ## 3. CSS 레이아웃
@@ -501,60 +515,93 @@ a[title ^= "eng"] { ... } /* title 속성 중에 값이 "eng"로 시작하는 <a
 
 CSS는 웹 요소에 시각적인 효과를 추가하는 기능이었다.
 
-애니메이션 동작을 통해 자바스크립트 없이도 웹 사이트의 메뉴를 부드럽게 열고, 또 웹 요소를 움직일 수 있다.
+애니메이션을 통해 자바스크립트 없이도 웹 사이트의 메뉴를 부드럽게 열고, 또 웹 요소를 움직일 수 있다.
 
-### 6.1 이미지 변형
+### 6.1 transition
 
-먼저 이미지를 변형하는 방법부터 알아보도록 하자.
+특정 시점에 컴포넌트에 애니메이션 효과를 부여하기 위한 기능이다.
 
-이미지를 변형하기 위한 기본 문법 형태는 아래와 같다.
++ transition-property: 어떤 속성에 transition 효과를 적용할지를 결정
++ transition-duration: transition이 실행되는 설정(단위: s, ms)
++ transition-timing-function: 주로 ease-in-out을 적용
++ transition-delay: 일정 시간 후에 transition을 실행하도록 설정
+
+아래와 같은 단축 속성도 존재한다.
 
 ```css
-  .photo { transform: 함수(...); }
+transition: [property] [duration] [timing-function] [delay];
 ```
 
-transform에 사용할 수 있는 함수를 아래와 같이 정리할 수 있다.
-
-+ 이미지 2차원 이동: translate(x, y)
-+ 이미지 3차원 이동: translate3d(x, y, z)
-+ 이미지 2차원 확대: scale(x, y)
-+ 이미지 3차원 확대: scale(x, y, z)
-+ 이미지 2차원 왜곡: skew(ax, ay)
-+ 이미지 2차원 회전: rotate(각도)
-+ 이미지 3차원 회전: rotate3d(x벡터, y벡터, z벡터, 각도)
-
-***
-
-### 6.2 트랜지션 알아보기
-
-트랜지션에서는 스타일이 바뀌는 시간을 조절해서 자바스크립트없이 애니메이션 효과를 낼 수 있다.
-
-트랜지션 속성에 대해서 먼저 살펴보자.
-
-+ transition-properties: 트랜지션 대상을 설정한다.
-+ transition-duration: 트랜지션 실행시간을 설정한다.
-+ transition-timing-function: 트랜지션 실행형태를 지정한다.(실행시간 곡선을 설정함)
-+ transition-delay: 트랜지션 지연시간을 설정한다.
-+ transition: 한꺼번에 설정한다.
-
-트랜지션 대상의 속성이 여러개라면 실행시간도 여러개일 수 있다.
-
-***
-
-
-### 6.3 애니메이션 알아보기
-
-애니메이션은 먼저 #keyframes로 특정 애니메이션을 정의하고, animation-name을 통해 애니메이션을 적용한다.
-
-아래의 예시를 통해 확인해보자.
+예를 들어, 아래와 같이 transition 효과를 줄 수 있다.
 
 ```css
-@keyframes shape {
+.box1:hover {
+/* .box1:hover시 1초동안 ease-in-out으로 width를 1000px로 변경 */
+  width: 1000px;
+  transition: width 1s ease-in-out 0s;
+}
+```
+
+### 6.2 transform
+
+컴포넌트 위치 및 모양 등을 변경하기 위한 속성이다
+
++ translate(x, y): 컴포넌트의 위치를 x-y축 기준으로 이동시키는 속성 (단위: px, %, em)
++ scale(x, y): 컴포넌트를 x-y축 방향으로 확대 및 축소하는 속성 (단위: px, %, em)
++ skew(x, y): 컴포넌트를 x-y축 방향으로 기울이는 속성 (단위: deg)
++ rotate(deg): 컴포넌트를 회전시키는 속성 (단위: deg)
+
+예를 들어, 아래와 같이 transition과 함께 사용할 수 있다.
+```css
+.box1:hover {
+  transform: translate(100px, 100px);
+  transition: transform 1s ease-in-out 0s;
+}
+```
+translateX(x), translateY(y), scale(n%) 등의 방법으로 사용할 수 있다.
+
+
+### 6.3 Animation
+
+트랜지션만으로 애니메이션 효과를 만들기 어려울 때 사용하는 방법이다.
+
+예를 들어, 특정 시점 없이 컴포넌트에 애니메이션을 적용하고 싶거나 복잡한 애니메이션을 적용이 필요할 때 사용한다.
+
+애니메이션을 @keyframes로 정의하고, animation-name을 통해 적용한다.
+
+속성은 아래와 같다.
+
++ animation-timing-function: 시간 곡선 조절
++ animation-iteration-count: 반복 횟수를 지정한다.(infinite도 가능)
++ animation-direction: from -> to로 진행하는데 진행방향을 바꾼다.
+
+transition과 마찬가지로 단축 속성도 존재한다.
+```css
+animation: [name] [duration] [timing-function] [delay] [iteration-count] [direction]
+```
+
+
+**Example**
+```css
+@keyframes shape-from-to {
   from {
     border: 1px solid transparent;
   }
   to {
     border: 1px solid #000;
+    border-radius: 50%;
+  }
+}
+@keyframes shape-percentage {
+  0% {
+    border: 1px solid transparent;
+  }
+  50% {
+    border: 1.5px solid #000;
+    border-radius: 40%;
+  }
+  100% {
+    border: 2px solid #000;
     border-radius: 50%;
   }
 }
@@ -566,15 +613,6 @@ transform에 사용할 수 있는 함수를 아래와 같이 정리할 수 있�
 }
 ```
 
-keyframes를 통해 애니메이션을 정의하고, animation-name으로 적용한다. 
-
-animiation-name 뿐만 아니라 다른 속성은 아래와 같다.
-
-+ animation-direction: from -> to로 진행하는데 진행방향을 바꾼다.
-+ animation-iteration-count: 반복 횟수를 지정한다.(infinite도 가능)
-+ animation-timing-function: 시간 곡선 조절
-
-***
 ***
 
 ## 7. 반응형 웹과 미디어 쿼리
