@@ -8,4 +8,42 @@
 
 HTML \<div> 태그와 유사한 기능을 갖는 기본 컴포넌트이다.
 
+### \<Text>
+
+HTML \<span> 태그와 유사한 기능을 갖는 기본 컴포넌트이다.
+
+ex. View, Text 컴포넌트
+
+```react
+const Comp = ({prop1, prop2, ...rest}) => {
+  return (
+    <View>
+      <Text>Hello World!</Text>   
+    </View>
+  )
+};
+```
+
+
+## 스타일 적용 방법
+
+CSS와 유사한 방법으로 적용할 수 있다.
+
++ 1. 적용할 스타일을 정의한다. 방법은 CSS 클래스를 정의하는 것과 유사하다.
+```react
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  style1: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+  }
+});
+```
+
++ 2. 컴포넌트에 앞서 정의한 스타일을 적용한다.
+
+
 
