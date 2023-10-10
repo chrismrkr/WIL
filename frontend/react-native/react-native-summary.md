@@ -43,7 +43,30 @@ const styles = StyleSheet.create({
 });
 ```
 
-+ 2. 컴포넌트에 앞서 정의한 스타일을 적용한다.
++ 2. 컴포넌트에 정의한 스타일을 적용한다.
+
+```jsx
+<View style={styles.style1}>
+  ...
+</View>
+```
+
+람다식과 배열을 이용하여 조건부 스타일과 다중 스타일 적용도 가능하다.
+
+```jsx
+const Button = ({buttonStyle, ...rest}) => {
+    return (
+        <Pressable
+          style = ({pressed}) => [
+            buttonStyle,
+            pressed & { backgroundColor: 'orange'},
+          ]
+        >
+          <Text>Button</Text>
+        </Pressable>
+    );
+};
+```
 
 
 
