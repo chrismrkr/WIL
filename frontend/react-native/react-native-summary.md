@@ -24,6 +24,22 @@ const Comp = ({prop1, prop2, ...rest}) => {
 };
 ```
 
+### \<Image>
+
+이미지를 삽입할 때 사용하는 컴포넌트이다.
+
+#### 주요 속성
++ source: 저장된 이미지 파일이나 url을 통해 이미지를 받아오기 위해 사용됨
++ resizeMode: 이미지를 어떻게 보여줄 것인지를 결정함(ex. contain, cover, strecth, repeat, center)
+
+```jsx
+<Image
+  source={require(absolutePath)}
+  resizeMode={'cover'}
+  style={styles.image}
+/>
+```
+
 
 ## 스타일 적용 방법
 
