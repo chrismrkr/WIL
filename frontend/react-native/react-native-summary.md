@@ -138,5 +138,16 @@ const Button = ({buttonStyle, ...rest}) => {
 
 ## 기타 주요 기능
 
+### 컴포넌트 특별 속성
+
+#### key
+리스트로 컴포넌트를 정의할 때 사용되는 unique ID
+
+#### ref
+
+### React Hook
+
++ useEffect
+
 
 
