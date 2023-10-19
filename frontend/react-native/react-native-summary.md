@@ -84,9 +84,9 @@ const Button = ({title, disabled, onPress, isLoading}) => {
 ```
 
 #### 주요 속성
-+ style: 컴포넌트에 스타일을 지정함함
++ style: 컴포넌트에 스타일을 지정함
 + onPress: 컴포넌트를 눌렀을 때 발생하는 이벤트를 지정함
-
++ disabled: 컴포넌트를 누를 수 없게 만드는 속성. 동적 이벤트와 연결하여 사용함
 
 ***
 ### \<KeyboardAvoidingView>
