@@ -89,7 +89,7 @@ const Button = ({title, disabled, onPress, isLoading}) => {
 
 
 ***
-### \<KeyboardAvodingView>
+### \<KeyboardAvoidingView>
 
 키보드가 화면을 가리는 문제를 해결하기 위해 사용하는 컴포넌트이다.
 
@@ -160,19 +160,6 @@ const ScreenStack = () => {
 };
 ```
 
-#### screenOptions 속성
-+ contentStyle
-+ headTitleAlign: 헤더 정렬 방식을 결정
-+ headerTintColor: 헤더의 타이틀 색을 결정
-+ headderTitleStyle: 헤더 전체 색을 결정
-+ headerLeft: headerLeft에 설정할 컴포넌트를 결정(ex. ```headerLeft: (props) => HeaderLeftButon(),```)
-
-#### options 속성
-+ title: Screen title을 결정. name 속성으로도 지정이 가능하나 name은 key이므로 중복될 수 없음.
-+ headerTitle: screenOptions의 headerLeft와 유사한 기능(ex. ```headerTitle: (props) => HeaderTitle(),```)
-
-추가로, 화면(컴포넌트)에서 options 설정이 직접 가능하다. 예를 들어, 위 예시의 SignInScreen 컴포넌트에서 직접 options 설정이 가능하다.
-
 #### 화면 이동
 + navigation.push: navigation stack에 쌓으며 화면 이동(즉, 뒤로가기 가능)
 + navigation.navigate: navigation stack에 쌓지 않고 화면 이동
@@ -190,6 +177,19 @@ const SignInScreen = ({navigation, route}) => {
     );
 };
 ```
+
+#### screenOptions 속성
++ contentStyle
++ headerTitleAlign: 헤더 정렬 방식을 결정
++ headerTintColor: 헤더의 타이틀 색을 결정
++ headderTitleStyle: 헤더 전체 색을 결정
++ headerLeft: headerLeft에 설정할 컴포넌트를 결정(ex. ```headerLeft: (props) => HeaderLeftButon(),```)
+
+#### options 속성
++ title: Screen title을 결정. name 속성으로도 지정이 가능하나 name은 key이므로 중복될 수 없음.
++ headerTitle: screenOptions의 headerLeft와 유사한 기능(ex. ```headerTitle: (props) => HeaderTitle(),```)
+
+추가로, 화면(컴포넌트)에서 options 설정이 직접 가능하다. 예를 들어, 위 예시의 SignInScreen 컴포넌트에서 직접 options 설정이 가능하다.
 
 ***
 
