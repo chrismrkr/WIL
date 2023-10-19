@@ -1,6 +1,6 @@
 # 리액트 네이티브
 
-## 기본 컴포넌트
+## 주요 컴포넌트
 
 + React Native 기본 컴포넌트 참고 링크: https://reactnative.dev/docs/components-and-apis
 
@@ -67,6 +67,39 @@ HTML의 \<input>과 유사한 컴포넌트이다.
   style={styles.image}
 />
 ```
+***
+## \<NavigationContainer>
+
+여러 화면 컴포넌트를 담기 위해서 사용되는 컴포넌트이다. TabController와 유사한 기능을 한다.
+
+주로 App.js에서 선언하여 사용한다.
+
+```jsx
+import { NavigationContainer } from '@react-navigation/native';
+const App = () => {
+  return (
+    <NavigationContainer>
+      ...
+    </NavigationContainer>
+  );
+};
+```
+***
+## Native Stack Navigator
+
+\<NavigationContainer> 안에서 **화면 이동**을 위해서 사용되는 객체이다. (컴포넌트는 아니다.)
+
+아래와 같이 선언한다.
+
+```jsx
+import { createNativeStackNavigator } from '@react-native/native-stack';
+const stack = createNativeStackNavigator();
+
+const ScreenStack = () => {
+
+};
+```
+
 ***
 
 ## 주요 API
