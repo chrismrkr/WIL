@@ -63,7 +63,7 @@ HTML의 \<input>과 유사한 컴포넌트이다.
 ***
 ### \<Pressable> 
 
-특정 컴포넌트를 사용자가 터치하여 누를 수 있게 만드는 컴포넌트이다.
+컴포넌트를 사용자가 터치하여 누를 수 있게 만드는 컴포넌트이다.
 
 ```jsx
 const Button = ({title, disabled, onPress, isLoading}) => {
@@ -93,6 +93,8 @@ const Button = ({title, disabled, onPress, isLoading}) => {
 
 키보드가 화면을 가리는 문제를 해결하기 위해 사용하는 컴포넌트이다.
 
+주로 \<Pressable>에서 사용한다.
+
 ```jsx
 import { KeyboardAvoidingView, Pressable, Platform, Keyboard } from "react-native";
 
@@ -111,7 +113,7 @@ const InputView = ({children}) => {
 + behavior: 'height', 'padding', 'position' 지정. 컴포넌트를 선택했을 때 어떻게 동작할지를 결정함.
 
 ***
-## \<NavigationContainer>
+### \<NavigationContainer>
 
 여러 화면 컴포넌트를 담기 위해서 사용되는 컴포넌트이다. TabController와 유사한 기능을 한다.
 
@@ -127,19 +129,65 @@ const App = () => {
   );
 };
 ```
+
 ***
-## Native Stack Navigator
+### Native Stack Navigator
 
 \<NavigationContainer> 안에서 **화면 이동**을 위해서 사용되는 객체이다. (컴포넌트는 아니다.)
 
-아래와 같이 선언한다.
+Stack이 LIFO(Last In, First Out) 특성을 갖는 것과 유사하게 Native Stack Navigator도 화면 컴포넌트를 Stack에 쌓아서 관리한다. 
+
+자세한 내용은 reactnavigation.org/docs를 참고할 수 있고, 아래와 같이 선언할 수 있다.
 
 ```jsx
 import { createNativeStackNavigator } from '@react-native/native-stack';
+import { HeaderLeftButton } from 
 const stack = createNativeStackNavigator();
 
 const ScreenStack = () => {
+  return (
+    <Stack.Navigator
+        initialRouteName={'SignIn'}
+        screenOptions={{...}}
+    >
+      <Stack.Screen name={'SignIn'}
+                    component={SignInScreen}
+                    options={{...}}
+      />
+      <Stack.Screen name={'Main'} component={MainScreen} />
+    </Stack.Navigator>
+  );
+};
+```
 
+#### screenOptions 속성
++ contentStyle
++ headTitleAlign: 헤더 정렬 방식을 결정
++ headerTintColor: 헤더의 타이틀 색을 결정
++ headderTitleStyle: 헤더 전체 색을 결정
++ headerLeft: headerLeft에 설정할 컴포넌트를 결정(ex. ```headerLeft: (props) => HeaderLeftButon(),```)
+
+#### options 속성
++ title: Screen title을 결정. name 속성으로도 지정이 가능하나 name은 key이므로 중복될 수 없음.
++ headerTitle: screenOptions의 headerLeft와 유사한 기능(ex. ```headerTitle: (props) => HeaderTitle(),```)
+
+추가로, 화면(컴포넌트)에서 options 설정이 직접 가능하다. 예를 들어, 위 예시의 SignInScreen 컴포넌트에서 직접 options 설정이 가능하다.
+
+#### 화면 이동
++ navigation.push: navigation stack에 쌓으며 화면 이동(즉, 뒤로가기 가능)
++ navigation.navigate: navigation stack에 쌓지 않고 화면 이동
+
+```jsx
+const SignInScreen = ({navigation, route}) => {
+    const onSubmit = () => {
+        navigation.push('List', { param: ...}); // Stack.Screen의 속성인 name(List)를 key로 컴포넌트를 스택에 쌓는다.
+    };
+
+    return (
+        <View>
+          <Button onPress={()=>onSubmit()}/>
+        </View>
+    );
 };
 ```
 
@@ -183,47 +231,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'flex-start',
     flexWrap: 'wrap',
-  }
-});
-```
+  함 
 
-+ 2. 컴포넌트에 정의한 스타일을 적용한다.
-
++ useEffect: 컴포넌트가 렌더링되는 시점에 실행되는 Hook
 ```jsx
-<View style={styles.style1}>
-  ...
-</View>
+const Comp = () => {
+  const [var, setVar] = useState('');
+  useEffect(() => {
+    setVar('init');
+  }, [param1, param2]);
+}
 ```
-
-+ 조건부 및 다중 스타일: 람다식과 배열을 이용하여 조건부 스타일 또는 다중 스타일 적용이 가능하다.
-
++ useRef: 컴포넌트 내에서 다른 컴포넌트를 참조할 수 있도록 만드는 Hook
 ```jsx
-const Button = ({buttonStyle, ...rest}) => {
+const Comp = () => {
+    const refComp = useRef(null);
     return (
-        <Pressable
-          style = ({pressed}) => [
-            buttonStyle,
-            pressed & { backgroundColor: 'orange'},
-          ]
-        >
-          <Text>Button</Text>
-        </Pressable>
+        // onSubmitEditing 이벤트가 발생하면 ref를 통해 다음 컴포넌트로 자동으로 이동함
+        <View>
+          <Input onSubmitEditing={() => refComp.current.focus()} />
+          <Input ref={refComp}/>
+        </View>
+    
     );
-};
+}
 ```
-
-## 기타 주요 기능
-
-### 컴포넌트 특별 속성
-
-#### key
-리스트로 컴포넌트를 정의할 때 사용되는 unique ID
-
-#### ref
-
-### React Hook
-
-+ useEffect
-
 
 
