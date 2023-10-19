@@ -140,6 +140,8 @@ Stack이 LIFO(Last In, First Out) 특성을 갖는 것과 유사하게 Native St
 자세한 내용은 reactnavigation.org/docs를 참고할 수 있고, 아래와 같이 선언할 수 있다.
 
 ```jsx
+import { SignInScreen } from '../screens/SignInScreen';
+import { MainScreen } from '../screens/MainScreen';
 import { createNativeStackNavigator } from '@react-native/native-stack';
 import { HeaderLeftButton } from 
 const stack = createNativeStackNavigator();
