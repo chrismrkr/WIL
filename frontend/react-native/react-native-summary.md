@@ -10,6 +10,23 @@ HTML \<div> 태그와 유사한 기능을 갖는 기본 컴포넌트이다.
 
 ***
 
+### \<Image>
+
+이미지를 삽입할 때 사용하는 컴포넌트이다.
+
+#### 주요 속성
++ source: 저장된 이미지 파일이나 url을 통해 이미지를 받아오기 위해 사용됨
++ resizeMode: 이미지를 어떻게 보여줄 것인지를 결정(ex. contain, cover, strecth, repeat, center)
+
+```jsx
+<Image
+  source={require(absolutePath)}
+  resizeMode={'cover'}
+  style={styles.image}
+/>
+```
+***
+
 ### \<Text>
 
 HTML \<span> 태그와 유사한 기능을 갖는 기본 컴포넌트이다.
@@ -44,29 +61,55 @@ HTML의 \<input>과 유사한 컴포넌트이다.
 + placeholderTextColor
 
 ***
+### \<Pressable> 
+
+특정 컴포넌트를 사용자가 터치하여 누를 수 있게 만드는 컴포넌트이다.
+
+```jsx
+const Button = ({title, disabled, onPress, isLoading}) => {
+  return (
+    <Pressable onPress={()=>onPress()}
+        style={({pressed}) => 
+            [styles.container, 
+                !disabled && {backgroundColor: PRIMARY.DEFAULT},
+                pressed && {backgroundColor: PRIMARY.DARK}]}
+        disabled={disabled}
+    >
+            {isLoading ? 
+            (<ActivityIndicator size={'small'} color={GRAY.DEFAULT}/>) :
+            (<Text style={styles.title}>{title}</Text>)}
+    </Pressable>
+  )
+};
+```
+
+#### 주요 속성
++ style: 컴포넌트에 스타일을 지정함함
++ onPress: 컴포넌트를 눌렀을 때 발생하는 이벤트를 지정함
+
+
+***
 ### \<KeyboardAvodingView>
 
 키보드가 화면을 가리는 문제를 해결하기 위해 사용하는 컴포넌트이다.
 
-#### 주요 속성
-+ behavior: 'height', 'padding', 'position' 지정 가능
-
-***
-### \<Image>
-
-이미지를 삽입할 때 사용하는 컴포넌트이다.
-
-#### 주요 속성
-+ source: 저장된 이미지 파일이나 url을 통해 이미지를 받아오기 위해 사용됨
-+ resizeMode: 이미지를 어떻게 보여줄 것인지를 결정(ex. contain, cover, strecth, repeat, center)
-
 ```jsx
-<Image
-  source={require(absolutePath)}
-  resizeMode={'cover'}
-  style={styles.image}
-/>
+import { KeyboardAvoidingView, Pressable, Platform, Keyboard } from "react-native";
+
+const InputView = ({children}) => {
+    return (
+        <KeyboardAvoidingView style={styles.avoid} behavior={Platform.select({ios: 'padding'})}>
+            <Pressable style={styles.avoid} onPress={() => Keyboard.dismiss()}>
+                {children}
+            </Pressable>
+        </KeyboardAvoidingView>
+    )
+}
 ```
+
+#### 주요 속성
++ behavior: 'height', 'padding', 'position' 지정. 컴포넌트를 선택했을 때 어떻게 동작할지를 결정함.
+
 ***
 ## \<NavigationContainer>
 
