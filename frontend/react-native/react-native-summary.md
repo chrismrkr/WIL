@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'flex-start',
     flexWrap: 'wrap',
+  }});
 ```
 
 + useEffect: 컴포넌트가 렌더링되는 시점에 실행되는 Hook
