@@ -232,8 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'flex-start',
     flexWrap: 'wrap',
-  함 
-
+```
 + useEffect: 컴포넌트가 렌더링되는 시점에 실행되는 Hook
 ```jsx
 const Comp = () => {
@@ -244,6 +243,7 @@ const Comp = () => {
 }
 ```
 + useRef: 컴포넌트 내에서 다른 컴포넌트를 참조할 수 있도록 만드는 Hook
+
 ```jsx
 const Comp = () => {
     const refComp = useRef(null);
