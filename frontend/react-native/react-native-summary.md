@@ -203,7 +203,7 @@ const SignInScreen = ({navigation, route}) => {
 아래와 같이 사용할 수 있다.
 
 ```jsx
-import { StKeyboardAvoidingView, Platform, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 <KeyboardAvoidingView behavior={Platform.select({ios: 'padding'})}>
   <View> {comp} </View>
 </KeyboardAvoidingView>
