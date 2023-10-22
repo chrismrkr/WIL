@@ -193,7 +193,30 @@ const SignInScreen = ({navigation, route}) => {
 
 추가로, 화면(컴포넌트)에서 options 설정이 직접 가능하다. 예를 들어, 위 예시의 SignInScreen 컴포넌트에서 직접 options 설정이 가능하다.
 
+#### Stack를 활용한 로그인 상태 관리
+
+
+
 ***
+### \<SafeAreaView>
+스마트폰 노치 등에 의해 화면이 가려지는 것을 해결하기 위해 사용하는 컴포넌트이다. 
+
+```jsx
+import { SafeAreaView, } from "react-native-safe-area-context";
+const comp = () => {
+    return (
+      <SafeAreaView>
+        {...}
+      </SafeAreaView>
+    );
+};
+```
+
+또는, useSafeAreaInsets Hook을 사용하여 화면 가리짐을 피하기 위한 padding 값을 알아낼 수 있다.
+
+***
+
+
 
 ## 주요 API
 
@@ -260,3 +283,13 @@ const Comp = () => {
     );
 }
 ```
+
++ useSafeAreaInsets: 화면 가려짐을 피하기 위한 padding이 얼마인지 알 수 있는 Hook
+```jsx
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const Comp = () => {
+    const insets = useSafeAreaInsets();
+    console.log(insets);
+};
+``` 
