@@ -216,11 +216,10 @@ import { StKeyboardAvoidingView, Platform, View } from "react-native";
 + dismiss: 키보드가 사라지도록 함
 ***
 
-## 리액트 네이티브 제공 아이콘
+### 리액트 네이티브 제공 아이콘
 icons.expo.fyl 사이트에서 원하는 아이콘을 찾아서 사용할 수 있다.
 
-## 스타일 적용 방법
-
+### 스타일 적용 방법
 CSS와 유사한 방법으로 적용할 수 있다.
 
 + 1. 적용할 스타일을 정의한다. 방법은 CSS 클래스를 정의하는 것과 유사하다.
