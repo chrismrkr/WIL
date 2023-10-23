@@ -193,9 +193,22 @@ const SignInScreen = ({navigation, route}) => {
 
 추가로, 화면(컴포넌트)에서 options 설정이 직접 가능하다. 예를 들어, 위 예시의 SignInScreen 컴포넌트에서 직접 options 설정이 가능하다.
 
-#### Stack를 활용한 로그인 상태 관리
+#### Navigator를 활용한 로그인 상태 관리
+Navigator와 state를 활용하여 로그인 상태에 따라 화면 컴포넌트를 관리할 수 있다.
 
+```jsx
+import { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 
+const App = () => {
+  const [user, setUser] = useState(null);
+  return (
+    <NavigationContainer>
+      {user ? <MainStack /> : <AuthStack setUser={()=>setUser()}/>}
+    </NavigationContainer>
+  );
+}
+```
 
 ***
 ### \<SafeAreaView>
@@ -242,7 +255,123 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 ### 리액트 네이티브 제공 아이콘
 icons.expo.fyl 사이트에서 원하는 아이콘을 찾아서 사용할 수 있다.
 
-### 스타일 적용 방법
+***
+### Context API
+자식 컴포넌트에게 파라미터를 전달하기 위해서 state를 사용한다. 하지만, 자식 컴포넌트로 state를 전달할 때마다 렌더링이 다시 발생한다.(prop drilling)
+
+이에 따라 state 추적의 어려움이 있고, 이를 해결하기 위해서 Context API가 존재한다.
+
+Context API는 전역에서 state를 선언하여 여러 컴포넌트에서 이를 공유할 수 있도록 하는 API이다.
+
+사용법은 아래와 같다. **Provider에서 Context state(전역변수)를 생성하고, Consumer에서 이를 사용한다.**
+
+```jsx
+// Context Provider
+import { createContext, useState, } from "react";
+const Context = createContext(); // Context 생성
+
+export const ProviderComp = ({children}) => { // Context를 제공할 Provider 생성
+  const [state, setState] = useState(null);
+  return (
+    <Context.Provider value={{state, setState}}>
+      {children}
+    </Context.Provider>
+  );
+}
+```
+```jsx
+// Context Consumer
+const ConsumerComp = () => {
+  return (
+    <Context.Consumer>
+      {({setState}) => {
+          return ( ... );
+        }
+      }
+    </Context.Consumer/>
+  );
+};
+```
+
+하지만, 매번 Consumer를 통해 context를 받아오는 것은 번거로우므로 useContext Hook을 이용할 수 있다.
+
+```jsx
+const ConsumerComp = () => {
+  const {setState} = useContext(Context);
+  return (
+    ...
+  );
+}
+```
+
+
+#### Context API를 활용한 로그인 상태 관리
+
+state 대신 context 전역변수를 통해 로그인 상태를 관리할 수 있다.
+
+```jsx
+// UserContext.js
+import { createContext, } from "react";
+export const UserContext = createContext();
+
+const UserProvider = ({children}) => {
+  const [user, setUser] = useState(null);
+  return (
+    <UserContext.Provider value={{user, setUser}}>
+      {children}
+    </UserContext>
+  );
+};
+export default UserProvider;
+```
+```jsx
+// App.js
+const App = () => {
+  return (
+    <UseProvider>
+      <Navigation />
+    </UseProvider>
+  );
+}
+```
+```jsx
+// Navigation.js
+const Navigation = () => {
+  const {user} = useContext(UserContext);
+  return (
+    <NavigationContainer>
+        {user ? <MainStack/> : <AuthStack/>}
+    </NavigationContainer>
+  )
+};
+```
+```jsx
+const AuthStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name={'SignIn'} component={SignInScreen}>
+      </Stack.Screen>
+    </Stack.Navigator>
+  )
+};
+```
+```jsx
+const SignInScreen = ({navigation, route}) => {
+  const [setUser] = useContext(UserContext);
+  const onSubmit = ({setUser}) => {
+    const data = await login('/...');
+    setUser(date);
+  }
+  return (
+    ...
+  );
+};
+```
+
+***
+
+
+## 스타일 적용 방법
 CSS와 유사한 방법으로 적용할 수 있다.
 
 + 적용할 스타일을 정의한다. 방법은 CSS 클래스를 정의하는 것과 유사하다.
