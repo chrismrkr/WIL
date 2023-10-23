@@ -395,6 +395,22 @@ const styles = StyleSheet.create({
   }});
 ```
 
++ 스타일을 컴포넌트에 적용한다. 배열, 람다식, 조건문을 사용할 수 있다.
+```jsx
+<View style={[styles.style1, {backgroundColor: '#047857'}, ]} >
+  {children}
+</View>
+<Pressable
+    style={({pressed}) => 
+            [styles.container, 
+             pressed && {backgroundColor: PRIMARY.DARK}, ]
+          }
+> </Pressable>
+```
+
+
+## 리액트 Hook
+
 + useEffect: 컴포넌트가 렌더링되는 시점에 실행되는 Hook
 ```jsx
 const Comp = () => {
@@ -430,3 +446,5 @@ const Comp = () => {
     console.log(insets);
 };
 ``` 
+
++ useContext: 전역 state를 사용하기 위한 Hook
