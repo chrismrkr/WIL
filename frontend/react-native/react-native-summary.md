@@ -227,6 +227,14 @@ const comp = () => {
 
 또는, useSafeAreaInsets Hook을 사용하여 화면 가리짐을 피하기 위한 padding 값을 알아낼 수 있다.
 
+```jsx
+const insets = useSafeAreaInsets();
+console.log(insets);
+/*  결과
+{"bottom": 34, "left": 0, "right": 0, "top": 47}
+*/
+```
+
 ***
 
 
