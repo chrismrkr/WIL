@@ -2,7 +2,14 @@
 
 ## React Native 프로젝트 시작
 
+### with Expo
 
+node.js와 device를 이용하여 개발 환경을 구축하고 프로젝트를 시작할 수 있는 방법
+
++ 1. install expo: npm install -g expo-cli
++ 2. react native 프로젝트 생성: expo init [프로젝트명] 
++ 3. App 실행: npm start
++ 4. expo 로그인: npx expo login
 
 ***
 
