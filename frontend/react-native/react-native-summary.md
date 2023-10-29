@@ -70,9 +70,10 @@ const Button = ({title, disabled, onPress, isLoading}) => {
   return (
     <Pressable onPress={()=>onPress()}
         style={({pressed}) => 
-            [styles.container, 
+            [  styles.container, 
                 !disabled && {backgroundColor: PRIMARY.DEFAULT},
-                pressed && {backgroundColor: PRIMARY.DARK}]}
+                pressed && {backgroundColor: PRIMARY.DARK}
+            ]}
         disabled={disabled}
     >
             {isLoading ? 
@@ -110,7 +111,7 @@ const InputView = ({children}) => {
 ```
 
 #### 주요 속성
-+ behavior: 'height', 'padding', 'position' 지정. 컴포넌트를 선택했을 때 어떻게 동작할지를 결정함.
++ behavior: 'height', 'padding', 또는 'position' 지정. 컴포넌트를 선택했을 때 어떻게 동작할지를 결정함.
 
 ***
 ### \<NavigationContainer>
@@ -121,10 +122,12 @@ const InputView = ({children}) => {
 
 ```jsx
 import { NavigationContainer } from '@react-navigation/native';
+import ScreenStack from '../navigations/ScreenStack';
+
 const App = () => {
   return (
     <NavigationContainer>
-      ...
+      <ScreenStack />
     </NavigationContainer>
   );
 };
@@ -163,13 +166,17 @@ const ScreenStack = () => {
 ```
 
 #### 화면 이동
-+ navigation.push: navigation stack에 쌓으며 화면 이동(즉, 뒤로가기 가능)
-+ navigation.navigate: navigation stack에 쌓지 않고 화면 이동
+Navigation Stack 내에서 사용되는 컴포넌트(화면)은 {navigation, route} 객체를 속성으로 전달받는다. 
+
+해당 객체를 이용하여 화면을 이동할 수 있다.
+
++ navigation.push: navigation stack에 쌓으며 화면 이동(뒤로가기 가능)
++ navigation.navigate: navigation stack에 쌓지 않고 화면 이동(뒤로가기 불가능)
 
 ```jsx
 const SignInScreen = ({navigation, route}) => {
     const onSubmit = () => {
-        navigation.push('List', { param: ...}); // Stack.Screen의 속성인 name(List)를 key로 컴포넌트를 스택에 쌓는다.
+        navigation.push('List', { param: ...}); // Stack.Screen의 속성인 name(List)를 key로 컴포넌트를 Stack에 쌓는다.
     };
 
     return (
@@ -183,8 +190,8 @@ const SignInScreen = ({navigation, route}) => {
 #### screenOptions 속성
 + contentStyle
 + headerTitleAlign: 헤더 정렬 방식을 결정
-+ headerTintColor: 헤더의 타이틀 색을 결정
-+ headderTitleStyle: 헤더 전체 색을 결정
++ headerTintColor: 헤더 중 타이틀 색을 결정
++ headderTitleStyle: 전체 헤더 색을 결정
 + headerLeft: headerLeft에 설정할 컴포넌트를 결정(ex. ```headerLeft: (props) => HeaderLeftButon(),```)
 
 #### options 속성
@@ -262,6 +269,7 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 ### 리액트 네이티브 제공 아이콘
 icons.expo.fyl 사이트에서 원하는 아이콘을 찾아서 사용할 수 있다.
+
 
 ***
 ### Context API
