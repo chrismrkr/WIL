@@ -8,9 +8,9 @@ export const ButtonTypes = {
     DANGER: 'DANGER',
 };
 
-const Button = ({title, onPress, disabled, isLoading, buttonType}) => {
+const Button = ({title, onPressEvent, disabled, isLoading, buttonType}) => {
     return (
-        <Pressable onPress={()=>onPress()}
+        <Pressable onPress={()=>onPressEvent()}
         style={({pressed}) => 
             [   styles.container, 
                 disabled && {backgroundColor: colors[buttonType].LIGHT},
