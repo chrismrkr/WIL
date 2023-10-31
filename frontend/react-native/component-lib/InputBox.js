@@ -1,3 +1,7 @@
+/* InputBox.js
+** Customizied component in which user can insert value.
+*/
+
 import { View, StyleSheet, Text, TextInput } from "react-native";
 import { useState } from "react";
 import { FontAwesome } from '@expo/vector-icons';
