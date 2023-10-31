@@ -47,14 +47,14 @@ const colors = {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: PRIMARY.LIGHT,
+        backgroundColor: colors[PRIMARY].LIGHT,
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 20,
     },
     title: {
-        color: WHITE,
+        color: colors[WHITE],
         fontSize: 16,
         fontWeight: '700',
         lineHeight: 20,
