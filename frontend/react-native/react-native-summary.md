@@ -7,8 +7,8 @@
 node.js와 device를 이용하여 개발 환경을 구축하고 프로젝트를 시작할 수 있는 방법
 
 + 1. install expo: npm install -g expo-cli
-+ 2. react native 프로젝트 생성: expo init [프로젝트명] 
-+ 3. App 실행: npm start
++ 2. react native 프로젝트 생성: npx create-expo-app [프로젝트명]
++ 3. App 실행: npx expo start
 + 4. expo 로그인: npx expo login
 
 ***
@@ -131,6 +131,8 @@ const InputView = ({children}) => {
 
 여러 화면 컴포넌트를 담기 위해서 사용되는 컴포넌트이다. TabController와 유사한 기능을 한다.
 
+```npm install @react-native/native``` 설치가 필요하다.
+
 주로 App.js에서 선언하여 사용한다.
 
 ```jsx
@@ -153,14 +155,16 @@ const App = () => {
 
 Stack이 LIFO(Last In, First Out) 특성을 갖는 것과 유사하게 Native Stack Navigator도 화면 컴포넌트를 Stack에 쌓아서 관리한다. 
 
-자세한 내용은 reactnavigation.org/docs를 참고할 수 있고, 아래와 같이 선언할 수 있다.
+자세한 내용은 reactnavigation.org/docs를 참고할 수 있고, ```npm install @react-native/native``` 설치가 필요하다.
+
+아래와 같이 선언할 수 있다.
 
 ```jsx
 import { SignInScreen } from '../screens/SignInScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { createNativeStackNavigator } from '@react-native/native-stack';
 import { HeaderLeftButton } from 
-const stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const ScreenStack = () => {
   return (
@@ -423,7 +427,8 @@ const styles = StyleSheet.create({
 </View>
 <Pressable
     style={({pressed}) => 
-            [styles.container, 
+            [styles.container,
+             {backgroundColor: PRIMARY.DEFAULT},
              pressed && {backgroundColor: PRIMARY.DARK}, ]
           }
 > </Pressable>
