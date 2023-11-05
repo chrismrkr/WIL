@@ -103,6 +103,16 @@ const Button = ({title, disabled, onPress, isLoading}) => {
 + disabled: 컴포넌트를 누를 수 없게 만드는 속성. 동적 이벤트와 연결하여 사용함
 
 ***
+
+### \<FontAwesome>, \<MaterialCommunityIcons>
+아이콘을 배치하기 위해 사용하는 컴포넌트이다. 아래를 import하여 사용해야 한다.
+
++ FontAwesome: ```import { FontAwesome } from '@expo/vector-icons'```
++ MaterialCommunityIcons: ```import { MaterialCommunityIcons } from '@expo/vector-icons'```
+
+
+
+***
 ### \<KeyboardAvoidingView>
 
 키보드가 화면을 가리는 문제를 해결하기 위해 사용하는 컴포넌트이다.
