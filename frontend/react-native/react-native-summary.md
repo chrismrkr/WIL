@@ -128,8 +128,8 @@ const IconButton = ({iconName}) => {
 
 필요한 Icon은 아래 url에서 찾을 수 있다.
 
-+ FontAwesome: fontawesome.com/icons
-+ MaterialCommunityIcons: static.enapter.com/rn/icons/material-community.html
++ FontAwesome: https://fontawesome.com/icons
++ MaterialCommunityIcons: https://static.enapter.com/rn/icons/material-community.html
 
 
 ***
