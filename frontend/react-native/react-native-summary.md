@@ -110,6 +110,26 @@ const Button = ({title, disabled, onPress, isLoading}) => {
 + FontAwesome: ```import { FontAwesome } from '@expo/vector-icons'```
 + MaterialCommunityIcons: ```import { MaterialCommunityIcons } from '@expo/vector-icons'```
 
+아래와 같이 사용할 수 있다.
+
+```jsx
+const IconButton = ({iconName}) => {
+  return (
+    <Pressable onPress={()=>console.log('press')} >
+      <MaterialCommunityIcons
+        name = {iconName}
+        size = {30}
+        color={'black'}
+      />
+    </Pressable>
+  )
+}
+```
+
+필요한 Icon은 아래 url에서 찾을 수 있다.
+
++ FontAwesome: fontawesome.com/icons
++ MaterialCommunityIcons: static.enapter.com/rn/icons/material-community.html
 
 
 ***
