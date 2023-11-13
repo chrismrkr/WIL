@@ -114,6 +114,21 @@ List<Member> memberList = em.createQuery("select m from Member m", Member.class)
 Obj newObj = em.merge(obj);
 ```
 
+@Transactional로 메소드를 묶지 않는 경우 조회된 객체는 준영속 상태가 되고, 지연로딩의 경우에는 연관관계에 있는 엔티티를 프록시 객체로 가져온다.
+
+이러한 경우, 트랜잭션이 종료되어 준영속 상태가 되었으므로 연관관계에 있는 객체를 조회할 수 없다.
+
+```java
+class Member {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "team_id")
+  Team team;
+}
+
+Member m = memberRepository.findById(1L);
+m.getTeam(); // <- 조회되지 않음. 객체 m 조회 후, 트랜잭션이 끝나므로 준영속 상태가 된다.
+```
+
 ***
 
 ## 2. 엔티티 매핑
