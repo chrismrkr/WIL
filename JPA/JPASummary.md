@@ -1044,7 +1044,7 @@ SQL로 변환되면 아래와 같다.
   FROM Member M inner join Team T on M.TEAM_ID = T.TEAM_ID
 ```
 
-위와 같은 페치 조인을 통해 조인된 Member와 Team이 영속성 컨텍스트에 존재하게 된다.
+위와 같은 페치 조인을 통해 조인된 Member와 Team이 모두 영속성 컨텍스트에 존재하게 된다.(준영속 상태가 아님)
 
 + 컬렉션 페치 조인
 
