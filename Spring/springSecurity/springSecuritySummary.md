@@ -1024,3 +1024,5 @@ public class MethodResourcesFactoryBean implements FactoryBean<LinkedHashMap<Str
     }
 }
 ```
+
+## 4. 스프링 시큐리티 OAuth2.0 인증
