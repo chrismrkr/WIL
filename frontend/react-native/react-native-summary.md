@@ -331,7 +331,7 @@ Context API는 전역에서 state를 선언하여 여러 컴포넌트에서 이�
 ```jsx
 // Context Provider
 import { createContext, useState, } from "react";
-const Context = createContext(); // Context 생성
+export const Context = createContext(); // Context 생성
 
 export const ProviderComp = ({children}) => { // Context를 제공할 Provider 생성
   const [state, setState] = useState(null);
@@ -391,9 +391,9 @@ export default UserProvider;
 // App.js
 const App = () => {
   return (
-    <UseProvider>
+    <UserProvider>
       <Navigation />
-    </UseProvider>
+    </UserProvider>
   );
 }
 ```
