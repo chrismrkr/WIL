@@ -205,7 +205,7 @@ m.getTeam(); // <- throw LazyInitialaztionException. 객체 m 조회 후, 트랜
 ***
 
 ## 3. 연관관계 매핑
-**연관관계의 주인은 외래 키를 등록, 삭제, 수정할 수 있다. 그러나, 주인이 아닌 곳은 읽기만 가능하다.**
+**연관관계의 주인은 외래 키를 등록, 삭제, 수정할 수 있다. 그러나, 주인이 아닌 곳은 읽기(ReadOnly)만 가능하다.**
 
 N:1, 1:N, N:N에서 항상 N에 외래키(1)가 존재한다. 물론, N이 항상 연관관계의 주인인 것은 아니다.
 
@@ -289,14 +289,14 @@ public class Member {
 + 다대일(N:1) 매핑인 경우 3개의 insert 쿼리만 발생한다. 그러나, 일대다(1:N) 매핑에서 3개의 insert 쿼리 후, 2개의 update 쿼리가 추가적으로 발생한다. 관리와 성능 상 어려움이 존재하므로 가급적이면 다대일 매핑을 사용하자.
  
  ### 3.3 일대일(1:1) 매핑
- **일대일(1:1) 관계는 양쪽 엔티티간 사로 하나의 관계만을 갖는다. 예를 들어, 회원(Member) 엔티티와 팀(Team) 엔티티가 존재할 때, 팀은 반드시 한 회원에 의해서만 관리되고 회원 또한 2개 이상의 팀을 관리할 수 없다면 이는 일대일 관계에 해당된다.**
+ **일대일(1:1) 관계는 양쪽 엔티티간 사로 하나의 관계만을 갖는다. 예를 들어, 관리자(Administrator) 엔티티와 팀(Team) 엔티티가 존재할 때, 팀은 반드시 1며의 관리자 의해서만 관리되고 관리자 또한 2개 이상의 팀을 관리할 수 없다면 이는 일대일 관계에 해당된다.**
 
-주 테이블(회원)에서 외래키(팀)을 관리하는 방법과 대상 테이블(팀)에서 외래키(회원)을 관리하는 방법 2가지가 존재한다.
+주 테이블(관리자)에서 외래키(팀)을 관리하는 방법과 대상 테이블(팀)에서 외래키(관리자)을 관리하는 방법 2가지가 존재한다.
 + 주 테이블에서 관리
 
 ```java
 @Entity
-public class Member {
+public class Administrator {
   ...
    @OneToOne
    @JoinColumn(name="TEAM_ID")
@@ -310,7 +310,7 @@ public class Member {
 public class Team {
   ...
   @OneToOne(mappedby="team")
-  private Member member;
+  private Administrator administrator;
   ...
 }
 ```
@@ -323,17 +323,21 @@ public class Team {
 public class Team {
   ...
    @OneToOne
-   @JoinColumn(name="MEMBER_ID")
-   private Member member;
+   @JoinColumn(name="administrator_id")
+   private Administrator administrator;
    ...
    }
 
 // 대상 테이블에서 관리한다면, 반드시 양방향 매핑되어야 한다.
 
 @Entity
-public class Member {
+public class Administrator {
+  @Id
+  @GeneratedValue
+  @Column(name = "administrator_id")
+  private Long id
   ...
-  @OneToOne(mappedby="member")
+  @OneToOne(mappedby="administrator")
   private Team team;
   ...
 }
@@ -341,7 +345,7 @@ public class Member {
 
 대상 테이블에서 관리하는 전략은 데이터베이스 설계자 입장에서 바람직한 설계이다.
 
-만약 팀은 반드시 한명의 회원에 의해 관리되어야 하나, 한 회원이 여러 팀을 관리할 수 있다고 요구사항이 변경되었다고 가정하자. 
+만약 팀은 반드시 1명의 관리자에 의해 관리되어야 하나, 관리자 1명이 여러 팀을 관리할 수 있다고 요구사항이 변경되었다고 가정하자. 
 
 이는 일대일 관계에서 일대다 관계로 변화된 것을 의미한다. 대상 테이블에서 외래키를 관리한 경우, 쉽게 로직을 변경할 수 있지만, 주 테이블에서 관리했다면 그렇지 않다. 
   
