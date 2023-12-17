@@ -337,7 +337,7 @@ public class Administrator {
   @Column(name = "administrator_id")
   private Long id
   ...
-  @OneToOne(mappedby="administrator")
+  @OneToOne(mappedby = "administrator")
   private Team team;
   ...
 }
@@ -347,7 +347,45 @@ public class Administrator {
 
 만약 팀은 반드시 1명의 관리자에 의해 관리되어야 하나, 관리자 1명이 여러 팀을 관리할 수 있다고 요구사항이 변경되었다고 가정하자. 
 
-이는 일대일 관계에서 일대다 관계로 변화된 것을 의미한다. 대상 테이블에서 외래키를 관리한 경우, 쉽게 로직을 변경할 수 있지만, 주 테이블에서 관리했다면 그렇지 않다. 
+이는 일대일 관계에서 일대다 관계로 변화된 것을 의미한다. 대상 테이블(Team)에서 외래키를 관리한 경우 쉽게 로직을 변경할 수 있지만, 주 테이블(Administrator)에서 관리했다면 그렇지 않다.
+
+왜냐하면, Team 테이블에서는 @OneToOne에서 @ManyToOne으로 변경된 것이므로 코드적으로나 데이터베이스적으로나 변경할 것이 크게 없기 때문이다.
+
+하지만, Administrator 테이블에서는 @OneToOne에서 @OneToMany로 변경된 것이므로 테이블 제약조건 뿐만 아니라 코드적으로도 크게 변경되어야 한다.
+
+그러므로, @OneToOne 관계에서 외래키를 어디에서 관리할지를 잘 결정해야 한다.
+
++ @MapsId
+
+일대일 관계에서는 불필요하게 기본 키를 생성하지 않아도 된다. 
+
+예를 들어, Team 테이블의 기본 키를 새로이 생성하지 않고 Administrator 테이블의 기본 키로 사용해도 된다.
+
+이러한 경우에 @MapsId를 사용할 수 있다.
+
+```java
+public class Administrator {
+  @Id
+  @GeneratedValue
+  @Column(name = "administrator_id")
+  private Long id;
+
+  @OneToOne
+  private Team team;
+}
+
+public class Team {
+  @Id
+  @Column(name = "administrator_id")
+  private Long id;
+
+  @MapsId // 해당 객체를 기본 키로 사용한다는 것을 의미함
+  @OneToOne(mappedBy = "team")
+  private Administrator administrator;
+  
+}
+```
+
   
 ### 3.4 다대다(N:N) 매핑
 
