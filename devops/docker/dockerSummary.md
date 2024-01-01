@@ -83,7 +83,8 @@ docker start [컨테이너_이름]
 
 ### 컨테이너 중지
 ```shell
-docker stop [컨테이너_이름]
+docker stop [컨테이너_이름/컨테이너_ID] # stop gracefully
+docker kill [컨테이너_이름/컨테이너_ID] # stop immediately
 ```
 
 ### 컨테이너 삭제
