@@ -151,7 +151,9 @@ docker run -p [로컬 port 번호]:[컨테이너 port 번호] [사용자 id]/[�
 ### 3.1 실습: Dockerfile를 이용하여 Node.js App 실행
 
 |- Dockerfile
+
 |- package.json
+
 |- server.js
 
 위와 같이 로컬 디렉토리에 파일이 존재하면, 아래와 같이 Dockerfile을 작성하여 도커 이미지를 생성할 수 있다.
