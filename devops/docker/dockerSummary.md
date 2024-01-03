@@ -60,6 +60,11 @@ docker run -i -t ubuntu:16.04 /bin/bash
 # -p : 포트 포워딩 옵션 
 ```
 
+```shell
+# myid/docker-app:latest 도커 이미지를 컨테이너로 실행하고 shell을 기동하라는 명령어어
+docker run -it myid/docker-app:latest sh
+```
+
 ### 컨테이너 종료
 ```shell
 exit
@@ -105,17 +110,10 @@ docker rmi [이미지_이름]
 
 ### 이미지 생성
 
-아래는 Dockerfile을 이용해서 .jar 파일을 docker image로 생성하는 방법이다.
-```Dockerfile
-## Dockerfile 생성
-FROM openjdk:11
-ARG JAR_FILE=[src file name(ex .jar etc)]
-COPY ${JAR_FILE} ../../docker-images/[image file name]
-ENTRYPOINT ["java","-jar","/[src file name]"]
-```
 ```shell
-docker built -t [id/repository:tag] .
+docker create [도커 image id]
 ```
+
 
 ### 이미지 docker hub 저장
 
@@ -124,6 +122,24 @@ docker login
 docker push [id/image:tag]
 ```
 
-## 3. docker-compose
+## 3. Dockerfile
 
+```docker create``` 명령어를 사용하지 않고 docker image를 생성하기 위해 사용되는 파일이다.
+
+Docker image를 생성하기 위한 대략적인 과정, Dockerfile의 토대, 그리고 실행 명령어는 아래와 같다.
+
++ 1. Base Image 지정
++ 2. Image 생성을 위한 추가적인 명령어 명시
+
+```Dockerfile
+FROM baseImage # Base Image를 명시함
+
+RUN command # 추가적으로 필요한 파일을 다운로드 함
+
+CMD ["execute shell"] # 컨테이너 시작 시 실행할 명령어 명시 
+```
+
+```shell
+docker build -t [사용자 id]/[도커 이미지 name]:[tag] ./
+```
 
