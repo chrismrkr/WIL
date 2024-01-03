@@ -183,3 +183,15 @@ COPY ./ ./              # 그 이외에는 cache된 것을 사용함
 CMD ["node", "server.js"] 
 ```
 
+### 3.2 Docker Volume
+
+파일(ex. server.js)이 변경될 때 마다, 도커 이미지를 새롭게 빌드하고 컨테이너를 실행하는 절차는 다소 비효율적이다.
+
+이를 해소하기 위해 로컬 파일을 마운트하여 파일이 변경되더라도 새롭게 이미지를 빌드하지 않아도 반영되도록 만들 수 있다.
+
+```shell
+docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %(pwd):/usr/src/app [이미지 아이디]
+
+# node_modules는 로컬 호스트 디렉토리에 존재하지 않으므로 로컬을 참조하지 않고,
+# 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
+```
