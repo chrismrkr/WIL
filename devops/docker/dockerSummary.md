@@ -124,7 +124,11 @@ docker push [id/image:tag]
 
 ## 3. Dockerfile
 
-```docker create``` 명령어를 사용하지 않고 docker image를 생성하기 위해 사용되는 파일이다.
+Dockerfile은 ```docker create``` 명령어를 사용하지 않고 docker image를 생성하기 위해 사용되는 파일이다.
+
+Dockerfile을 통하여 Docker Image가 생성되는 과정은 아래와 같다.
+
+(Base Image를 통하여 임시 컨테이너 실행 -> 신규 명령어 및 파일 스냅샷 추가 -> 새로운 이미지 생성)
 
 Docker image를 생성하기 위한 대략적인 과정, Dockerfile의 토대, 그리고 실행 명령어는 아래와 같다.
 
@@ -140,6 +144,38 @@ CMD ["execute shell"] # 컨테이너 시작 시 실행할 명령어 명시
 ```
 
 ```shell
-docker build -t [사용자 id]/[도커 이미지 name]:[tag] ./
+docker build -t [사용자 id]/[도커 이미지 name]:[tag] ./ # 이미지 생성
+docker run -p [로컬 port 번호]:[컨테이너 port 번호] [사용자 id]/[도커 이미지 name]:[tag] # 컨테이너 실행
+```
+
+### 3.1 실습: Dockerfile를 이용하여 Node.js App 실행
+
+|- Dockerfile
+|- package.json
+|- server.js
+
+위와 같이 로컬 디렉토리에 파일이 존재하면, 아래와 같이 Dockerfile을 작성하여 도커 이미지를 생성할 수 있다.
+
+```Dockerfile
+FROM node:10             # 베이스 이미지를 node:10으로 하고,
+WORKDIR /usr/src/app     # 실행할 컨테이너의 WORKDIR을 /usr/src/app에 지정하고, 
+COPY ./ ./               # 현재 로컬 디렉토리에 있는 파일을 WORKDIR에 복사하고,
+RUN npm install          # npm install을 실행하여 관련 파일을 설치하고,
+CMD ["node", "server.js"] # 컨테이너 생성 후, node server.js 커맨드를 통해 App을 실행한다.
+```
+
++ COPY를 하지 않으면?
+컨테이너에는 node 베이스 이미지만 존재하고, 파일 스냅숏(package.json, server.js)은 존재하지 않게 되므로 App이 실행되지 않는다.
+
++ Dockerfile 개선
+예를 들어, server.js 파일이 변경될 때 마다 ```npm install```을 실행할 필요는 없다. 이를 위해 아래와 같이 수정하면 된다.
+
+```Dockerfile
+FROM node:10            
+WORKDIR /usr/src/app     
+COPY package*.json ./   # package*.json 파일이 수정될 때만 npm install을 실행함            
+RUN npm install
+COPY ./ ./              # 그 이외에는 cache된 것을 사용함
+CMD ["node", "server.js"] 
 ```
 
