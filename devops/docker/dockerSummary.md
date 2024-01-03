@@ -165,9 +165,11 @@ CMD ["node", "server.js"] # 컨테이너 생성 후, node server.js 커맨드를
 ```
 
 + COPY를 하지 않으면?
+
 컨테이너에는 node 베이스 이미지만 존재하고, 파일 스냅숏(package.json, server.js)은 존재하지 않게 되므로 App이 실행되지 않는다.
 
 + Dockerfile 개선
+  
 예를 들어, server.js 파일이 변경될 때 마다 ```npm install```을 실행할 필요는 없다. 이를 위해 아래와 같이 수정하면 된다.
 
 ```Dockerfile
