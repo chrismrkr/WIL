@@ -195,3 +195,21 @@ docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %(pwd):/usr/src/app [
 # node_modules는 로컬 호스트 디렉토리에 존재하지 않으므로 로컬을 참조하지 않고,
 # 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
 ```
+
+## 4. Docker Compose
+
+하나 이상의 컨테이너를 서로 네트워크적으로 연결하여 기동할 때 사용한다.
+
+docker-compose.yml 파일을 설정한 후, 명령어를 통해 컨테이너를 실행할 수 있다.(Dockerfile과 함께 사용된다.)
+
+```yml
+version: "3"
+services:
+  
+```
+
+```shell
+docker-compose up --build # 이미지 빌드 후, docker-compose로 컨테이너 실행
+docker-compose up # 이미지가 있으면 빌드하지 않고, docker compose로 컨테이너 실행
+docker-compose down # docker-compose 컨테이너 중지
+```
