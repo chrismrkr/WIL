@@ -202,10 +202,20 @@ docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %(pwd):/usr/src/app [
 
 docker-compose.yml 파일을 설정한 후, 명령어를 통해 컨테이너를 실행할 수 있다.(Dockerfile과 함께 사용된다.)
 
+아래와 같은 형태로 .yml 파일을 작성한다.
+
 ```yml
+# docker-compose.yml
 version: "3"
 services:
-  
+  react:
+    build:
+      context: . # 참조 디렉토리 설정
+      dockerfile: Dockerfile # 참조 Dockerfile 설정
+    ports:
+      - "5000:3000" # 로컬 포트 - 컨테이너 포트 매핑
+    volumes:
+      - ./:/usr/src/app # volume 옵션 사용: ./를 /usr/src/app에 마운트함
 ```
 
 ```shell
