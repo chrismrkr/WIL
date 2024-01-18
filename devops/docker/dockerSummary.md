@@ -228,6 +228,8 @@ docker-compose down # docker-compose 컨테이너 중지
 
 Github Repository에 존재하는 소스를 자동으로 테스트 및 AWS ElasticBeanStalk에 배포하는 방법에 대해 설명한다.
 
+현재 디렉토리의 docker-compose.yaml, deploy_example.yaml 파일을 참고한다.
+
 ### 5.1 IAM 역할 생성
 
 IAM이란 Identity And Management의 약자로 AWS 리소스에 대한 접근을 제어하는 서비스를 의미한다.
