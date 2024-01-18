@@ -144,7 +144,7 @@ CMD ["execute shell"] # 컨테이너 시작 시 실행할 명령어 명시
 ```
 
 ```shell
-docker build -t [사용자 id]/[도커 이미지 name]:[tag] ./ # 이미지 생성
+docker build -t [사용자 id]/[도커 이미지 name]:[tag] -f [Dockerfile 이름(생략 시, Dockerfile을 찾음)]./ # 이미지 생성
 docker run -p [로컬 port 번호]:[컨테이너 port 번호] [사용자 id]/[도커 이미지 name]:[tag] # 컨테이너 실행
 ```
 
@@ -190,7 +190,7 @@ CMD ["node", "server.js"]
 이를 해소하기 위해 로컬 파일을 마운트하여 파일이 변경되더라도 새롭게 이미지를 빌드하지 않아도 반영되도록 만들 수 있다.
 
 ```shell
-docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %(pwd):/usr/src/app [이미지 아이디]
+docker run -d -p [로컬_PORT:컨테이너_PORT] -v /usr/src/app/node_modules -v %(pwd):/usr/src/app [이미지 아이디]
 
 # node_modules는 로컬 호스트 디렉토리에 존재하지 않으므로 로컬을 참조하지 않고,
 # 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
@@ -223,3 +223,72 @@ docker-compose up --build # 이미지 빌드 후, docker-compose로 컨테이너
 docker-compose up # 이미지가 있으면 빌드하지 않고, docker compose로 컨테이너 실행
 docker-compose down # docker-compose 컨테이너 중지
 ```
+
+## 5. Git Action을 활용한 소스 배포
+
+Github Repository에 존재하는 소스를 자동으로 테스트 및 AWS ElasticBeanStalk에 배포하는 방법에 대해 설명한다.
+
+### 5.1 IAM 역할 생성
+
+IAM이란 Identity And Management의 약자로 AWS 리소스에 대한 접근을 제어하는 서비스를 의미한다.
+
+IAM 서비스에서 AWS 리소스에 대한 사용자와 역할을 생성할 수 있다.
+
+IAM 역할은 AWS 정책들을 가질 수 있고, 정책이란 리소스 접근 권한을 의미한다.
+
+
+### 5.2 AWS ElasticBeanstalk 생성
+
+소스를 배포하여 컨테이너들을 기동하기 위한 서버를 생성하는 것과 유사하다. 
+
+IAM 역할을 설정하여 elasticbeanstalk 서버 리소스 접근에 대한 권한을 부여한다.
+
+예를 들어, IAM 역할이 RDS(관계형 데이터베이스) 쓰기, 읽기, 실행 권한 정책을 갖고, 이를 Elasticbeanstalk에 연결하여 리소스 접근 권한을 부여할 수 있다.
+
+반대로, elasticbeanstalk에 역할을 설정하지 않으면 리소스 접근이 불가능하다.
+
+
+### 5.3 IAM 사용자 생성
+
+IAM 사용자란 AWS 리소스 접근 제어에 대한 특정 권한을 부여받는 사용자를 의미한다.
+
+IAM 사용자에 정책을 설정하여 권한을 부여할 수 있다.
+
+IAM 사용자를 생성할 때, ACCESS_KEY와 SECRET_ACCESS_KEY가 생성되고, 이를 활용하여 elastic beanstalk(리소스) 접근에 필요한 역할 자격을 얻을 수 있다.
+
+### 5.4 Git Action 연동
+
+방법은 아래와 같다. ./github/workflows/deploy.yaml 파일을 이용하여 자동으로 AWS Elasticbeanstalk에 배포되도록 한다.
+
++ 1. Github Repository 생성 후, 소스 배포(git push)
++ 2. AWS 및 Docker 배포 관련 KEY 설정 : AWS_ACCESS_KEY, AWS_SECRET_KEY, DOCKER_USERNAME, DOCKER_PASSWORD 
++ 3. AWS RDS(관계형 데이터베이스) 생성
+
+
+### 5.5 보안 그룹 생성
+
+보안 그룹은 방화벽과 관련된 개념이다.
+
+보안 규칙(방화벽 등)을 설정된 보안 그룹을 만든 후, 이를 Elasticbeanstalk 구성 옵션에서 지정하여 사용할 수 있다.
+
+### 5.6 ElasticBeanstalk 환경변수(환경속성) 추가
+
+구성 옵션에서 RDS와 관련된 환경변수 추가가 필요하다. docker-compose.yaml 파일에서 참고하여 설정할 수 있다.
+
+### 5.7 git push
+
+./github/workflows/deploy.yaml 파일이 존재하고, git push가 발생하면 자동으로 빌드하여 Elastic Beanstalk에 배포된다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
