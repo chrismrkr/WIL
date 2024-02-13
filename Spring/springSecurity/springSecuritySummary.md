@@ -427,7 +427,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ***
 
-### 1.12 ExceptionTranslationFilter, RequestCacheAwareFilter
+### 1.12 ExceptionTranslationFilter
 
 인증 및 인가에 실패할 때 발생하는 Filter의 흐름이 있다.
 
@@ -435,9 +435,9 @@ AbstractSecurityInterceptor.class, ExceptionTranslationFilter.class를 분석하
 
 인증 예외가 발생하면 AuthenticationEntryPoint.commence()를 실행하고, 인가 예외가 발생하면 AccessDeniedHandler.handle()을 실행한다.
 
-**익명 사용자에 의해 발생하는 인가 예외는 인증 예외를 발생시킨다는 것에 주의해야 한다.**
+인증 예외란 예를 들어, 익명 사용자가 인증되지 않은 상태로 리소스에 접근하고자 할 때 발생하는 Exception이다.
 
-왜냐하면, 익명 사용자 권한은 한번도 인증하지 않은 사용자에게 주어지는 권한이기 때문이다.
+인가 예외란 예를 들어, 사용자가 특정 리소스에 접근하고자 할 때, 권한이 부족해서 발생하는 Excpetion이다.
 
 그러므로, 위의 두 클래스만 생성해주면 된다. 스프링 시큐리티에서는 이를 API로 제공한다. 
 
