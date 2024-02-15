@@ -247,8 +247,8 @@
   - 2단계 부트로더 : 파일 시스템에 존재. 부트 매니저에 따라 운영체제를 선택하고, 운영체제를 위한 커널을 메모리에 로드하고 커널에 제어권 전달
   - 커널 : /sbin/init 또는 심볼릭 링크 /usr/lib/systemd/systemd 실행하여 init 프로세스 실행
   - INIT 프로세스 : /etc/inittab 파일을 읽어서 적절한 시스템 스크립트(/etc/rcㅁ.d)실행
-    - level : 0-종료, 1-단일 사용자(복구용), 2-다중 사용자, 3-네트워크 기능 포함한 다중 사용자, 5-X 윈도우 다중 사용자, 6-시스템 재부팅
-  - systemd : .target 파일을 실행하고. runlevel은 INIT 프로세스와 유사함
+    - run level : 0-종료, 1-단일 사용자(복구용), 2-다중 사용자, 3-네트워크 기능 포함한 다중 사용자, 5-X 윈도우 다중 사용자, 6-시스템 재부팅
+  - systemd : .target 파일을 실행하고. run level은 INIT 프로세스와 유사함
   - 사용자 프롬프트
 
 ##### 2.2.3.3 로그인, 로그아웃, 시스템 종료
@@ -288,6 +288,21 @@
 - 패스워드 복구
   - root 계정 접근 가능 : 위 설정에서 password 삭제
   - root 계정 접근 불가능 : 부팅 메뉴에서 Rescued Install System -> /mnt/sysimgage/boot/grub/grub.conf 수정
+
+
+##### 2.3.3.5 GRUB2 Legacy 패스워드 설정 및 복구
+
+GRUB Legacy와 유사함... 추후 확인
+
+#### 2.3.4 systemd
+
+- 부팅시 사용하던 init을 대체하기 위한 시스템 서비스
+
+
+
+
+
+
 
 
 
