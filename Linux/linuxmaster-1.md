@@ -375,7 +375,9 @@
 - 직전 명령어 실행 : ```!!```
 - alias 조회 : ```alias```
 - alias 설정 : ex. ```alias ll="ls -lia"```
-- 명령어 치환 기능 ex. ```toush $(date)```
+- 명령어 치환 기능 :  ex. ```touch $(date)```
+- 산술 평가 기능 : ex. ```$((2+3))```
+  - 명령어 치환과 산술 평가 차이에 주의할 것
 - 셸 키보드 단축키
 - 표준 입출력 : stdin-0, stdout-1, stderr-2
 - 리다이레션 : 전체 입출력-<,> 버퍼에 추가하며 입출력-<<,>>
@@ -501,36 +503,44 @@ do
 done
 ```
 
+- 선택문
+```sh
+#!/bin/bash
+select menu in who whoami quit
+do
+	case $menu in 
+		who) echo "who";;
+		whoami) echo "whoami";;
+		quit) break;;
+	esac
+done
+```
 
+```
+1) who
+2) whoami
+3) quit
+#? 1
+who
+```
 
+- 함수 선언
 
+```sh
+#!/bin/bash
+factorial() {
+  if [ $1 -eq 1 ]
+  then
+    echo 1
+  else
+          local sub_result=$(( $(factorial $(($1 - 1))) ))
+    echo $(( $1 * sub_result ))
+  fi
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+result=$(factorial $1)
+echo "result: $result"
+```
 
 
 
