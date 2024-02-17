@@ -486,8 +486,20 @@ case $NOW in
 	*)
 		echo "not weekend...";;
 esac
-``
+```
 - 반복문
+```sh
+for i in 1,2,3,4,5
+do
+	echo "Looping $i"
+done
+```
+```sh
+while 표현문
+do
+	명령문
+done
+```
 
 
 
