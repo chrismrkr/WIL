@@ -246,13 +246,12 @@
   - 1.5단계 부트로더 : 파일 시스템 드라이버 포함. 2단계 부트로더로 점프
   - 2단계 부트로더 : 파일 시스템에 존재. 부트 매니저에 따라 운영체제를 선택하고, 운영체제를 위한 커널을 메모리에 로드하고 커널에 제어권 전달
   - 커널 : /sbin/init 또는 심볼릭 링크 /usr/lib/systemd/systemd 실행하여 init 프로세스 실행
-  - INIT 프로세스 : /etc/inittab 파일을 읽어서 적절한 시스템 스크립트(/etc/rcㅁ.d)실행
+  - INIT 프로세스 : centOS6에서 /etc/inittab 파일을 읽어서 적절한 시스템 스크립트(/etc/rcㅁ.d)실행
     - run level : 0-종료, 1-단일 사용자(복구용), 2-다중 사용자, 3-네트워크 기능 포함한 다중 사용자, 5-X 윈도우 다중 사용자, 6-시스템 재부팅
   - systemd : .target 파일을 실행하고. run level은 INIT 프로세스와 유사함
   - 사용자 프롬프트
 
 ##### 2.2.3.3 로그인, 로그아웃, 시스템 종료
-
 - 로그인 공지 기능
   - /etc/issue : 로컬에서 로그인 시도 시, 로그인 전 해당 메세지 출력
   - /etc/issue.net : 원격으로 로그인 시도 시, 로그인 전 해당 메세지 출력
@@ -265,13 +264,9 @@
 - 종료 : shutdown -h [+minutes] 으로 종료 가능
   - shutdown -r [+minutes]으로 재부팅 가능
 
-
 ##### 2.2.3.4 GRUB Legacy 패스워드 설정 및 복구
-
-부트로더 실행시 사용하는 패스워드와 관련된 내용
-
+- 부트로더 실행시 사용하는 패스워드와 관련된 내용
 - 패스워드 설정 : /boot/grub/grub.conf
-
 ```shell
   # grub-crypt 명령어로 encoded password 생성 후 아래 추가
   hiddenmenu
@@ -284,21 +279,15 @@
   hiddenmenu
   password [my password]
 ```
-
 - 패스워드 복구
   - root 계정 접근 가능 : 위 설정에서 password 삭제
   - root 계정 접근 불가능 : 부팅 메뉴에서 Rescued Install System -> /mnt/sysimgage/boot/grub/grub.conf 수정
-
-
 ##### 2.2.3.5 GRUB2 Legacy 패스워드 설정 및 복구
-
-GRUB Legacy와 유사함... 추후 확인
+- GRUB Legacy와 유사함... 추후 확인
 
 #### 2.2.4 systemd
-
 ##### 2.2.4.1 개요
 - 시스템과 관련된 서비스를 제공하는 매니저
-
 ##### 2.2.4.2 구조
 - 유닛
   - .service : 시스템 상에 동작하는 서비스 또는 데몬과 연관된 유닛
@@ -313,17 +302,14 @@ GRUB Legacy와 유사함... 추후 확인
   - [Unit[
   - [Unit Type]
   - [Install]
-
 ##### 2.2.4.3 주요 명령어
 - 서비스 관리
 - 타겟 유닛
 - 전원 관리
 
 #### 2.2.5 파일 시스템의 이해
-
 ##### 2.2.5.1 개요
 - 데이터를 레코드 및 블록 단위로 저장하고 캐시 기능도 지원함
-
 ##### 2.2.5.2 리눅스 파일 시스템 구조
 - 부트섹터
 - 블록그룹
@@ -341,11 +327,127 @@ GRUB Legacy와 유사함... 추후 확인
   - OCFS, Raw Partitions
 
 ### 2.3 X 윈도우
-
 #### 2.3.1 X 윈도우 개념
 - 유닉스 및 리눅스 접속을 위한 독립적 윈도우 시스템
-
+- 일반적인 서버-클라이언트 모델을 사용하므로 X 프로토콜을 준수할 수 있는 시스템에는 X 윈도우 이식 가능
 #### 2.3.2 X 윈도우 구조
+- X 서버, X 클라이언트
+- X 프로토콜 : Request, Reply, Event, Error
+- Xlib, XCB : X 윈도우 시스템 프로토콜 클라이언트 라이브러리
+- XToolkit : GUI 개발 kit. 그래픽 요소는 다른 라이브러리로 구현
+#### 2.3.3 XFree86, X.org
+- X 윈도우 프로젝트
+#### 2.3.4 X 윈도우 계층
+- X 서버 : X 서버, 디스플레이 매니저
+- X 클라이언트 : 어플리케이션, 데스크톱 환경, 윈도우 매니저(X 윈도우 그래픽 요소 관리)
+#### 2.3.5 데스크톱환경 구성 사례
+#### 2.3.6 X 윈도우 실행
+- CentOS6
+  - /etc/inittab 에서 run level을 5로 변경
+- CentOS7
+  - systemctl 명령어로 변경
+```shell
+  systemctl set-default runlevel5.target(graphical.target) 
+```
+
+
+### 2.4 셸(Shell)
+#### 2.4.1 셸의 이해
+##### 2.4.1.1 셸의 개념
+- 셸 :  커널 서비스를 사용하기 위한 사용자 인터페이스
+##### 2.4.1.2 셸의 유형
+##### 2.4.1.3 셸의 설정 및 확인
+- 현재 셸 확인 : ```echo $SHELL```
+- 지원하는 셸 목록 확인 : ```cat /etc/shells```, ```chsh -l```
+- 셸 변경 : ```chsh -s [/bin 하위 shell]```
+- 특정 사용자의 셸 확인 : ```cat /etc/passwd | grep [사용자 이름]```
+- 환경변수 확인 : ```set```
+- 현재 셸에 export된 변수 확인 : ```env```
+- 특정 환경변수 확인 : ```echo $[환경변수명]```, ```printenv [환경변수명]```
+- 특정 환경변수 설정 : ```export [환경변수명]=...```
+##### 2.4.1.4 셸의 시작과 종료
+##### 2.4.1.5 셸의 기능
+- 자동완성 : TAB
+- 히스토리 : ```history```
+- 가장 최근 n개 히스토리 : ```history n```
+- 히스토리 제거 : ```history -c```
+- 히스토리의 n번째 명령어 실행 : ```!n```
+- 직전 명령어 실행 : ```!!```
+- alias 조회 : ```alias```
+- alias 설정 : ex. ```alias ll="ls -lia"```
+- 명령어 치환 기능 ex. ```toush $(date)```
+- 셸 키보드 단축키
+- 표준 입출력 : stdin-0, stdout-1, stderr-2
+- 리다이레션 : 전체 입출력-<,> 버퍼에 추가하며 입출력-<<,>>
+```shell
+# example : 어떤 의미인지 알아볼 것
+sort < list.txt
+find /tmp -name `good*' 2>error.log
+invalid-command 2>/dev/null
+ls exist-dir not-exist-dir > result 2>&1
+```
+- 파이프 : ```|```
+- tee : 표준 입력으로 데이터를 받아 표준 출력하거나 파일 저장을 동시에 할 수 있는 명령어
+```sh
+tee file # 표준출력과 동시에 file에 저장함
+ping google.com -c 1 | tee -a result.txt
+ping google.com | tee result.txt
+```
+- 그룹 연산자
+```sh
+ls ; echo "second" # ;는 순차적으로 명령어를 실행
+ls || echo "second" # ||는 앞의 명령이 성공하면 종료. 실패하면 그 다음을 실행함
+ls && echo "success" # &&는 앞의 명령어가 성공하면 이후 명령어를 실행함
+$(date; pwd; ls) > result.txt
+```
+- 산술 논리 연산 : expr ex. ```expr 1 \* 3```
+  - length, substr도 지원함
+  - 메타문자(ex. *)는 escape가 필요함
+- 작업 제어 기능 : 백그라운드 실행-&
+- 내부 명령어
+  - 변수 : let, eval, set, unset, export
+  - 스크립트 : source(현재 셸에서 스크립트로 실행), exec(fork하지 않고 현재 프로세스에서 실행), bash(새로운 프로세스로 실행), exit
+
+
+#### 2.4.2 셸 프로그래밍
+##### 2.4.2.1 개요
+- 셸 스크립트를 작성하는 활동
+- 셸 스크립트 형식
+```sh
+#! /bin/bash # 사용할 shell 선택
+# 이하 원하는 셸 스크립트 기술
+echo "hello world!"
+```
+- 별도 프로세스로 셸 스크립트 실행 : ```./[script.sh] ``` 단, 실행 권한이 있어야 함
+  - ./를 붙이는 이유는 셸은 기본적으로 환경변수에 지정된 PATH에서만 파일을 찾기 때문임
+  -  ```bash script.sh```와 동일함
+##### 2.4.2.2 기본 문법
+- 주석 : ``` # 으로 주석 ```
+- 변수
+```sh
+#! /bin/bash
+name="hong gil dong"
+echo $MSG
+echo "\${name} =${name}"
+echo "length=${#name}"
+echo "offset=${name:5}"
+echo "length from offset=${name:5:3}"
+echo "\${name} =${name+HELLO}" # name이 null이 아니면 HELLO 반환. 그러나, 변수에 저장하지는 않음
+echo "\${name} =${name-HELLO}" # name이 null이면 HELLO 반환. 그러나, 변수에 할당하지는 않음
+echo "\${name} =${name?HELLO}" # name이 null이 아니면 name을 반환. 그렇지 않으면 HELLO 반환
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
