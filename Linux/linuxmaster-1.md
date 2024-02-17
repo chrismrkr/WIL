@@ -187,6 +187,8 @@
 - RAID 3 : 바이트 레벨로 스트라이핑 기술을 적용함. 패리티 디스크를 통해 오류 체크 및 복구 가능. 쓰기 및 읽기 성능 모두 우수함
 - RAID 4 : 블록 레벨로 스트라이핑 기술을 적용함.
 - RAID 5 : 블록 레벨로 스트라이핑 기술을 적용하나, 패리티 디스크가 따로 존재하지 않음(가장 많이 사용)
+  - 디스크 개수를 늘릴수록 저장공간 효율성이 증가함
+- RAID 6 : 2개의 패리티를 사용하여 2개의 디스크 오류에도 데이터를 읽을 수 있고 최소 4개 디스크 필요
 - RAID 0+1 : RAID 0 구성 세트에 RAID 1을 적용  
 - RAID 1+0 : RAID 1 구성 세트에 RAID 0을 적용
 
@@ -202,7 +204,7 @@
 - 디스크와 파일 시스템의 중간 장치로, 파일을 디스크에 저장할 때 LVM이 매핑한 Logical Volume에 저장하도록 함.
 - LVM 구성도
   - VG(Volume Group) : 여러 PV를 갖는 그룹. PV와 VG는 N:1 관계
-  - PV(Physical Volume) : 기존 물리적 디스크를 LVM에서 사용할 수 있도록 논리적으로 분할한 개념
+  - PV(Physical Volume) : 기존 물리적 디스크를 LVM에서 사용할 수 있도록 논리적으로 분할한 개념(ex. /dev/sda3, /dev/sdc1)
   - PE(Physical Extent) : 일정한 크기의 블록(4MB). PE와 PV 는 N:1 관계
   - LV(Logical Volume) : VG에서 필요한 만큼 할당하여 만들어지는 공간(ex. /usr, /home)
   - LE(Logical Extent) : 일정 크기의 블록(4MB). LE와 LV는 N:1 관계. LE와 PE는 1:1 관계
@@ -299,7 +301,7 @@
   - .timer : systemd 타이머과 관련된 유닛
 
 - 유닛 파일 구조
-  - [Unit[
+  - [Unit]
   - [Unit Type]
   - [Install]
 ##### 2.2.4.3 주요 명령어
@@ -322,7 +324,7 @@
   - 아이노드 테이블 : EX. ex2 방식
   - 디렉토리, 데이터 블록
 - 로컬 파일 시스템
-  - ext, ext2, ext3, ext4, btrFS, ZFS, Reisefs, XFS, JFS
+  - ext, ext2, ext3, ext4, btrFS, ZFS, Reisefs, XFS(CentOS 7 기본 탑재. b-tree 알고리즘), JFS
 - 클러스터 파일 시스템
   - OCFS, Raw Partitions
 
@@ -338,8 +340,8 @@
 #### 2.3.3 XFree86, X.org
 - X 윈도우 프로젝트
 #### 2.3.4 X 윈도우 계층
-- X 서버 : X 서버, 디스플레이 매니저
-- X 클라이언트 : 어플리케이션, 데스크톱 환경, 윈도우 매니저(X 윈도우 그래픽 요소 관리)
+- X 서버 : X 서버, 디스플레이 매니저(그래픽 유저 인터페이스 제공)
+- X 클라이언트 : 어플리케이션, 데스크톱 환경, 윈도우 매니저(X 윈도우 그래픽 요소(X 윈도우 표현 및 배치) 관리)
 #### 2.3.5 데스크톱환경 구성 사례
 #### 2.3.6 X 윈도우 실행
 - CentOS6
@@ -349,6 +351,9 @@
 ```shell
   systemctl set-default runlevel5.target(graphical.target) 
 ```
+- xhost + : 특정 또는 모든 클라이언트 접속 허용
+- xhost - : 특정 또는 모든 클라이언트 접속 차단
+
 
 
 ### 2.4 셸(Shell)
@@ -433,7 +438,7 @@ echo "hello world!"
 name="hong gil dong"
 echo $name
 echo "\${name} =${name}"
-echo "length=${#name}"
+echo "length=${#name}" # 문자열 길이
 echo "offset=${name:5}"
 echo "length from offset=${name:5:3}"
 echo "\${name} =${name+HELLO}" # name이 null이 아니면 HELLO 반환. 그러나, 변수에 저장하지는 않음
@@ -515,7 +520,6 @@ do
 	esac
 done
 ```
-
 ```
 1) who
 2) whoami
@@ -525,7 +529,6 @@ who
 ```
 
 - 함수 선언
-
 ```sh
 #!/bin/bash
 factorial() {
@@ -541,6 +544,80 @@ factorial() {
 result=$(factorial $1)
 echo "result: $result"
 ```
+
+- 문자열 제거
+```sh
+STR="ABC123abc123ABC"
+echo "${STR#A*1} # 맨 앞부터 A로 시작해서 1로 끝나는 문자열 중 가장 짧은 것을 제거
+echo "${STR##A*1} # 맨 앞부터 A로 시작해서 1로 끝나는 문자열 중 가장 긴 것을 제거
+echo "${STR%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중 가장 짧은 것을 제거
+echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중 가장 긴 것을 제거
+```
+
+### 2.5 프로세스
+#### 2.5.1 프로세스 개요
+##### 2.5.1.1 프로세스 개념
+- 정의 : 실행 중인 프로그램 인스턴스
+##### 2.5.1.2 프로세스 유형
+- 최상위 프로세스 : CentOS 6-/sbin/init, CentOS 7-/usr/lib/systemd/systemd
+- 부모 프로세스와 자식 프로세스 : fork
+- 고아 프로세스 : 부모 프로세스가 종료된 경우. 고아 프로세스의 부모는 init 프로세스
+- 좀비 프로세스 : 부모 프로세스가 자식 프로세스를 회수할 때, 리소스는 회수했지만 프로세스 테이블에서 삭제되지 않은 경우
+- 데몬 : 자동으로 실행되며 백그라운드에서 이벤트 핸들링을 하는 프로세스(ex. 파일전송, 프린터, 원격접속 등)
+##### 2.5.1.3 프로세스 식별자
+- PID, PPID, UID(GID)
+#### 2.5.2 프로세스 동작원리
+##### 2.5.2.1 프로세스 생성
+- fork를 통해 부모 프로세스를 복제하여 자식 프로세스를 생성하고, exec를 통해 자식 프로그램으로 교체됨
+- exit가 호출하면 부모 프로세스는 wait 시스템 콜을 통해 자식 프로세스 코드 회수
+##### 2.5.2.2 프로세스 제어
+- 포어 그라운드 프로세스 : 새롭게 시작되는 프로세스로 실행되는 동안 셸을 block함
+- 백 그라운드 프로세스 : 백그라운드에서 프로세스 실행. 실행 명령어 뒤에 &를 붙여서 백그라운드 모드로 실행 가능
+- 포어그라운드-백그라운드 전환
+  - 포어그라운드 -> 백그라운드 전환 : ctrl+z로 중지된 프로세스를 ```bg```명령어로 백그라운드 실행 가능(```jobs```명령어로 현재 백그라운드 실행 프로세스 확인 가능)
+  - 백그라운드 -> 포어그라운드 전환 : ```fg %1```
+##### 2.5.2.3 프로세스 중지
+- ctrl+c, kill
+- 시그널 : 프로세스가 다른 프로세스에 신호를 주는 방식. kill -l
+  - SIGHUP(1) : 터미널 접속 끊김
+  - SIGINT(2) : ctrl+c로 인터럽트 발생
+  - SIGQUIT(3) : ctl+\ 입력
+  - SIGKILL(9) : 프로세스 강제 종료
+  - SIGTERM(15) : 프로세스 정상 종료
+  - SIGCONT(18) : 프로세스 재개
+  - SIGSTOP(19) : 프로세스 중지
+  - SIGTSTP(20) : 프로세스 대기를 위해 ctl+z 입력
+##### 2.5.2.4 프로세스 상태
+##### 2.5.2.5 프로세스 구조
+- PCB(Process Control Block) : 프로세스 스케줄링 시, 프로세스의 상태 정보 등을 관리하는 커널에 존재하는 테이블
+  - 프로세스당 1개의 PCB를 갖음.
+- 프로세스 테이블 : 모든 프로세스를 관리하는 테이블
+#### 2.5.3 데몬
+##### 2.5.3.1 실행방식
+- standalone : 시스템 시작 시 즉각 백그라운드 실행. 응답성은 좋으나 효율성이 떨어짐
+  - CentOS 6 - /etc/rc.d/init.d
+  - CentOS  /etc/systemd/system
+- xineted : 사용자 요청이 있을 때 마다 실행
+- systemd on-demand 방식 : xineted와 동일하게 CentOS 7에서 동작
+##### 2.5.3.2 데몬 시작
+- CentOS 6 : /etc/rc.d/init.d 에 시작 스크립트 존재
+- CentOS 7 : systemd 유닛 단위로 실행
+  - 원하는 타겟 실행 시, 데몬이 실행되도록 할 수 있음 (ex. systemctl enable httpd.service)
+##### 2.5.3.3 데몬 설정 도구(CentOS 6)
+- ntsys, chkconfig, system-config-services
+##### 2.5.3.4 데몬 설정 도구(CentOS 7)
+- systemctl, systemd-cgtop(cgroup에 속한 데몬 설정), systemd-cgls, systemd-analyze
+  - cgroup : 애플리케이션 단위로 리소스 자원 관리
+
+
+
+
+
+
+
+
+
+
 
 
 
