@@ -407,6 +407,7 @@ $(date; pwd; ls) > result.txt
 - 내부 명령어
   - 변수 : let, eval, set, unset, export
   - 스크립트 : source(현재 셸에서 스크립트로 실행), exec(fork하지 않고 현재 프로세스에서 실행), bash(새로운 프로세스로 실행), exit
+    - './', 'bash' 명령어가 새로운 프로세스를 생성하여 셸을 실행함
 
 
 #### 2.4.2 셸 프로그래밍
@@ -421,13 +422,14 @@ echo "hello world!"
 - 별도 프로세스로 셸 스크립트 실행 : ```./[script.sh] ``` 단, 실행 권한이 있어야 함
   - ./를 붙이는 이유는 셸은 기본적으로 환경변수에 지정된 PATH에서만 파일을 찾기 때문임
   -  ```bash script.sh```와 동일함
+  -  ```. script.sh```는 새로운 셸에서 실행함
 ##### 2.4.2.2 기본 문법
 - 주석 : ``` # 으로 주석 ```
 - 변수
 ```sh
 #! /bin/bash
 name="hong gil dong"
-echo $MSG
+echo $name
 echo "\${name} =${name}"
 echo "length=${#name}"
 echo "offset=${name:5}"
@@ -436,8 +438,56 @@ echo "\${name} =${name+HELLO}" # name이 null이 아니면 HELLO 반환. 그러�
 echo "\${name} =${name-HELLO}" # name이 null이면 HELLO 반환. 그러나, 변수에 할당하지는 않음
 echo "\${name} =${name?HELLO}" # name이 null이 아니면 name을 반환. 그렇지 않으면 HELLO 반환
 ```
-
-
+- 위치 매개변수
+```sh
+cp org.txt tgt.txt # $0-cp, $1-org.txt, $2-tgt.txt
+# '#@'는 입력된 매개변수를 순서대로 보관함
+# '$*'는 입력된 매개변수를 하나의 스트링으로 보관함 
+``
+- echo와 특수문자
+```sh
+#!/bin/bash
+echo -e "hello\nworld"
+echo -e "hello\tworld"
+echo -e "hello\bworld" # backspace
+echo -e "hello\fworld" # formfeed
+echo -e "hello\rworld" # carriage-return
+echo -e "hello\\world"
+``
+- 조건식
+  - 숫자 : -eq -gt -ge -lt -le -ne ! -a -o
+  - 문자열 : = != < > -n -z
+  - 파일 : -b -c -d -e -x -r -w -f -g
+```sh
+[ 2 -gt l]
+echo $?
+```
+- if-elif-else 조건문
+```sh
+#!/bin/bash
+if [ "$1" -gt 2 ]
+then 
+	echo "greater than 2"
+elif [ "$1" -gt 1 ]
+then
+	echo "greater than 1"
+else
+	echo "less then 1 or equal to 1"
+fi
+```
+- case 조건문
+```sh
+#!/bin/bash
+NOW=$(date +"%a")
+#NOW="Mon"
+case $NOW in
+	Sat|Sun)
+		echo "it is weekend!";;
+	*)
+		echo "not weekend...";;
+esac
+``
+- 반복문
 
 
 
