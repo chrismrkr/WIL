@@ -236,9 +236,125 @@ su - # root 사용자 환경변수도 로드됨
 - fg : 백그라운드 프로세스를 포어 그라운드로 전환
 - bg : 포어 그라운드를 백그라운드 프로세스로 전환
 ##### 1.3.1.4 프로세스 우선순위
-- nice : 프로세스 우선순위. -20 ~ 19 사이이고 숫자가 클수록 우선순위가 낮아짐
+- nice [options] [command arg] : 프로세스 우선순위. -20 ~ 19 사이이고 숫자가 클수록 우선순위가 낮아짐
   - ```nice --10 bash``` : bash의 우선순위를 10 만큼 내림
-- renice : 현재 실행 중인 프로세스 운선순위 변경
+- renice [-n] priority [option] : 현재 실행 중인 프로세스 운선순위 변경
+  - nice와 달리 우선순위를 증감시키는 것이 아닌 특정 값으로 직접 변경함
+- nohub [command]: 로그아웃 또는 연결 세션 종료 시그널이 발생하더라도 프로세스를 종료하지 않음
+  - ex. nohub tail -f server.log | grep 192.168.0.0 >> greplog.out
+##### 1.3.1.5 프로세스 검색
+- pgrep [options] [pattern] : 프로세스 이름 일부 또는 전체가 매칭되는 것을 찾음
+#### 1.3.2 프로세스 관련 파일
+##### 1.3.2.1 /proc 디렉토리
+- 가상의 파일 시스템으로 파일 접근 명령어(ls, cd) 및 시스템 조회 가능
+- /proc/[PID] 에 프로세스 정보 존재
+#### 1.3.3 작업 예약
+##### 1.3.3.1 at
+- 지정된 시간에 작업을 실행
+- ```at [options] time```을 입력하면 at 전용 프롬프트 시작
+- 원하는 명령어 및 스크립트 입력
+- ctrl + d 입력
+- /var/spool/at 에서 관리됨. 실행 결과는 /usr/sbin/sendmail을 통해 메일로 전송
+- atq : 예약된 at 작업을 확인할 수 있음
+- atrm : 예약된 작업을 삭제할 수 있음
+##### 1.3.3.2 cron
+- 배치성 작업
+- 크론 데몬(cron.service)가 사용자 정의 크론(/var/spool/cron/crontabs), /etc/crontab, /etc/crond를 감시하여 배치를 실행함
+- 크론 설정 파일
+ - 크론 설정 파일에 아래와 같이 크론 작업을 정의할 수 있음
+ - *(min) *(hour) *(day of month) *(month) *(day of week) [command]
+ - ex. 30 22 * * SAT,SUN /usr/bin/backup.sh : 매주 주말 22시 30분에 해당 셸을 실행함
+- crontab 명령어
+  - ```crontab -e -u [계정명]``` : 해당 명령어로 크론 설정 파일에 접근하여 작업을 추가 및 수정 할 수 있음
+
+
+
+### 1.4 설치 및 관리
+#### 1.4.1 패키지를 통한 소프트웨어 설치
+##### 1.4.1.1 설치 개요
+- 패키지 도구 : 시스템에 소프트웨어를 편리하게 설치하기 위한 도구
+- rpm, yum, apt-get, apt
+##### 1.4.1.2 저수준 패키지 도구
+- rpm 패키지 명령어로 설치. 먼저 설치가 필요한 라이브러리가 없으면 에러가 발생할 수 있음
+- 패키지 설치 : ``` rpm -i [package-name]```
+- 패키지 업그레이드 : ```rpm -U [package-name]```
+- 패키지 확인 : ```rpm -q [package-name]```, ```rpm -qa```
+- 특정 파일을 설치한 패키지 확인 : ```rpm -qf [file-name]```
+##### 1.4.1.3 고수준 패키지 도구
+- 패키지 검색 : ```yum(apt) search [package-name]```
+- 패키지 설치 : ```yum(apt-get) install(update) [package-name]```
+- 패키지 제거 : ```yum(apt-get) erase(remove) [package-name]```
+  - 환경설정까지 제거하려면 purge 옵션 사용
+- 패키지 정보 출력 : ```yum(apt) info(show) [package-name]```
+#### 1.4.2 레드햇 패키지 관리와 데비안 패키지 관리
+##### 1.4.2.1 레드햇 패키지 관리(RPM)
+- 설치 및 업데이트 : rpm -i, rpm -U
+- 제거 : rpm -e
+- 확인 : rpm -q
+##### 1.4.2.2 YUM
+- 명령어 : yum [options] [command] [package-name]
+- 환경설정 : /etc/yum.conf
+- 예제. http 패키지 설치
+  - yum install httpd
+##### 1.4.2.3 데비안 패키지 관리
+- 명령어 : apt-get [options] [command] [package-name]
+#### 1.4.3 소스 코드 컴파일을 통한 소프트웨어 설치
+##### 1.4.3.1 소스 코드 컴파일을 위한 소프트웨어 설치 개요
+- tar로 아카이브한 후, gzip 등으로 압축된 패키지를 설치함
+##### 1.4.3.2 빌드도구
+- cmake : makefile을 생성함
+##### 1.4.3.3 컴파일러
+- gcc [options] 파일명
+  - gcc myfile.c -o myfile.out
+##### 1.4.3.4 아카이브
+- tar
+  - 백업 및 배포 목적으로 많은 파일을 아카이브 파일로 만드는 유틸리티
+  - tar [options] [filename]
+  - tar 파일 생성 : tar -cvf archive.tar file1.java, file2.java
+  - tar 파일 해체 : tar -xvf archive.tar
+##### 1.4.3.5 압축
+- compress, uncompress
+  - compress [options] filename
+  - uncompress [options] filename
+- gzip, gunzip
+  - gizp [options. -c(압축) -d(해제)] filename
+- 이외 : bzip2(bunzip2), xz(unxz), zip(unzip)
+
+
+## 2. 장치 관리
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
