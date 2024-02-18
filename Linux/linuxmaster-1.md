@@ -712,6 +712,7 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
 - NetworkManager Command Line Interface
 ##### 3.2.2.3 route
 - 라우팅 테이블 표시 및 수정
+- 
 ##### 3.2.2.4 arp
 - arp 캐시 등의 정보가 포함됨
 #### 3.2.3 네트워크 진단 명령어
@@ -728,6 +729,7 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
   - ESTABLISHED : 클라이언트와의 연결이 완료됨
   - FIN_WAIT1 : 연결 종료 FIN을 보내고 ack 응답 대기 중
   - CLOSE_WAIT1 : 연결 종료 FIN을 받고 ack를 보낸 상태
+  - TIME_WAIT : ACK를 받고 기다리는 상태
 ##### 3.2.3.5 traceroute
 - 패킷이 어느 경로로 전송되었는지 추적하기 위한 명령어
 ##### 3.2.3.6 mii-tool
@@ -737,6 +739,7 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
 #### 3.2.4 DNS 명령어
 ##### 3.2.4.1 nslookup
 - ip를 통해 도메인 이름을 찾을 수 있는 명령어
+- 찾지 못하는 경우 /etc/resolv.conf에서 nameserver를 확인해야함
 
 
 
