@@ -71,7 +71,9 @@ su - # root 사용자 환경변수도 로드됨
 - newgrp : 현재 로그인한 사용자의 그룹을 변경함
 #### 1.1.6 사용자 환경설정 파일
 - /etc/passwd, /etc/shadow, /etc/group, /etc/gshadow
-- /etc/default/useradd, /etc/login.defs, /etc/skel
+- /etc/default/useradd : useradd 명령어 기본 설정
+- /etc/login.defs : 패스워드 관련 설정
+- /etc/skel : 사용자 생성 시, 해당 디렉토리 내용이 사용자 홈 디렉토리로 복사됨
 ##### 1.1.6.1 /etc/passwd
 - 사용자 계정 UUID, GID, 홈 디렉토리, 셸 정보를 포함한 파일
 - 모든 사용자가 읽을 수 있고, 루트 사용자가 이를 수정할 수 있음
@@ -100,8 +102,8 @@ su - # root 사용자 환경변수도 로드됨
 - logname : 현재 로그인한 사용자의 로그인 이름
 - id [option] [username] : 사용자의 정보와 그룹 정보 출력
 - groups [username] : 사용자 그룹 정보 출력
-- lslogins : 시스템 전체 사용자 출력
-- pwconv, pwunconv, grpconv, grpunconv
+- lslogins : 시스템 전체 사용자 **ID** 출력
+- pwconv(/etc/passwd로부터 /etc/shadow 생성), pwunconv(/etc/shadow를 /etc/passwd로 되돌림), grpconv, grpunconv
 - pwck : /etc/passwd에 잘못된게 있는지 검증
 - gwck : /etc/group에 잘못된게 있는지 검증
 
@@ -312,6 +314,9 @@ su - # root 사용자 환경변수도 로드됨
   - tar [options] [filename]
   - tar 파일 생성 : tar -cvf archive.tar file1.java, file2.java
   - tar 파일 해체 : tar -xvf archive.tar
+  - tar 파일 목록 확인 : tar -t archive.tar
+  - 압축된 tar 파일 해제 : -zxvf(gzip), -jxvf(bzip2), -Jxvf(xz)
+
 ##### 1.4.3.5 압축
 - compress, uncompress
   - compress [options] filename
