@@ -308,6 +308,7 @@ su - # root 사용자 환경변수도 로드됨
 ##### 1.4.3.3 컴파일러
 - gcc [options] 파일명
   - gcc myfile.c -o myfile.out
+  - gcc -c myfile.c
 ##### 1.4.3.4 아카이브
 - tar
   - 백업 및 배포 목적으로 많은 파일을 아카이브 파일로 만드는 유틸리티
@@ -316,7 +317,6 @@ su - # root 사용자 환경변수도 로드됨
   - tar 파일 해체 : tar -xvf archive.tar
   - tar 파일 목록 확인 : tar -t archive.tar
   - 압축된 tar 파일 해제 : -zxvf(gzip), -jxvf(bzip2), -Jxvf(xz)
-
 ##### 1.4.3.5 압축
 - compress, uncompress
   - compress [options] filename
@@ -326,7 +326,63 @@ su - # root 사용자 환경변수도 로드됨
 - 이외 : bzip2(bunzip2), xz(unxz), zip(unzip)
 
 
+
 ## 2. 장치 관리
+
+### 2.1 디스크 확장
+- **주요 명령어 : fdisk**
+#### 2.1.1 개요
+- 용량이 부족할 때 확장함
+- 하드디스크 부착 > 확장 피티션 생성 > 논리 파티션 생성 > 파티션 포맷 > 마운트 > 확인 > /etc/fstab 설정 순서로 진행됨
+#### 2.1.2 하드디스크 부착
+- fdisk -l 명령어로 부착 여부 확인
+#### 2.1.3 확장 파티션 생성
+- sudo fdisk [새로운 하드디스크 Physical Volume]로 콘솔 실행하여 생성
+#### 2.1.4 논리 파티션 생성
+- sudo fdisk [새로운 하드디스크 Physical Volume]로 콘솔 실행하여 생성
+- 하나의 파티션을 논리적으로 여러개로 나눔. 실린더의 개수를 조절하여 나눌 수 있음
+##### 2.1.5 파티션 포맷
+- 특정 파일 시스템으로 파티션을 포맷함
+- ex. ```sudo mkfs.ext4 /dev/sdb5```
+##### 2.1.6 마운트
+- ```sudo mount -t ext4 /dev/sdb5 /home/ubuntu```
+##### 2.1.7 확인
+- ```df```
+##### /etc/fstab 저장
+
+
+### 2.2 프린터
+- 프린트 관련 명령어 위주로 살펴볼 것
+#### 2.2.1 리눅스 프린팅 시스템의 개요
+#### 2.2.2 CUPS
+#### 2.2.3 프린터 추가
+- http://localhost:631
+- http://127.0.0.1:631
+- 병렬 포트 연결 : /dev/lp0에서 접근 가능
+- USB 포트 연결 : /dev/usb/lp0에서 접근 가능
+#### 2.2.4 프린트 출력
+- lpr [options] [filename] : 데이터를 LPD(Linux Printing Daemon)에 전달하여 출력
+  - ```cat file.txt > /dev/lp0```
+  - ```cat file.txt > lpr```
+  - ```lpr file.txt```
+- lp [options] [filename] : 문서를 출력함
+  - ```lp -n 3 file.doc```
+##### 2.2.5 프린트 취소
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
