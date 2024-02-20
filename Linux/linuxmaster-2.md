@@ -340,7 +340,7 @@ su - # root 사용자 환경변수도 로드됨
 - yum, apt-get 등으로 컴파일에 필요한 도구 설치
 - 이전 커널 환경설정 제거 : ```make mrproper```
 - 커널 환경설정 ```make menuconfig``` 명령어로 실행하여 환경설정 변경 후 save 시 .config 파일이 변경됨
-  - 이전 환경 설정을 복사해둔 후 변경하는 것이 좋음 : ```cp /boot/config-$(uname -r).config
+  - 이전 환경 설정을 복사해둔 후 변경하는 것이 좋음 : ```cp /boot/config-$(uname -r).config```
 - 컴파일 진행
   - ```make bzImage``` : 커널 이미지 생성
   - ```make modules``` : 커널에서 사용할 모듈 컴파일
