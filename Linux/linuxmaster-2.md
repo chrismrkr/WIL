@@ -375,26 +375,28 @@ su - # root 사용자 환경변수도 로드됨
 ##### 2.2.1.5 파티션 포맷
 - 특정 파일 시스템으로 파티션을 포맷함
 - ex. ```sudo mkfs.ext4 /dev/sdb5```
-##### 2.1.6 마운트
+##### 2.2.1.6 마운트
 - ```sudo mount -t ext4 /dev/sdb5 /home/ubuntu```
-##### 2.1.7 확인
+##### 2.2.1.7 확인
 - ```df```
-##### /etc/fstab 저장
+##### 2.2.1.8 파티션 설정 저장
+- /etc/fstab 저장
 #### 2.2.2 프린터
 - 프린트 관련 명령어 위주로 살펴볼 것
 ##### 2.2.2.1 리눅스 프린팅 시스템의 개요
-##### 2.2.2.2 CUPS
+##### 2.2.2.2 CUPS(Common Unix Printing System)
 ##### 2.2.2.3 프린터 추가
 - http://localhost:631
 - http://127.0.0.1:631
 - 병렬 포트 연결 : /dev/lp0에서 접근 가능
 - USB 포트 연결 : /dev/usb/lp0에서 접근 가능
 ##### 2.2.2.4 프린트 출력
-- lpr [options] [filename] : 데이터를 LPD(Linux Printing Daemon)에 전달하여 출력
+- BSD 명령어 : lpr [options] [filename] : 데이터를 LPD(Linux Printing Daemon)에 전달하여 출력
   - ```cat file.txt > /dev/lp0```
   - ```cat file.txt > lpr```
   - ```lpr file.txt```
-- lp [options] [filename] : 문서를 출력함
+  - ```lpr -# 3 file```
+- SystemV 명령어 : lp [options] [filename] : 문서를 출력함
   - ```lp -n 3 file.doc```
 ##### 2.2.2.5 프린트 취소
 - BSD : ```lprm [options] [filename]```
@@ -426,7 +428,7 @@ su - # root 사용자 환경변수도 로드됨
 - GPL 오픈소스 라이브러리 이며 리눅스 뿐만 아니라 여러 운영체제에서 지원함
 ##### 2.2.4.2 XSANE(X based interface for the SANE)
 - SANE의 그래픽 기반 응용 프로그램
-- 
+
 
 
 
