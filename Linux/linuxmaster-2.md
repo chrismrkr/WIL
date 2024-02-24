@@ -438,6 +438,128 @@ su - # root 사용자 환경변수도 로드됨
 - 시스템 로그는 /var/log 디렉토리에서 확인할 수 있음
 - 시스템 리부팅 시, 로그 파일을 제거됨
 ##### 3.1.1.2 주요 시스템 로그 파일
+- /var/log/messages(syslog) : 전체 시스템의 모든 동작 사항과 정보 메세지가 로깅됨
+- /var/log/httpd : 웹 서버 아파치의 httpd 데몬이 기록하는 로그 파일
+- /var/log/xferlog : ftp 접속 연관 로그 파일
+- /var/log/secure : 시스템 로그인 행위가 기록된 로그 파일
+- /var/log/lastlog : 사용자의 마지막 로그인 기록을 담고, 바이너리 형식이므로 lastlog 명령어로 확인 가능
+- /var/log/wtmp : 각 사용자의 모든 로그인 및 로그아웃 기록을 담고, 바이너리 형식이므로 last 명령어로 확인 가능
+- /var/log/btmp : 모든 로그인 실패 기록을 담고, 바이너리 형식이므로 lastb 명령어로 확인 가능
+- /var/log/utmp : 사용자의 현재 로그인 상태를 담은 로그
+##### 3.1.1.3 시스템 로그 파일 명령어
+- dmseg : 커널 링 버퍼 출력 및 제어 명령어(옵션 : -c, -T, -level)
+- lastlog : /var/log/lastlog 파일의 로그를 확인하는 명령어(옵션 : -b, -t, -u)
+- last : /var/log/wtmp 파일 로그를 확인하는 명령어(옵션 : reboot, -x, -f)
+- lastb : /var/log/btmp 파일 로그를 확인하는 명령어
+#### 3.1.2 시스템 로그 관리
+##### 3.1.2.1 시스템 로그 관리 개요
+- syslog
+  - 1980년대 에릭 알만이 개발함
+  - /etc/syslog.conf 기반 /var/log 디렉토리에 로그 생성
+- rsyslog
+  - syslog보다 더 인기있음
+  - 2004년 레이너 게르하드를 주축으로 오픈소스로 제작되었고 ip 통신을 통한 로그 기능 구현 목적
+  - /etc/rsyslog.conf에 데몬 환경설정이 저장됨. 부팅 시 데몬이 실행되어 로그를 수집함
+##### 3.1.2.2 rsyslog를 통한 로그 관리
+- rsyslog 관련 파일
+  - /etc/rc.d/init.d/rsyslog : rsyslogd 데몬을 실행하는 스크립트로 start, stop, restart 명령어 실행 가능
+  - /etc/rsyslog.conf : rsyslogd 데몬 환경설정 파일
+- /etc/rsyslog.conf 파일구조 **(중요)**
+  - Global directives, Templates, Output channels, Rules로 이루어짐. Rules가 가장 중요
+  - Rules : selector + action
+    - selector
+      - facility : 로깅할 프로그램을 지정함
+      - priority : 로그 메세지 수준 정의. 지정 수준보다 높은 로그만 기록됨
+    - aciton : 네트워크를 통해 로그 메세지를 전달하는 등의 행위를 정의함
+  - 예시 : [facility,].[priority];[facility,].[priority]   [log 파일 경로]
+    - *.=crit;user.none  /var/log/critical : 모든 facility의 로그 중 crit 레벨인 것과 user 서비스의 로그는 /var/log/critical에 기록함
+    - *.alert  *
+    - cron.*  root,francis
+    - authpriv.*   /dev/tty1
+    - mail.*;mail.!=debug  /var/log/mail-messages
+    - auth,authpriv.alert  @192.168.0.1
+##### 3.1.2.3 로테이션을 통한 로그 용량 관리
+- logrotate : 로그 파일 시스템이 꽉 차는 것을 막고 디스크 공간을 효율적으로 사용하는 유틸리티
+##### 3.1.2.4 journalctl을 통한 로그 관리
+- systemd에서 제공하는 커널 및 저널 로그  ㅘㄴ리
+
+### 3.2 시스템 보안 및 관리
+#### 3.2.1 시스템 보안 관리
+##### 3.2.1.1 리눅스 보안 소개
+##### 3.2.1.2 물리적 보안
+##### 3.2.1.3 시스템 보안
+- sudo 사용은 안전하나 root 사용자 로그인 제한을 막으려면 /etc/passwd 파일의 루트 사용자 셸 설정은 /sbin/nologin으로 변경 필요
+##### 3.2.1.4 서비스 및 운영 보안
+##### 3.2.1.5 파일 시스템 보안
+- chmod, chown, set-UID, sticky-bit와는 별개로 파일 속성 설정을 통한 보안
+- chattr : 파일 속성 수정
+  - chattr +i [file] : 파일을 삭제하거나 이름을 변경할 수 없음
+  - chattr +a [file] : 파일에 오직 추가만 가능. 덮어쓰기 및 삭제 불가능
+- getfacl : 파일의 ACL 확인
+- setfacl : ACL 설정
+  - ex. setfacl [-options] [u:][사용자명][:권한] [filename]
+  - ex. setfacl -m d:u:francis:rw /fransis
+  - ex. getfacl file1 | setfacl --set-file=- file2
+##### 3.2.1.6 네트워크 보안
+#### 3.2.2 SELinux(Security-Enhanced Linux)
+##### 3.2.1.1 SELinux 개요
+- root 권한을 획득하면 시스템 전체를 제어할 수 있다는 점이 위협이 될 수 있음
+- root 권한이더라도 미리 지정한 권한으로 리소스 접근을 제한하는 방법임
+##### 3.2.1.2 SELinux 설정 및 해제
+#### 3.2.3 시스템 보안 유틸리티
+##### 3.2.3.1 SSH
+##### 3.2.3.2 PAM(Pluggable Authentication Module)
+- 리눅스 시스템에서 애플리케이션을 사용하고자 할 때 동적으로 인증할 수 있는 라이브러리
+- /etc/pam.conf, /etc/pam.d/ 에서 설정함
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
