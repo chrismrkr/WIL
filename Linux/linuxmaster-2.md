@@ -511,6 +511,62 @@ su - # root 사용자 환경변수도 로드됨
 ##### 3.2.3.2 PAM(Pluggable Authentication Module)
 - 리눅스 시스템에서 애플리케이션을 사용하고자 할 때 동적으로 인증할 수 있는 라이브러리
 - /etc/pam.conf, /etc/pam.d/ 에서 설정함
+- 환경설정 파일의 control-flag : 인증 성공, 실패에 따른 행위를 설정함
+  - requisite : 반드시 성공. 실패 시 실패 반환
+  - required : 반드시 성공. 단, 동일한 module-type을 모두 체크 후 실패 반환
+  - sufficient : 이전 모듈 체크가 성공하면 나머지는 체크하지 않음
+##### 3.2.3.3 sudo
+- /etc/sudoers에 등록된 사용자만 sudo 명령 가능. 해당 파일은 visudo로 사용 권장
+- /etc/sudoers
+  - user hostname=(runas-user:runas-group) commands
+  - ex. francis ALL=(ALL:ALL) ALL
+  - ex. chris myhost=(webuser:webusers) ALL
+#### 3.2.4 주요 보안 도구
+##### 3.2.4.1 nmap
+##### 3.2.4.2 tcpdump
+##### 3.2.4.3 tripwire
+##### 3.2.4.4 Nessus
+##### 3.2.4.5 GnuPG
+##### 3.2.4.6 John the Ripper
+
+### 3.3 시스템 백업
+#### 3.3.2 파일 백업
+##### 3.3.2.1 tar
+- 전체 백업
+  - tar -cvfp [backup.tar] /file
+  - tar -xvf [backup.tar]
+- 증분 백업
+  - level 0 : 최초 파일 백업
+    - tar -g snapshot -cvfp [backup-lv0.tar] /file
+  - level 1 : 변경된 내용만 백업
+    - tar -g snapshot -cvfp [backup-lv1.tar] /file
+  - 해제
+    - tar -xvf backup-lv0.tar -C
+    - tar -xvf backup-lv1.tar -C
+##### 3.3.2.2 cpio
+
+#### 3.3.3 파일 시스템 및 디스크 백업
+##### 3.3.3.1 dump
+- 디스크 파티션 단위로 백업할 때 사용 
+##### 3.3.3.2 dd
+- 파티션이나 디스크 단위로 백업할 때 사용
+- 백업 시 블록 단위로 지정 가능
+##### 3.3.3.3 restore
+- dump로 생성한 백업 파일 복원
+#### 3.3.4 네트워크 백업
+##### 3.3.4.1 rsync
+- 네트워크로 연결된 원격 컴퓨터의 파일들을 동기화하는 도구
+- root 권한 불필요
+- 로컬 시스템 백업 시에는 별다른 설정 필요 없음
+
+
+
+
+
+
+
+
+
 
 
 
