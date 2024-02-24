@@ -71,6 +71,7 @@ su - # root 사용자 환경변수도 로드됨
 - newgrp : 현재 로그인한 사용자의 그룹을 변경함
 #### 1.1.6 사용자 환경설정 파일
 - /etc/passwd, /etc/shadow, /etc/group, /etc/gshadow
+- /etc/shadow
 - /etc/default/useradd : useradd 명령어 기본 설정
 - /etc/login.defs : 패스워드 관련 설정
 - /etc/skel : 사용자 생성 시, 해당 디렉토리 내용이 사용자 홈 디렉토리로 복사됨
