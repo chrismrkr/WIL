@@ -597,8 +597,8 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
 - standalone : 시스템 시작 시 즉각 백그라운드 실행. 응답성은 좋으나 효율성이 떨어짐
   - CentOS 6 - /etc/rc.d/init.d
   - CentOS  /etc/systemd/system
-- xineted : 사용자 요청이 있을 때 마다 실행
-- systemd on-demand 방식 : xineted와 동일하게 CentOS 7에서 동작
+- inetd : 사용자 요청이 있을 때 마다 실행
+- systemd on-demand 방식 : inetd와 동일하게 CentOS 7에서 동작
 ##### 2.5.3.2 데몬 시작
 - CentOS 6 : /etc/rc.d/init.d 에 시작 스크립트 존재
 - CentOS 7 : systemd 유닛 단위로 실행
