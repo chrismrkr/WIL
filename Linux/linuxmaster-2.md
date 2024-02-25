@@ -473,16 +473,16 @@ su - # root 사용자 환경변수도 로드됨
       - priority : 로그 메세지 수준 정의. 지정 수준보다 높은 로그만 기록됨
     - aciton : 네트워크를 통해 로그 메세지를 전달하는 등의 행위를 정의함
   - 예시 : [facility,].[priority];[facility,].[priority]   [log 파일 경로]
-    - *.=crit;user.none  /var/log/critical : 모든 facility의 로그 중 crit 레벨인 것과 user 서비스의 로그는 /var/log/critical에 기록함
-    - *.alert  *
-    - cron.*  root,francis
+    - *.=crit;user.none  /var/log/critical : 모든 facility의 crit 레벨인 로그 중 user 서비스의 로그는 제외하고 /var/log/critical에 기록함
+    - *.alert  * : 모든 facility의 alert 이상의 로그를 저장함
+    - cron.*  root,francis : cron 서비스의 모든 로그를 root, francis 콘솔에 출력
     - authpriv.*   /dev/tty1
     - mail.*;mail.!=debug  /var/log/mail-messages
     - auth,authpriv.alert  @192.168.0.1
 ##### 3.1.2.3 로테이션을 통한 로그 용량 관리
 - logrotate : 로그 파일 시스템이 꽉 차는 것을 막고 디스크 공간을 효율적으로 사용하는 유틸리티
 ##### 3.1.2.4 journalctl을 통한 로그 관리
-- systemd에서 제공하는 커널 및 저널 로그  ㅘㄴ리
+- systemd에서 제공하는 커널 및 저널 로그 관리
 
 ### 3.2 시스템 보안 및 관리
 #### 3.2.1 시스템 보안 관리
