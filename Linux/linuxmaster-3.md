@@ -14,7 +14,7 @@
 ##### 1.1.2.1 웹의 동작 원리
 - 클라이언트 -> 방화벽 -> WEB 서버 -> WAS -> infrastructure
 - www.google.com를 브라우저에 입력했을 때 웹 페이지가 표시되는 과정
-  - DNS 서버를 통해 www.google.com에 매치되는 ipfmf ckwdma
+  - DNS 서버를 통해 www.google.com에 매치되는 ip를 찾음
   - TCP 3-way 방식으로 웹 서버와 연결(80, 443 포트)
   - 요청에 대한 응답을 WEB & WAS로 부터 내려받음
   - 웹 브라우저에 페이지를 렌더링함
@@ -151,7 +151,7 @@
   - telnet, samba, ssh 등을 통해 사용자 인증 가능
 - LDAP(Lightweight Directory Access Protocol)
   
-#### 1.2.2 NIS 사용하기
+#### 1.2.2 NIS(Network Information Service) 사용하기
 ##### 1.2.2.1 NIS 서버 설치 및 구성
 - RPC 데몬 구동
   - 서버 및 클라이언트 모두 원격 통신을 위해 RPC 데몬 구동 필요
@@ -162,7 +162,7 @@
   - /usr/lib/systemd/system에 NIS 관련 서비스 파일이 설치됨
 - NIS 도메인명 등록
   - 명령어 사용 : ```nisdomainname [도메인명]```
-  - /etc/sysconfig/network에 설정하면 재부팅 후에도 도메인이 사라지지 않음
+  - **/etc/sysconfig/network**에 설정하면 재부팅 후에도 도메인이 사라지지 않음
 - NIS 사용자 계정 생성
   - NIS 클라이언트에서 사용할 계정 생성 : ```useradd nisuser```
 - NIS 관련 데몬 실행
@@ -175,7 +175,7 @@
 - NIS 클라이언트 설치 : ```yum -y install ypbind yp-tools```
 - NIS 도메인명 설정
 - NIS 서비스(서버)와 도메인 정보 설정
-   - /etc/yp.conf에 설정
+   - **/etc/yp.conf**에 설정
 - NIS 클라이언트 데몬(ypbind) 실행
 ##### 1.2.2.3 NIS 관련 주요 명령어
 - nisdomainname : NIS 도메인 이름 설정 또는 도메인 확인
@@ -206,6 +206,10 @@
 - 삼바 관련 패키지 설치 : ```yum -y install samba-common samba-client```
 - 삼바 서버 접속
   - smbclient 명령어
+    - smbclient -L : 삼바 서버의 공유 디렉토리 정보 표시
+    - smbclient -M : 메세지 전송
+    - smbclient -U : 사용자 이름 지정
+    - smbclient -p : TCP 포트번호 지정
     
 #### 1.3.2 NFS(Network File System) 서비스 사용하기
 ##### 1.3.2.1 NFS 서비스 개요
@@ -250,9 +254,13 @@
 - 메일 관련 패키지 설치 : ```yum -y install sendmail```
 - sendmail 주요 설정 파일
   - /etc/mail/sendmail.cf
+    -
   - /etc/mail/access : 메일 서버에 접속하는 호스트의 접근을 제어하는 설정 파일
     - ex. Connect:127.0.0.1  OK, From:abnormal@google.com   REJECT
     - ```makemap hash /etc/mail/access < /etc/mail/access```
+  - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정으로 전달하는 것을 설정
+    - sendmail이 참조하는 파일은 /etc/aliases.db임
+    - /etc/aliases 수정 후, newaliases 또는 sendmail bi로 변경
 
 ### 1.5 DNS 관리 서비스
 #### 1.5.1 DNS의 개요
@@ -264,9 +272,10 @@
 ##### 1.5.2.1 DNS 설치
 - 관련 패키지 설치 : ```yum -y install bind```
 ##### 1.5.2.2 /etc/named.conf 파일 설정
+- /*~*/, //, #를 주석 기호로 사용할 수 있음
 - DNS 서버 주요 환경 설정 파일
   - options
-    - directory : zone 파일 설정
+    - directory : zone 파일 설정(/var/named)
     - forward : only(도메인 주소에 대한 query를 다른 서버로 넘김), first(다른 서버에서 응답이 없을 경우 자신이 응답)
     - allow-query : 질의할 수 있는 호스트 지정
     - allow-transfer : 파일 내용을 복사할 대상 정의
@@ -274,8 +283,26 @@
   - acl : 여러 호스트들을 하나의 이름으로 지정하여 allow-query, allow-transfer에서 사용하도록 함
   - zone : 도메인을 관리하기 위한 데이터 파일
 ##### 1.5.2.3 zone 파일 설정
-- 도메인, IP, 리소스 간 매핑 정보를 포함함
-- ex.
+- 도메인, IP, 리소스 간 매핑 정보를 포함한 파일
+- zone 파일은 도메인 -> ip 매핑이고, rev 파일은 ip -> 도메인 매핑
+- named-checkzone [도메인명] [파일경로] : /var/named/ 이하 zone 파일 문법 점검
+- named-checkconf [파일경로] : /etc/named.conf 문법 점검
+```sh
+zone "[도메인명]" IN {
+  type [master|slave|hint];
+  file "[zone 파일명]";
+};
+```
+- SOA 레코드 : zone 소유자, 메일주소, 유효성 검사 주기 등을 설정함
+  - Nameserver
+  - Contact_email_address
+  - Serial_number
+- 주요 레코드 타입
+  - A : ipv4 주소
+  - CNAME : 도메인 이름 별칭
+  - MX : 도메인 이름에 대한 메일 교환 서버
+  - NS : 호스트에 대한 공식 네임 서버
+  
 
 ### 1.6 가상화 관련 서비스
 #### 1.6.1 가상화 서비스의 개요
@@ -288,14 +315,30 @@
 - 절연(insulation)
 ##### 1.6.1.2 가상화 서비스 방식과 기술
 - 하드웨어 레벨의 가상화
-  - 전가상화
-  - 반가상화
+  - 전가상화 : 하드웨어를 완전히 가상화하여 다양한 게스트 OS를 수정없이 사용 가능
+  - 반가상화 : 하이퍼바이저에 하드웨어 제어를 요청하며 동작
 - 호스트 기반 가상화(Virtual Machine)
+- Xen : 하이퍼바이저 기반의 가상화 기술로 전가상화 및 반가상화 모두 지원
+- KVM : CPU 전가상화를 지원하는 기술로 이더넷, DISK I/O, 그래픽은 반가상화를 지원함
+
 
 ### 1.7 기타 서비스
 #### 1.7.1 슈퍼 데몬
 ##### 1.7.1.1 슈퍼 데몬의 개요
-##### 1.7.1.2 
+- inetd와 같이 다른 서비스를 실행 관리하는 데몬을 슈퍼 데몬이라 함
+- inetd, standalone 방식 사용. Access Control을 위한 TCP Wrapper
+- xinted(/etc/xinted)
+##### 1.7.1.2 TCP Wrapper
+- /etc/hosts.allow, /etc/hosts.deny 파일을 이용하여 데몬 서비스 접근제어
+#### 1.7.2 프록시 서비스
+##### 1.7.2.1 프록시 개요
+##### 1.7.2.2 리눅스 프록시 서버(squid)
+#### 1.7.3 DHCP 서비스
+##### 1.7.3.1 DHCP 서비스의 개요
+- 호스트가 사용할 ip 주소, 게이트워이 주소, 네임 서버 주소 등을 자동으로 할당하는 서비스
+#### 1.7.4 VNC 서비스
+##### 1.7.4.1 VNC 서비스의 개요
+- 해상도 변경 : /etc/sysconfig/vncservers 수정
 
 ## 2. 네트워크 보안
 ### 2.1 네트워크 침해 유형 및 특징
@@ -307,8 +350,9 @@
 - 패킷 정보를 임의로 변경하는 기법
 ##### 2.1.1.3 Dos DDos
 - Ping of Death : 패킷을 정상적인 크기보다 더 크게하여 전송하여 시스템에 문제를 일으키는 방법
-- 
-
+- Smurf Attack : 송신 ip 주소를 공격 서버로 변경하고 브로드캐스트하면 공격 대상 서버가 이를 받게되며 부하가 걸림
+- Teardrop Attack : 패킷을 재조립할 때 offset을 임의로 공격
+- Land Attack : 발신자 수신자 ip를 모두 공격 대상으로 변경
 
 
 
