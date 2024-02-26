@@ -190,11 +190,124 @@
 #### 1.3.1 삼바(SAMBA) 서비스 사용하기
 ##### 1.3.1.1 삼바 서비스 개요
 - GPL 라이센스인 자유 소프트웨어로 호스트 간 디렉토리, 파일, 프린터 등을 공유하기 위해 사용함
+- 삼바의 구성요소
+  - smdb : 주요 서비스로 ip를 통해 직접 접속 가능(tcp : 445)
+  - nmdb : UDP 포트(137, 138)로 호스트를 브로드 캐스팅 방식으로 검색 후, TCP 139 포트를 이용하여 호스트 이름으로 접속
+##### 1.3.1.2 삼바 서비스 설치와 구성
+- 삼바 관련 패키지 설치 : ```yum -y install samba samba-common samba-client```
+- 삼바 서비스 실행 : ```systemctl start smb.service nmb.service```
+  - 부팅 시 자동 실행하도록 설정 : ```systemctl enable smb.service nmb.service```
+- 삼바 서비스 설정 : /etc/samba/smb.conf
+- 삼바 서비스 사용자 등록 및 패스워드 설정
+  - /etc/samba/smbusers에서 리눅스 계정과 삼바 사용자 매핑
+  - smbpasswd 명령어로 삼바 사용자 계정 활성화 및 패스워드 설정
+  - pdbedit 명령어로 삼바 사용자 목록 및 세부 내용 확인
+##### 1.3.1.3 삼바 서비스 이용하기
+- 삼바 관련 패키지 설치 : ```yum -y install samba-common samba-client```
+- 삼바 서버 접속
+  - smbclient 명령어
+    
+#### 1.3.2 NFS(Network File System) 서비스 사용하기
+##### 1.3.2.1 NFS 서비스 개요
+- TCP/IP를 통해 원격 호스트에 있는 파일 시스템을 로컬 호스트에 마운트해서 사용하는 방식
+##### 1.3.2.2 NFS 서비스 설치 및 구성
+- NFS 관련 패키지 설치 : ```yum -y install rpcbind nfs-utils```
+- NFS 서버 설정
+  - /etc/exports 파일에서 NFS 서비스 설정
+  - echo "/var/test-nfs 172.30.0.0/24(rw,no_root_squash)" >> /etc/exports
+    - [서버 디렉토리] [접속 허가 클라이언트 호스트](옵션)
+    - 옵션 종류
+      - root-squash : root 접근 권한 거부
+      - no-root-squash: root 접근 권한 허용
+  - mkdir /var/test-nfs
+  - chmod 666 /var/test-nfs
+- NFS 관련 데몬 실행 : ```systemctl start rpcbind nfs-server``` ```systemctl enable rpcbind nfs-server```
+##### 1.3.2.3 NFS 서비스 이용하기
+- NFS 서버 접속
+- 클라이언트 호스트에 디렉토리 마운트
+  - ```mount -t nfs [클라이언트 ip]:[서버 디렉토리 경로] /var/test-local```
+  - /etc/fstab에서도 설정 가능
+    
+#### 1.3.3 FTP(File Transport Protocal)
+##### 1.3.3.1 FTP 개요
+- FTP 서버와 클라이언트 사이 파일 전송을 위한 프로토콜
+- 능동 모드 : 클라이언트가 서버에 포트번호를 알리고 이를 통해 서버가 클라이언트로 접속
+- 수동 모드 : 서버가 포트번호를 지정하고, 이를 통해 클라이언트가 서버로 접속
+##### 1.3.3.2 FTP 서비스 설치와 구성
+- FTP 관련 패키지 설치 : ```yum -y install vsftpd```
+- FTP 서버 설정 : ```/etc/vsftpd/vsftpd.conf```
+- vsftpd 데몬 실행 : ```systemctl start vsftpd.service```
+##### 1.3.3.3 FTP 서비스 이용하기
+- FTP 클라이언트 설치 : ```yum -y install ftp```
+
+### 1.4 메일 관련 서비스
+#### 1.4.1 메일 관련 서비스의 개요
+##### 1.4.1.1 메일 서비스의 개념과 구성요소
+- SMTP : TCP 25. 메일 전송을 위해 사용하는 프로토콜
+- POP3 : TCP 110. 도착한 메일을 수신하는 프로토콜 
+- IMAP : TCP 143. 도착한 메일을 수신하는 프로토콜. POP3과 달리 메일을 서버에 남겨 두었다가 삭제할 수 있음
+##### 1.4.1.2 메일 서비스 사용하기
+- 메일 관련 패키지 설치 : ```yum -y install sendmail```
+- sendmail 주요 설정 파일
+  - /etc/mail/sendmail.cf
+  - /etc/mail/access : 메일 서버에 접속하는 호스트의 접근을 제어하는 설정 파일
+    - ex. Connect:127.0.0.1  OK, From:abnormal@google.com   REJECT
+    - ```makemap hash /etc/mail/access < /etc/mail/access```
+
+### 1.5 DNS 관리 서비스
+#### 1.5.1 DNS의 개요
+##### 1.5.1.1 DNS의 개념과 구성요소
+- 도메인 이름과 ip를 상호 변환하는 서비스
+- TCP 53, UDP 53 포트 이용
+- Primary Name Server, Slave Name Server, Caching Name Server 3가지 존재
+#### 1.5.2 DNS 서비스 사용하기
+##### 1.5.2.1 DNS 설치
+- 관련 패키지 설치 : ```yum -y install bind```
+##### 1.5.2.2 /etc/named.conf 파일 설정
+- DNS 서버 주요 환경 설정 파일
+  - options
+    - directory : zone 파일 설정
+    - forward : only(도메인 주소에 대한 query를 다른 서버로 넘김), first(다른 서버에서 응답이 없을 경우 자신이 응답)
+    - allow-query : 질의할 수 있는 호스트 지정
+    - allow-transfer : 파일 내용을 복사할 대상 정의
+  - logging
+  - acl : 여러 호스트들을 하나의 이름으로 지정하여 allow-query, allow-transfer에서 사용하도록 함
+  - zone : 도메인을 관리하기 위한 데이터 파일
+##### 1.5.2.3 zone 파일 설정
+- 도메인, IP, 리소스 간 매핑 정보를 포함함
+- ex.
+
+### 1.6 가상화 관련 서비스
+#### 1.6.1 가상화 서비스의 개요
+##### 1.6.1.1 가상화 특징
+- 하나의 물리적 리소스를 여러 논리적 리소스로 나누거나, 다수의 물리적 자원을 하나의 논리적 자원으로 통합하는 것
+- 공유(Sharing) : 다수의 가상 자원들이 하나의 물리적 자원에 연결되거나 가리키는 것
+- 프로비저닝(Provisioning) : 사용자의 요구사항에 맞게 리소스를 세밀한 조각으로 나눈 것
+- 에뮬레이션(Emulation)
+- 단일화(Aggregation) : 물리적 자원을 통합하여 하나의 논리적 자원으로 하는 것
+- 절연(insulation)
+##### 1.6.1.2 가상화 서비스 방식과 기술
+- 하드웨어 레벨의 가상화
+  - 전가상화
+  - 반가상화
+- 호스트 기반 가상화(Virtual Machine)
+
+### 1.7 기타 서비스
+#### 1.7.1 슈퍼 데몬
+##### 1.7.1.1 슈퍼 데몬의 개요
+##### 1.7.1.2 
+
+## 2. 네트워크 보안
+### 2.1 네트워크 침해 유형 및 특징
+#### 2.1.1 네트워크 침해 유형
+##### 2.1.1.1 스니핑
+- 네트워크 내에서 전송되는 패킷을 임의로 확인하는 공격 기법
+- 대응방법 : SSL 암호화
+##### 2.1.1.2 스푸핑
+- 패킷 정보를 임의로 변경하는 기법
+##### 2.1.1.3 Dos DDos
+- Ping of Death : 패킷을 정상적인 크기보다 더 크게하여 전송하여 시스템에 문제를 일으키는 방법
 - 
-
-
-
-
 
 
 
