@@ -62,9 +62,124 @@
   - /etc/rc.d/rc.local에서 데몬 설정
   - /usr/local/apache/conf/httpd.conf에서 웹 서버 도메인 및 ip 설정 가능
 ##### 1.1.3.3 MySQL 소스코드 컴파일 및 설치
-
-
+- cmake 설치 : ```yum install cmake```
+- 소스코드 및 boost 라이브러리 다운로드
+  - wget 명령어로 boost.tar.gz, mysql-boost-[version].tar.gz 다운로드 후 압축 해제
+- 소스코드 빌드 설정 실행
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql ... 명령어로 환경설정
+  - ```cmake -L``` 설정된 옵션 확인 가능
+- 소스코드 컴파일 및 빌드
+  - ```make && make install```
+- 설치 확인
+  - /usr/local/mysql 내용 확인
+  - ```mysql --version``` 명령어로 확인
+  - ```useradd -d /usr/local/mysql mysql``` 명령어로 계정 생성
+  - /var/log/mysqld.log에서 임시 root 계정 비밀번호 확인 가능
+- 기본 DB 및 테이블 생성
+  - ```mysqld --initialize```    
 ##### 1.1.3.4 PHP 소스코드 컴파일 및 설치
+- 소스코드 다운로드
+  - wget php-[version].tar.bz2 다운로드 후 압축 해제
+- 소스코드 빌드 설정(cmake)
+  - ```./configure --prefix=/usr/local/php --with-apxs2=/usr/local/apache/bin/apxs --with-mysql=/usr/local/mysql --with-config-file-path=/usr/local/apache/conf```
+- 소스코드 컴파일 및 설치
+  - ```make && make install```
+- 설치 확인
+  - ```php --version```
+- php.ini 파일 복사 후 아파치 웹 서버 재시작
+  - cp ./php.init-production /usr/local/apache/conf/php.ini
+  - /usr/local/apache/bin/apachectl restart
+- 연동 확인
+  - echo "<?php phpinfo(); ?> > /usr/local/apache/htdocs/sample.php
+##### 1.1.3.5 패키자 관리자를 이용한 APM 설치 및 연동
+- 아파치 웹 서버 설치 및 기본 동작 확인
+  - ```yum -y install httpd```
+  - ```netstat -nlp | grep httpd```
+- MySQL 설치와 기본 동작 확인
+  - ```yum -y install [url]```
+  - ```service mysqld start``` 또는 ```systemctl start mysqld.service```
+  - ```service mysqld status``` 또는 ```systemctl status mysqld.service```
+- MySQL root 패스워드 변경
+  - /var/log/mysqld.log에서 root 계정 임시 비밀번호 확인 가능
+  - ```mysqladmin -uroot -p'[임시 비밀번호]' password [신규 비밀번호]
+- MySQL 접속
+  - mysql -uroot -p'[비밀번호]'
+- PHP 설치 및 기본 동작 확인
+  - ```yum -y install php php-mysql```
+  - ```php -r 'echo "hello world";'
+- 아파치 웹 서버 php 설정 변경
+  - vi /etc/httpd/conf/httpd.conf에서 변경
+- 아파치 웹서버 재시작
+  - ```apachectl restart```
+- 아파치, MySQL, php 연동 테스트
+- 방화벽 설정
+###### 1.1.3.6 아파치 웹 서버의 구조와 세부 설정
+- **실습 및 기출 문제 위주로 진행하며 정리할 것**
+- /etc/httpd/conf에 기본 환경설정 파일인 httpd.conf 파일이 존재함
+- httpd.conf 파일에서 Include conf.d/*.conf로 모든 설정 파일을 포함함
+- httpd.conf 주요 설정 항목
+  - ServerRoot : 아파치 서버의 주요 파일이 저장된 최상위 디렉터리 절대경로 설정
+  - Listen : 포트번호 지정
+  - LoadModules : DSO(Dynamic Shared Object) 방식으로 로드할 모듈 지정
+  - User : 데몬 실행 사용자 권한 지정
+  - Group : 데몬 실행 그룹 권한 지정
+  - ServerAdmin : 어드민 이메일 설정. 에러 발생 시 해당 메일로 에러 메세지 전달
+  - ServerName : 호스트명 입력
+  - DocumentDirectory : Docment Root 디렉토리를 지정함
+  - Directory : 지정한 디렉토리에 대한 권한, 제어, 옵션 등을 설정함
+  - FileMatch : 지정된 패턴에 맞는 파일에 대한 권한, 제어, 옵션 등을 설정함
+  - AllOverride
+  - LogLevel
+    - /etc/rsyslog.conf 내 우선순위와 동일함
+  - ifModule : 지정한 모듈에 대한 세부 동작 옵션 설정
+    - log_config_module : 로그 레벨
+    - mod_userdir.c : 사용자 별 홈 페이지 사용여부 설정(사용자 A는 a 홈페이지, B는 b 홈페이지..)
+- httpd-vhosts.conf
+  - 하나의 ip 주소로 여러개의 도메인(호스트)를 설정할 수 있음
+- default.conf, http-default.conf
+  - 기본 설정 값이 들어 있음
+
+### 1.2 인증 관련 서비스
+#### 1.2.1 인증 관련 서비스 개요
+##### 1.2.1.1 리눅스 인증의 개요
+- 리눅스 기본 인증은 /etc/passwd, /etc/shadow에서 관리됨
+- 리눅스 시스템 사용자가 많으면 네트워크 인증이 필요함(NIS, LDAP)
+##### 1.2.1.2 NIS와 LDAP 서비스의 주요 특징
+- NIS(Network Information Service)
+  - 시스템에 등록된 사용자 계정 정보를 네트워크를 통해 다른 시스템에 제공
+  - 여러 호스트는 동일한 계정 정보를 이용할 수 있음
+  - telnet, samba, ssh 등을 통해 사용자 인증 가능
+- LDAP(Lightweight Directory Access Protocol)
+  - 디렉토리 
+#### 1.2.2 NIS 사용하기
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
