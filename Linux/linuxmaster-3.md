@@ -101,12 +101,12 @@
   - ```service mysqld status``` 또는 ```systemctl status mysqld.service```
 - MySQL root 패스워드 변경
   - /var/log/mysqld.log에서 root 계정 임시 비밀번호 확인 가능
-  - ```mysqladmin -uroot -p'[임시 비밀번호]' password [신규 비밀번호]
+  - ```mysqladmin -uroot -p'[임시 비밀번호]' password [신규 비밀번호]```
 - MySQL 접속
-  - mysql -uroot -p'[비밀번호]'
+  - mysql -uroot -p '[비밀번호]'
 - PHP 설치 및 기본 동작 확인
   - ```yum -y install php php-mysql```
-  - ```php -r 'echo "hello world";'
+  - ```php -r 'echo "hello world";'```
 - 아파치 웹 서버 php 설정 변경
   - vi /etc/httpd/conf/httpd.conf에서 변경
 - 아파치 웹서버 재시작
