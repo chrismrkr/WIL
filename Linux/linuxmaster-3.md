@@ -254,7 +254,6 @@
 - 메일 관련 패키지 설치 : ```yum -y install sendmail```
 - sendmail 주요 설정 파일
   - /etc/mail/sendmail.cf
-    -
   - /etc/mail/access : 메일 서버에 접속하는 호스트의 접근을 제어하는 설정 파일
     - ex. Connect:127.0.0.1  OK, From:abnormal@google.com   REJECT
     - ```makemap hash /etc/mail/access < /etc/mail/access```
