@@ -125,6 +125,7 @@
   - BSD : 버클리 대학교 오픈소스 라이센스. 2차 저작물은 재배포 및 소스 공개가 의무가 아님
   - 아파치 라이센스 : 2차 저작물을 상업적 목적으로 사용할 수 있음. 단, 아파치 라이센스를 따른다고 명시해야함
   - MPL 라이센스 : 자유 소프트웨어가 아닌 MPL 소스코드에 대한 공개만 강제됨
+    - 2차 저작물 라이센스 공개 필요
   - MIT 라이센스 : 라이센스 및 저작권만 명시하면 무엇이든 사용 가능
 
 #### 1.2.3 리눅스의 역사와 리눅스 배포판
@@ -138,9 +139,13 @@
   - 우분투
   - raspbian
   - chromeOS
+  - Vector Linux
 - 레드햇 : 유료서비스를 통한 수익 창출 추구.
   - centOS : 단, centOS는 개인 사용자에게 무료로 배포됨(apt)
   - Fedora
+  - Oracle Linux
+  - Scientific Linux
+  - Oracle Linux
 
 ***
 
@@ -335,6 +340,8 @@
 #### 2.3.1 X 윈도우 개념
 - 유닉스 및 리눅스 접속을 위한 독립적 윈도우 시스템
 - 일반적인 서버-클라이언트 모델을 사용하므로 X 프로토콜을 준수할 수 있는 시스템에는 X 윈도우 이식 가능
+- 디스플레이 장치에 의존적이지 않음
+- 라이센스 논란으로 인하여 XFree86을 사용하지 않고 X.org 사용
 #### 2.3.2 X 윈도우 구조
 - X 서버, X 클라이언트
 - X 프로토콜 : Request, Reply, Event, Error
@@ -603,16 +610,18 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
   - CentOS  /etc/systemd/system
 - inetd : 사용자 요청이 있을 때 마다 실행
 - systemd on-demand 방식 : inetd와 동일하게 CentOS 7에서 동작
+- /etc/rc.d/rc.local에 부팅 시 자동 실행되어야할 명령어를 기록함
 ##### 2.5.3.2 데몬 시작
 - CentOS 6 : /etc/rc.d/init.d 에 시작 스크립트 존재
 - CentOS 7 : systemd 유닛 단위로 실행
   - 원하는 타겟 실행 시, 데몬이 실행되도록 할 수 있음 (ex. systemctl enable httpd.service)
 ##### 2.5.3.3 데몬 설정 도구(CentOS 6)
-- ntsys, chkconfig, system-config-services
+- ntsys : 텍스트 환경에서 커서를 이용하여 부팅 중 자동으로 실행되는 서비스를 설정하는 유틸리티
+- chkconfig : Run Level 별로 서비스의 동작 방식을 설정하고 조회함
+- system-config-services : 서비스 시작, 정지, 재시작 등을 제어하는 명령어
 ##### 2.5.3.4 데몬 설정 도구(CentOS 7)
 - systemctl, systemd-cgtop(cgroup에 속한 데몬 설정), systemd-cgls, systemd-analyze
   - cgroup : 애플리케이션 단위로 리소스 자원 관리
-
 
 ***
 
