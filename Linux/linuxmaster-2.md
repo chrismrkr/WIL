@@ -570,6 +570,9 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
     - tar -xvf backup-lv0.tar -C
     - tar -xvf backup-lv1.tar -C
 ##### 3.3.2.2 cpio
+- 표준 입출력을 통해 디렉토리를 백업하고 복원함
+- ```find /source-directory -depth | cpio -o > archive.cpio```
+- ```cpio -i < archive.cpio -d /destination-directory```
 
 #### 3.3.3 파일 시스템 및 디스크 백업
 ##### 3.3.3.1 dump
