@@ -82,6 +82,7 @@
   - wget php-[version].tar.bz2 다운로드 후 압축 해제
 - 소스코드 빌드 설정(cmake)
   - ```./configure --prefix=/usr/local/php --with-apxs2=/usr/local/apache/bin/apxs --with-mysql=/usr/local/mysql --with-config-file-path=/usr/local/apache/conf```
+  -  ```--with-config-file-path=[ini파일_저장경로]``` 옵션을 통해 .ini 파일이 저장될 위치 미리 설정 가능
 - 소스코드 컴파일 및 설치
   - ```make && make install```
 - 설치 확인
@@ -150,7 +151,11 @@
   - 여러 호스트는 동일한 계정 정보를 이용할 수 있음
   - telnet, samba, ssh 등을 통해 사용자 인증 가능
 - LDAP(Lightweight Directory Access Protocol)
-  
+  - 주요 속성
+    - DN : 조직 내 고유 식별자
+    - RDN : 상대 RD
+    - CN : 전체 이름(성+이름)
+    - SN : 성
 #### 1.2.2 NIS(Network Information Service) 사용하기
 ##### 1.2.2.1 NIS 서버 설치 및 구성
 - RPC 데몬 구동
@@ -200,8 +205,10 @@
 - 삼바 서비스 설정 : /etc/samba/smb.conf
 - 삼바 서비스 사용자 등록 및 패스워드 설정
   - /etc/samba/smbusers에서 리눅스 계정과 삼바 사용자 매핑
-  - smbpasswd 명령어로 삼바 사용자 계정 활성화 및 패스워드 설정
-  - pdbedit 명령어로 삼바 사용자 목록 및 세부 내용 확인
+  - smbpasswd : 삼바 사용자 계정 활성화 및 패스워드 설정
+  - pdbedit : 삼바 사용자 목록 및 세부 내용 확인
+  - write list : 쓰기 가능한 사용자 지정
+  - valid users : 접근 가능 사용자 지정(기본 값 : 모든 사용자)
 ##### 1.3.1.3 삼바 서비스 이용하기
 - 삼바 관련 패키지 설치 : ```yum -y install samba-common samba-client```
 - 삼바 서버 접속
@@ -226,11 +233,15 @@
   - mkdir /var/test-nfs
   - chmod 666 /var/test-nfs
 - NFS 관련 데몬 실행 : ```systemctl start rpcbind nfs-server``` ```systemctl enable rpcbind nfs-server```
+- NFS 서버 관련 명령어
+  - exportfs : export된 디렉토리 정보, 즉 공유 목록 관리
 ##### 1.3.2.3 NFS 서비스 이용하기
 - NFS 서버 접속
 - 클라이언트 호스트에 디렉토리 마운트
   - ```mount -t nfs [클라이언트 ip]:[서버 디렉토리 경로] /var/test-local```
   - /etc/fstab에서도 설정 가능
+- NFS 클라이언트 관련 명령어
+  - showmount : NFS 서버에서 export된 정보 확인
     
 #### 1.3.3 FTP(File Transport Protocal)
 ##### 1.3.3.1 FTP 개요
@@ -260,6 +271,8 @@
   - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정으로 전달하는 것을 설정
     - sendmail이 참조하는 파일은 /etc/aliases.db임
     - /etc/aliases 수정 후, newaliases 또는 sendmail bi로 변경
+  - 홈 디렉토리의 .forward 파일
+    - 외부 메일 서버로 전송하기 위해 사용
 
 ### 1.5 DNS 관리 서비스
 #### 1.5.1 DNS의 개요
@@ -290,7 +303,7 @@
 - named-checkconf [파일경로] : /etc/named.conf 문법 점검
 ```sh
 zone "[도메인명]" IN {
-  type [master|slave|hint];
+  type [master|slave|hint]; # hint : 루트 도메인, mater : 1차 네임 서버, slave : 2차 네임 서버
   file "[zone 파일명]";
 };
 ```
@@ -321,6 +334,10 @@ zone "[도메인명]" IN {
 - 호스트 기반 가상화(Virtual Machine)
 - Xen : 하이퍼바이저 기반의 가상화 기술로 전가상화 및 반가상화 모두 지원
 - KVM : CPU 전가상화를 지원하는 기술로 이더넷, DISK I/O, 그래픽은 반가상화를 지원함
+##### 1.6.1.3 가상 머신 관련 명령어
+- virt-top : 가상머신 CPU 자원 모니터링
+- virsh : 가상머신 셸
+- virt-manager
 
 
 ### 1.7 기타 서비스
@@ -334,9 +351,12 @@ zone "[도메인명]" IN {
 #### 1.7.2 프록시 서비스
 ##### 1.7.2.1 프록시 개요
 ##### 1.7.2.2 리눅스 프록시 서버(squid)
+- http_access allow : 특정 대역만 사용하도록 허가함
 #### 1.7.3 DHCP 서비스
 ##### 1.7.3.1 DHCP 서비스의 개요
 - 호스트가 사용할 ip 주소, 게이트워이 주소, 네임 서버 주소 등을 자동으로 할당하는 서비스
+- DHCP 데몬 설정 파일 위치 : /etc/dhcp/dhcpd.conf
+  - log-facility :  syslog에서 전달한 로그 facility 지정
 #### 1.7.4 VNC 서비스
 ##### 1.7.4.1 VNC 서비스의 개요
 - 해상도 변경 : /etc/sysconfig/vncservers 수정
