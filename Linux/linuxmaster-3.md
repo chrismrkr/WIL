@@ -254,6 +254,8 @@
 - vsftpd 데몬 실행 : ```systemctl start vsftpd.service```
 ##### 1.3.3.3 FTP 서비스 이용하기
 - FTP 클라이언트 설치 : ```yum -y install ftp```
+##### 1.3.3.4 FTP 관련 파일
+- /etc/vsftpd/ftpdusers : 서버에 접근할 수 없는 계정 기입
 
 ### 1.4 메일 관련 서비스
 #### 1.4.1 메일 관련 서비스의 개요
