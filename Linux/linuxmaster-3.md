@@ -275,7 +275,9 @@
 - DNS 서버 주요 환경 설정 파일
   - options
     - directory : zone 파일 설정(/var/named)
-    - forward : only(도메인 주소에 대한 query를 다른 서버로 넘김), first(다른 서버에서 응답이 없을 경우 자신이 응답)
+    - forward :
+      - only : 도메인 주소에 대한 query를 다른 서버로 넘김
+      - first : 다른 서버에서 응답이 없을 경우 자신이 응답
     - allow-query : 질의할 수 있는 호스트 지정
     - allow-transfer : 파일 내용을 복사할 대상 정의
   - logging
