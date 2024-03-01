@@ -59,7 +59,7 @@
   - /usr/local/apache에서 설치 상태 확인
   - ```httpd -version```으로 설치 상태 확인
 - 데몬 설정 및 도메인 설정
-  - /etc/rc.d/rc.local에서 데몬 설정
+  - /etc/rc.d/rc.local에서 데몬 설정 
   - /usr/local/apache/conf/httpd.conf에서 웹 서버 도메인 및 ip 설정 가능
 ##### 1.1.3.3 MySQL 소스코드 컴파일 및 설치
 - cmake 설치 : ```yum install cmake```
