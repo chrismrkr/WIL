@@ -266,8 +266,9 @@ DirectoryIndex index.html
 ##### 1.3.2.3 NFS 서비스 이용하기
 - NFS 서버 접속
 - 클라이언트 호스트에 디렉토리 마운트
-  - ```mount -t nfs [클라이언트 ip]:[서버 디렉토리 경로] /var/test-local```
+  - ```mount -t nfs [NFS 서버 ip]:[서버 디렉토리 경로] /var/test-local```
   - /etc/fstab에서도 설정 가능
+    - ```[NFS 서버 ip]:[서버 디렉토리 경로] [로컬 디렉토리 경로] nfs ... ```
 - NFS 클라이언트 관련 명령어
   - showmount : NFS 서버에서 export된 정보 확인
     
