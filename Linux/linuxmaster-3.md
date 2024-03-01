@@ -139,6 +139,34 @@
   - 하나의 ip 주소로 여러개의 도메인(호스트)를 설정할 수 있음
 - default.conf, http-default.conf
   - 기본 설정 값이 들어 있음
+- 예시
+```conf
+# 기본 설정
+ServerRoot "/etc/httpd"
+
+# 서버의 IP 주소와 포트 지정
+Listen 80
+
+# 서버의 이름 설정
+ServerName example.com
+
+# 로그 파일 위치 설정
+ErrorLog "/var/log/httpd/error_log"
+CustomLog "/var/log/httpd/access_log" common
+
+# 기본 디렉토리 설정
+DocumentRoot "/var/www/html"
+
+# 디렉토리 옵션 설정
+<Directory "/var/www/html">
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# 기본 인덱스 페이지 설정
+DirectoryIndex index.html
+```
 
 ### 1.2 인증 관련 서비스
 #### 1.2.1 인증 관련 서비스 개요
