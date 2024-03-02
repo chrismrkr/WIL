@@ -591,8 +591,8 @@ echo "${STR%%A*1} # 맨 뒤부터 A로 시작해서 1로 끝나는 문자열 중
 - ctrl+c, kill
 - 시그널 : 프로세스가 다른 프로세스에 신호를 주는 방식. kill -l
   - SIGHUP(1) : 터미널 접속 끊김
-  - SIGINT(2) : ctrl+c로 인터럽트 발생
-  - SIGQUIT(3) : ctl+q 입력
+  - SIGINT(2) : ctrl+c로 인터럽트 발생시켜 프로세스 종료
+  - SIGQUIT(3) : ctl+q 또는 ctrl+\ 입력. 코어 덤프 후 프로세스 종료
   - SIGKILL(9) : 프로세스 강제 종료
   - SIGTERM(15) : 프로세스 정상 종료
   - SIGCONT(18) : 프로세스 재개
