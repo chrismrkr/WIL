@@ -564,8 +564,8 @@ dateext
 ##### 3.2.1.5 파일 시스템 보안
 - chmod, chown, set-UID, sticky-bit와는 별개로 파일 속성 설정을 통한 보안
 - chattr : 파일 속성 수정
-  - chattr +i [file] : 파일을 삭제하거나 이름을 변경할 수 없음
-  - chattr +a [file] : 파일에 오직 추가만 가능. 덮어쓰기 및 삭제 불가능
+  - chattr +i [file] : 파일을 삭제하거나 수정할 수 없음(immutable)
+  - chattr +a [file] : 파일에 오직 추가만 가능. 덮어쓰기 및 삭제 불가능(append-only)
 - getfacl : 파일의 ACL 확인
 - setfacl : ACL 설정
   - ex. setfacl [-options] [u:][사용자명][:권한] [filename]
