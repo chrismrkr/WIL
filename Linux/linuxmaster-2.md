@@ -194,6 +194,8 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - rm : 파일 삭제
 - mv : 파일 경로 이동 또는 이름 변경
 - touch : 파일 마지막 접근 시간 변경 또는 빈 파일 생성
+  - access time, modify time 변경
+  - change time은 파일 메타데이터(권한, 소유자) 최종 변경 시각이므로 변경되지 않음
 - file : 파일 유형 확인
 - find : 지정한 조건에 맞는 파일 및 디렉토리 검색(find ./ -user ubuntu)
 ##### 1.2.1.6 텍스트 관련 명령어
@@ -247,7 +249,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 ##### 1.2.4.2 디스크 쿼터 관련 명령어
 - quotacheck : 파일 시스템 사용량 체크하여 기록 파일 생성
 - quota : 사용자 및 그룹 디스크 쿼터 정보 출력
-- edquota : edit quota
+- edquota : edit quota(setquota, xfs_quota)
 - repquota : report quota. 현재 파일 쿼터 정보 출력
 
 ### 1.3 프로세스 관리
@@ -263,7 +265,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 ##### 1.3.1.3 프로세스 전환
 - jobs : 현재 실행 중인 jobs 출력
 - fg : 백그라운드 프로세스를 포어 그라운드로 전환
-  - ```fg %[작업 번호]``` : PID와 작업번호를 혼동하면 안됨
+  - ```fg %[작업 번호]``` : PID와 작업번호를 혼동하면 안됨. % 생략 가능
 - bg : 포어 그라운드를 백그라운드 프로세스로 전환
 ##### 1.3.1.4 프로세스 우선순위
 - nice [options] [command arg] : 프로세스 우선순위. -20 ~ 19 사이이고 숫자가 클수록 우선순위가 낮아짐
@@ -312,11 +314,16 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - rpm, yum, apt-get, apt
 ##### 1.4.1.2 저수준 패키지 도구
 - rpm 패키지 명령어로 설치. 먼저 설치가 필요한 라이브러리가 없으면 에러가 발생할 수 있음
-- 패키지 검증 : ```rpm -V```
-- 패키지 설치 : ``` rpm -i [package-name]```
-- 패키지 업그레이드 : ```rpm -U [package-name]```
-- 패키지 확인 : ```rpm -q [package-name]```, ```rpm -qa # 모든 패키지 조회```(데비안 : dpkg -l, dpkg -L [패키지명]) 
-- 특정 파일이 설치된 패키지 확인 : ```rpm -qf [file-name]```(데비안 : dpkg -s [패키지명](상세 설명) dpkg -S [파일명](파일이 포함된 패키지 조회))
+- 옵션
+  - -V : 검증(Validate)
+  - -i : 설치(install)
+  - -U : 업데이트(Update)
+  - -e : 제거(eliminate)
+  - -q [패키지명] : 패키지 설치 여부 확인(question)(dpkg -L)
+  - -qa : 설치된 모든 패키지 확인(question all)(dpkg -l)
+  - -qf [파일명] : 파일이 설치되어 있는 패키지 확인(question file)(dpkg -S)
+  - -ql [패키지명] : 패키지에 설치된 파일 목록 확인(question list)(dpkg -s)
+  - -qi [패키지명] : 패키지 정보 확인(question information)
 ##### 1.4.1.3 고수준 패키지 도구
 - 패키지 검색 : ```yum(apt) search [package-name]```
 - 패키지 설치 : ```yum(apt-get) install(update) [package-name]```
