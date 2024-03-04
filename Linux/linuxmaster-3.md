@@ -61,6 +61,8 @@
 - 데몬 설정 및 도메인 설정
   - /etc/rc.d/rc.local에서 데몬 설정 
   - /usr/local/apache/conf/httpd.conf에서 웹 서버 도메인 및 ip 설정 가능
+  - httpd -t 명령어로 컴파일 전 환경설정 파일 문법 오류 체크 가능
+  - httpd -f 명령어로 환경설정 파일을 직접 지정하여 실행 가능
 ##### 1.1.3.3 MySQL 소스코드 컴파일 및 설치
 - cmake 설치 : ```yum install cmake```
 - 소스코드 및 boost 라이브러리 다운로드
