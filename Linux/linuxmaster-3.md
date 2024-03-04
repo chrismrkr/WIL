@@ -215,11 +215,12 @@ DirectoryIndex index.html
 ##### 1.2.2.3 NIS 관련 주요 명령어
 - nisdomainname : NIS 도메인 이름 설정 또는 도메인 확인
 - ypwhich : NIS를 통해 로그인 후, 인증에 사용한 NIS 서버 도메인 확인
-- ypcat : NIS 서버 구성파일 확인
+- ypcat : NIS 클라이언트에서 NIS 서버 구성파일(map) 확인
 - yptest : NIS 클라이언트에서 NIS 동작, 설정, 도메인명, 사용자 계정 정보 등 확인
 - yppasswd : 사용자 비밀번호 변경
 - ypchsh : 사용자 셸 변경
 - ypchfn : 사용자 정보 변경
+- yppush : 서버에서 클라이언트로 서버 구성 파일(map) 전송 및 업데이트
 
 ### 1.3 파일 관련 서비스
 #### 1.3.1 삼바(SAMBA) 서비스 사용하기
@@ -235,10 +236,11 @@ DirectoryIndex index.html
 - 삼바 서비스 설정 : /etc/samba/smb.conf
 - 삼바 서비스 사용자 등록 및 패스워드 설정
   - /etc/samba/smbusers에서 리눅스 계정과 삼바 사용자 매핑
+    - WindowsUsername = LinuxUsername1, LinuxUsername2
   - smbpasswd : 삼바 사용자 계정 활성화 및 패스워드 설정
   - pdbedit : 삼바 사용자 목록 및 세부 내용 확인
   - write list : 쓰기 가능한 사용자 지정
-  - valid users : 접근 가능 사용자 지정(기본 값 : 모든 사용자)
+  - valid users : 접근 가능 리눅스 사용자 지정(기본 값 : 모든 사용자)
 ##### 1.3.1.3 삼바 서비스 이용하기
 - 삼바 관련 패키지 설치 : ```yum -y install samba-common samba-client```
 - 삼바 서버 접속
@@ -282,11 +284,13 @@ DirectoryIndex index.html
 ##### 1.3.3.2 FTP 서비스 설치와 구성
 - FTP 관련 패키지 설치 : ```yum -y install vsftpd```
 - FTP 서버 설정 : ```/etc/vsftpd/vsftpd.conf```
+  - ex. local_enable=YES : 일반 사용자(로컬 사용자) 접근 가능
 - vsftpd 데몬 실행 : ```systemctl start vsftpd.service```
 ##### 1.3.3.3 FTP 서비스 이용하기
 - FTP 클라이언트 설치 : ```yum -y install ftp```
 ##### 1.3.3.4 FTP 관련 파일
-- /etc/vsftpd/ftpdusers : 서버에 접근할 수 없는 계정 기입
+- /etc/vsftpd/ftpdusers : 서버에 접근할 수 **없는** 계정 기입
+
 
 ### 1.4 메일 관련 서비스
 #### 1.4.1 메일 관련 서비스의 개요
@@ -311,6 +315,7 @@ DirectoryIndex index.html
     - 외부 메일 서버로 전송하기 위해 사용
   - /etc/mail/virtusertable : 가상의 메일 계정으로 들어오는 메일을 특정 계정으로 전달
     - [가상 이메일 주소] [포워딩 이메일 주소]
+  - /etc/mail/local-host-names : 로컬 도메인으로 처리할 호스트 이름 목록
 
 ### 1.5 DNS 관리 서비스
 #### 1.5.1 DNS의 개요
@@ -318,6 +323,7 @@ DirectoryIndex index.html
 - 도메인 이름과 ip를 상호 변환하는 서비스
 - TCP 53, UDP 53 포트 이용
 - Primary Name Server, Slave Name Server, Caching Name Server 3가지 존재
+- BIND 프로그램이 DNS 서버 프로그램으로 가장 널리 쓰이며 ISC에서 배포함
 #### 1.5.2 DNS 서비스 사용하기
 ##### 1.5.2.1 DNS 설치
 - 관련 패키지 설치 : ```yum -y install bind```
