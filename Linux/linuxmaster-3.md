@@ -286,10 +286,10 @@ DirectoryIndex index.html
 - FTP 서버 설정 : ```/etc/vsftpd/vsftpd.conf```
   - ex. local_enable=YES : 일반 사용자(로컬 사용자) 접근 가능
 - vsftpd 데몬 실행 : ```systemctl start vsftpd.service```
+- /etc/vsftpd/ftpdusers : 서버에 접근할 수 **없는** 계정 기입
 ##### 1.3.3.3 FTP 서비스 이용하기
 - FTP 클라이언트 설치 : ```yum -y install ftp```
-##### 1.3.3.4 FTP 관련 파일
-- /etc/vsftpd/ftpdusers : 서버에 접근할 수 **없는** 계정 기입
+
 
 
 ### 1.4 메일 관련 서비스
