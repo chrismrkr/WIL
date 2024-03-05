@@ -322,6 +322,7 @@ DirectoryIndex index.html
 ##### 1.5.1.1 DNS의 개념과 구성요소
 - 도메인 이름과 ip를 상호 변환하는 서비스
 - TCP 53, UDP 53 포트 이용
+- /etc/named.conf, /var/named
 - Primary Name Server, Slave Name Server, Caching Name Server 3가지 존재
 - BIND 프로그램이 DNS 서버 프로그램으로 가장 널리 쓰이며 ISC에서 배포함
 #### 1.5.2 DNS 서비스 사용하기
@@ -335,17 +336,40 @@ DirectoryIndex index.html
     - forward :
       - only : 도메인 주소에 대한 query를 다른 서버로 넘김
       - first : 다른 서버에서 응답이 없을 경우 자신이 응답
+    - forwarders : forward할 서버 지정(ex. forwrders: host1; host2;)
     - allow-query : 질의할 수 있는 호스트 지정
     - allow-transfer : 파일 내용을 복사할 대상 정의
   - logging
   - acl : 여러 호스트들을 하나의 이름으로 지정하여 allow-query, allow-transfer에서 사용하도록 함
+    - ex. acl "host-group" {192.168.2.14; 192.168.2/24;};
+    - allow-query: host-group;
   - zone : 도메인을 관리하기 위한 데이터 파일
-##### 1.5.2.3 zone 파일 설정
+##### 1.5.2.3 zone 파일 설정(/var/named/)
 - 도메인, IP, 리소스 간 매핑 정보를 포함한 파일
 - zone 파일은 도메인 -> ip 매핑이고, rev 파일은 ip -> 도메인 매핑
 - named-checkzone [도메인명] [파일경로] : /var/named/ 이하 zone 파일 문법 점검
 - named-checkconf [파일경로] : /etc/named.conf 문법 점검
-```sh
+- ;를 이용하여 주석 가능
+```
+;@는 /etc/named에 설정된 도메인명임
+;SOA는 Start Of Authority의 약자로 DNS 핵심 정보를 지정함
+;$TTL은 캐시 보관 시간임
+
+$TTL 1D
+@  IN SOA ns.ihd.or.kr. kait.ihd.or.kr (
+  20240030306  ;Serial
+  7200         ;Refresh
+)
+IN NS ns.ihd.or.kr.
+IN A 192.168.12.22
+IN MX 10 ihd.or.kr.
+www IN A 192.168.12.22
+www1 IN CNAME www
+```
+
+아래 방법으로 zone 파일 지정도 가능함
+
+```
 zone "[도메인명]" IN {
   type [master|slave|hint]; # hint : 루트 도메인, mater : 1차 네임 서버, slave : 2차 네임 서버
   file "[zone 파일명]";
