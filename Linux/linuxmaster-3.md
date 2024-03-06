@@ -417,19 +417,40 @@ zone "[도메인명]" IN {
 - inetd, standalone 방식 사용. Access Control을 위한 TCP Wrapper
 - xinted(/etc/xinted)
 ##### 1.7.1.2 TCP Wrapper
-- /etc/hosts.allow, /etc/hosts.deny 파일을 이용하여 데몬 서비스 접근제어
+- inetd 데몬에 의해 관리되는 서비스에 대한 접근 제어를 함
+- /etc/hosts.allow, /etc/hosts.deny 파일 이용
 #### 1.7.2 프록시 서비스
 ##### 1.7.2.1 프록시 개요
 ##### 1.7.2.2 리눅스 프록시 서버(squid)
+- TCP 3128을 기본으로 사용함
+- /etc/squid/squid.conf 사용
+- acl : 별칭 지정
 - http_access allow : 특정 대역만 사용하도록 허가함
+- http_access deny : 특정 대역에서 접근을 불허함
 #### 1.7.3 DHCP 서비스
 ##### 1.7.3.1 DHCP 서비스의 개요
 - 호스트가 사용할 ip 주소, 게이트워이 주소, 네임 서버 주소 등을 자동으로 할당하는 서비스
 - DHCP 데몬 설정 파일 위치 : /etc/dhcp/dhcpd.conf
   - log-facility :  syslog에서 전달한 로그 facility 지정
+```
+subnet 192.168.10.0 netmask 255.255.255.0 {
+  range 192.168.10.0 192.168.10.200;
+  option domain-name "temp-dhcp.com";
+  ...
+}
+```
 #### 1.7.4 VNC 서비스
 ##### 1.7.4.1 VNC 서비스의 개요
+- Virtual Network Computing의 약자로 GUI 방식으로 원격 컴퓨터 접속 및 사용 기능 제공
 - 해상도 변경 : /etc/sysconfig/vncservers 수정
+##### 1.7.5 NTP 서비스
+##### 1.7.5.1 NTP(Network Time Protocol) 개요
+- 컴퓨터 간 시간을 동기화하기 위해 사용함
+##### 1.7.5.2 NTP 설치와 설정
+- /etc/ntp.conf 이용
+##### 1.7.5.3 NTP 서비스 명령어
+- ntpdate [서버주소] : 원격 서버와 시간을 동기화함
+- ntpq -p : 연결된 서버 상태 출력
 
 ## 2. 네트워크 보안
 ### 2.1 네트워크 침해 유형 및 특징
