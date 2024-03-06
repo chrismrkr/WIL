@@ -310,7 +310,7 @@ DirectoryIndex index.html
     - ```makemap hash /etc/mail/access < /etc/mail/access```
   - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정으로 전달하는 것을 설정
     - sendmail이 참조하는 파일은 /etc/aliases.db임
-    - /etc/aliases 수정 후, newaliases 또는 sendmail bi로 변경
+    - /etc/aliases 수정 후, ```newaliases 또는 sendmail bi```로 변경
   - 홈 디렉토리의 .forward 파일
     - 외부 메일 서버로 전송하기 위해 사용
   - /etc/mail/virtusertable : 가상의 메일 계정으로 들어오는 메일을 특정 계정으로 전달
