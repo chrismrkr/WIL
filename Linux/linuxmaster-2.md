@@ -79,6 +79,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - ```groupadd [option] [group-name]```으로 생성 가능
 ##### 1.1.5.3 그룹 정보 변경
 - ```groupmod [option] [new-group] [old-group]```으로 정보 변경 가능
+  - ```groupmod -n [new-name] [old-name]```
 ##### 1.1.5.4 그룹 삭제
 - ```groupdel [option] [group-name]```으로 삭제 가능
 ##### 1.1.5.5 그룹 패스워드 변경 및 사용자 추가
