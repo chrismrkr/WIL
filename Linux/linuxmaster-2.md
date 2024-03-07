@@ -509,14 +509,14 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - /var/log/httpd : 웹 서버 아파치의 httpd 데몬이 기록하는 로그 파일
 - /var/log/xferlog : ftp 접속 연관 로그 파일
 - /var/log/secure : 시스템 로그인 행위가 기록된 로그 파일
-- /var/log/lastlog : 사용자의 마지막 로그인 기록을 담고, 바이너리 형식이므로 lastlog 명령어로 확인 가능
-- /var/log/wtmp : 각 사용자의 모든 로그인, 로그아웃, 부팅 기록을 담고, 바이너리 형식이므로 last 명령어로 확인 가능
+- /var/log/lastlog : 모든 사용자의 마지막 로그인 기록을 담고, 바이너리 형식이므로 lastlog 명령어로 확인 가능
+- /var/log/wtmp : 각 사용자의 모든 로그인, 로그아웃, 부팅 기록을 담음. 즉, 사용자 당 1개의 로그파일을 갖음. 바이너리 형식이므로 last 명령어로 확인 가능
 - /var/log/btmp : 모든 로그인 실패 기록을 담고, 바이너리 형식이므로 lastb 명령어로 확인 가능
 - /var/log/utmp : 사용자의 현재 로그인 상태를 담은 로그
 ##### 3.1.1.3 시스템 로그 파일 명령어
-- dmseg : 커널 링 버퍼 출력 및 제어 명령어(옵션 : -c, -T, -level)
-- lastlog : /var/log/lastlog 파일의 로그를 확인하는 명령어(옵션 : -b, -t, -u)
-- last : /var/log/wtmp 파일 로그를 확인하는 명령어(옵션 : reboot, -x, -f)
+- dmseg : 커널 링 버퍼 출력 및 제어 명령어(옵션 : -c(clear), -T(TimeStamp), -level(log level))
+- lastlog : /var/log/lastlog 파일의 로그를 확인하는 명령어
+- last : /var/log/wtmp 파일 로그를 확인하는 명령어(옵션 : reboot, -x(explain), -f(file), -b(before), -t(after), -u(user))
 - lastb : /var/log/btmp 파일 로그를 확인하는 명령어
 #### 3.1.2 시스템 로그 관리
 ##### 3.1.2.1 시스템 로그 관리 개요
@@ -545,7 +545,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
     - authpriv.*   /dev/tty1
     - mail.*;mail.!=debug  /var/log/mail-messages
     - auth,authpriv.alert  @192.168.0.1
-- 로그 수준 : emerg,panic > alert > crit > error > warning > notice > info > debug > none
+- **로그 수준 : emerg,panic > alert > crit > error > warning > notice > info > debug > none**
 ##### 3.1.2.3 로그 로테이션
 - logrotate : 로그로 인해 파일 시스템이 꽉 차는 것을 막고 디스크 공간을 효율적으로 사용하는 유틸리티
 - /etc/logrotate.conf 환경설정을 읽어 /usr/sbin/logrotate 명령을 실핼함
