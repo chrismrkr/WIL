@@ -85,7 +85,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - ```gpasswd [옵션] [group-name]```으로 변경 가능
 - /etc/group 또는 /etc/gshadow에서 확인 가능
 ##### 1.1.5.6 그룹 참여
-- newgrp : 현재 로그인한 사용자의 그룹을 변경함
+- newgrp : 현재 로그인한 사용자의 그룹을 변경함. 로그아웃하면 원래대로 돌아옴
 #### 1.1.6 사용자 환경설정 파일
 - /etc/passwd, /etc/shadow, /etc/group, /etc/gshadow
 - /etc/shadow
