@@ -53,7 +53,7 @@
   - wget으로 httpd-[version].tar.bz2 파일 다운로드 후 압축 해제
   - 압축 해제된 디렉토리에서 ```./configure --prefix=/usr/local/apache --enable-mods-shared=all```로 설정 작업
   - ```./configure --help```로 옵션 확인 가능
-  - makefile 생성
+  - configure 명렁어를 통해 makefile 생성
 - 아파치 웹 서버 소스코드 컴파일 및 설치
   - ```make && make install```
   - /usr/local/apache에서 설치 상태 확인
