@@ -201,9 +201,9 @@ DirectoryIndex index.html
 - NIS 사용자 계정 생성
   - NIS 클라이언트에서 사용할 계정 생성 : ```useradd nisuser```
 - NIS 관련 데몬 실행
-  - ypserv
-  - yppasswdd
-  - ypxfrd
+  - ypserv : 서버 데몬으로 클라이언트에 네트워크 정보를 제공
+  - yppasswd : 사용자 패스워드 변경
+  - ypxfrd : 클라이언트에 NIS 맵을 전송
 - NIS 정보 갱신 및 적용 : ```make -c /var/yp```
 ##### 1.2.2.2 NIS 클라이언트 설치와 구성
 - RPC 데몬 구동
