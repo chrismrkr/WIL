@@ -308,13 +308,14 @@ DirectoryIndex index.html
   - /etc/mail/access : 메일 서버에 접속하는 호스트의 접근을 제어하는 설정 파일
     - ex. Connect:127.0.0.1  OK, From:abnormal@google.com   REJECT
     - ```makemap hash /etc/mail/access < /etc/mail/access```
-  - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정으로 전달하는 것을 설정
+  - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정(이메일)으로 전달하는 것을 설정
     - sendmail이 참조하는 파일은 /etc/aliases.db임
     - /etc/aliases 수정 후, ```newaliases 또는 sendmail bi```로 변경
   - 홈 디렉토리의 .forward 파일
     - 외부 메일 서버로 전송하기 위해 사용
-  - /etc/mail/virtusertable : 가상의 메일 계정으로 들어오는 메일을 특정 계정으로 전달
+  - /etc/mail/virtusertable : 가상의 도메인으로 들어오는 메일을 특정 계정으로 전달
     - [가상 이메일 주소] [포워딩 이메일 주소]
+    - ```makemap hash /etc/mail/virtusertable < /etc/mail/virtusertable```
   - /etc/mail/local-host-names : 로컬 도메인으로 처리할 호스트 이름 목록
 
 ### 1.5 DNS 관리 서비스
@@ -477,9 +478,12 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 #### 2.2.2 Snort를 이용한 대비 및 대처
 ##### 2.2.2.1 Snort의 개요
 - 탐지 룰(Rule)을 이용하여 네트워크 트래픽을 분석하고 침입을 탐지함
+  - Snort Rule은 크게 헤더와 룰 옵션으로 구성됨
 ##### 2.2.2.2 Snort의 Rule 설정
 - ex. alert tcp any any -> 192.168.10.0/24 80(msg:"passwd detected"; content:"passwd"; nocase; sid:100001;)
-
+  - 외부에서 192.158.10/24 대역 80 포트로 들어오는 패킷 중, passwd가 문제된 패킷이 발견되면 alert 메세지를 띄움
+- ex. alert ip any any -> any any (msg:"Land Attack"; sameip; sid:100001;)
+  - Land Attack 탐지
 #### 2.2.3 iptables를 이용한 대비 및 대처
 ##### 2.2.3.1 iptables 개요
 - 패킷 필터링을 수행하는 리눅스 방화벽
@@ -491,18 +495,32 @@ systemctl start iptables
 systemctl enable iptables
 ```
 ##### 2.2.3.2 iptables의 테이블 구조
-- filter, nat, mangle, raw, security 총 5가지 테이블이 존재하며 각각 chain 지정 및 정책 설정 가능
+- filter, nat, mangle(특수 규칙 적용), raw(연결 추적을 위한 세부 기능), security(보안 커널에서 사용하는 세부 규칙) 총 5가지 테이블이 존재하며 각각 chain 지정 및 정책 설정 가능
 - filter
   - input : 목적지로 들어오는 패킷 필터링
   - output : 출발지로 나가는 패킷 필터링
   - forward : 라우터로 통과되는 패킷
 - nat
-  - prerouting : 패킷의 도착지 주소를 변경
-  - postrouting : 패킷의 출발지 주소를 변경
-  - input, output : 주소 변경
+  - prerouting : 패킷의 최종 도착지 주소를 변경
+  - postrouting : 패킷의 최초 출발지 주소를 변경
+  - input, output : 라우팅 주소 변경
 
 ##### 2.2.3.3 iptables 사용하기
-- ```iptables [-t 테이블이름] [action] [match 규칙] [-j 타겟]```
+- ```iptables [-t 테이블이름] [action] [체인 이름] [match 규칙] [-j 타겟]```
+- filter 테이블을 사용하면 -t 생략 가능
+- 체인 자체 옵션
+  - -N : 정책 체인 신규(iptables -N new-filter)
+  - -X : 정책이 없는 체인 삭제
+  - -L : 지정한 체인 내부 목록 확인
+  - -F : 지정한 체인 내부 정책 삭제(flush)
+  - -C : 패킷 테스트
+  - -P : 지정된 체인에 기본 정책 설정
+- 체인 내부 옵션
+  - -A : append
+  - -I : 지정한 라인에 Insert
+  - -D : 내부 정책 제거
+  - -R : 정책 수정
+
 - ex1. iptables -A INPUT -s 192.168.10.0/24 ! -p icmp -j ACCEPT
   - 해당 대역에서 들어오면서 icmp 패킷이 아닌 요청을 수용하는 정책을 추가함
 - ex2. iptables -P INPUT DROP
