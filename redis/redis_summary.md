@@ -1,6 +1,6 @@
 # Redis
 ## 1. Redis 주요 특징
-- 싱글 스레드 기반
+- 싱글 스레드
 - RDB(Redis Database), AOF(Append only file)을 통한 영속성 제공
   - RDB : 스냅샷을 통해 백업 데이터를 저장함
   - AOF : Write 작업을 모두 로그에 저장함
@@ -150,5 +150,18 @@ EXEC # 트랜잭션 완료
 ```
 
 ## 5. Redis 데이터 타입 활용 예제
+- 분산 락
+- 중복 요청 방지
+- 로그인 상태 헬스 체크
 
+## 6. 주의사항
+### 6.1 O(N) 명령어
+- KEYS
+- SMEMBERS
+- HGETALL
+- SORT
+### 6.2 Thundering Herd Problem
+- 레디스 캐시가 만료되어 Cache Miss가 발생해 DB와 서버에 부하가 걸리는 문제
+### 6.3 Stale Cache Invalidation
+- 레디스 캐시와 실제 리포지토리 데이터가 서로 동기화 되지 않은 문제
 
