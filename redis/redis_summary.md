@@ -133,7 +133,7 @@ SET already hello3 XX # 이미 존재하므로 SET됨
 ```
 ### 4.3 PUB/SUB
 - Publisher와 Subscriber가 서로 알지 못하여도 통신이 가능하도록 decoupling된 자료구조
-- Subscriber가 구독하기 전 Publisher가 생성한 메세지는 수신할 수 없음
+- Subscriber가 구독하기 전에 Publisher가 생성한 메세지는 수신할 수 없음
 ```
 SUBSCIRE ch:order ch:payment
 PUBLISH ch:order order1
