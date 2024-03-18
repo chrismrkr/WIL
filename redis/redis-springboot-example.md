@@ -37,38 +37,38 @@ spring.redis.port=6379
 ```java
 @Repository
 @RequiredArgsConstructor
-public class OAuthTokenRedisRepositoryImpl implements OAuthTokenRepository {
+public class SomethingRedisRepositoryImpl implements SomethingRepository {
     private final RedisTemplate redisTemplate;
     @Override
-    public Optional<OAuthToken> findByAccessToken(String accessToken) {
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+    public Optional<Something> findByKey(String key) {
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
-        String refreshToken = valueOperations.get(accessToken);
-        if(Objects.isNull(refreshToken)) {
+        Object value = valueOperations.get(key);
+        if(Objects.isNull(value)) {
             return Optional.empty();
         }
 
-        OAuthToken result = OAuthToken.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+        Something result = Something.builder()
+                .key(key)
+                .value(value)
                 .build();
         return Optional.of(result);
     }
 
     @Override
-    public OAuthToken save(OAuthToken oAuthToken) {
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+    public Something save(Something something) {
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
-        OAuthTokenRedisEntity redisEntity = OAuthTokenRedisEntity.from(oAuthToken);
-        valueOperations.set(redisEntity.getAccessToken(), redisEntity.getRefreshToken());
+        SomethingEntity redisEntity = SomethingEntity.from(something);
+        valueOperations.set(redisEntity.getKey(), redisEntity.getValue());
 
         return redisEntity.to();
     }
 
     @Override
-    public void delete(OAuthToken oAuthToken) {
+    public void delete(Something something) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.getAndDelete(oAuthToken.getAccessToken());
+        valueOperations.getAndDelete(something.getKey());
     }
 }
 ```
