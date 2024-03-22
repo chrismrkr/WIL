@@ -335,7 +335,7 @@ DirectoryIndex index.html
   - options
     - directory : zone 파일 설정(/var/named)
     - forward :
-      - only : 도메인 주소에 대한 query를 다른 서버로 넘김
+      - only : 도메인 주소에 대한 query를 다른 서버로 넘김. 서버 응답이 없는 경우 버림.
       - first : 다른 서버에서 응답이 없을 경우 자신이 응답
     - forwarders : forward할 서버 지정(ex. forwrders: host1; host2;)
     - allow-query : 질의할 수 있는 호스트 지정
