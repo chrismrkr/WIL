@@ -195,8 +195,12 @@ docker run -d -p [로컬_PORT:컨테이너_PORT] -v /usr/src/app/node_modules -v
 # node_modules는 로컬 호스트 디렉토리에 존재하지 않으므로 로컬을 참조하지 않고,
 # 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
 ```
+## 4. Docker Network
 
-## 4. Docker Compose
+
+```
+
+## 5. Docker Compose
 
 하나 이상의 컨테이너를 서로 네트워크적으로 연결하여 기동할 때 사용한다.
 
@@ -224,13 +228,13 @@ docker-compose up # 이미지가 있으면 빌드하지 않고, docker compose�
 docker-compose down # docker-compose 컨테이너 중지
 ```
 
-## 5. Git Action을 활용한 소스 배포
+## 6. Git Action을 활용한 소스 배포
 
 Github Repository에 존재하는 소스를 자동으로 테스트 및 AWS ElasticBeanStalk에 배포하는 방법에 대해 설명한다.
 
 현재 디렉토리의 docker-compose.yaml, deploy_example.yaml 파일을 참고한다.
 
-### 5.1 IAM 역할 생성
+### 6.1 IAM 역할 생성
 
 IAM이란 Identity And Management의 약자로 AWS 리소스에 대한 접근을 제어하는 서비스를 의미한다.
 
@@ -239,7 +243,7 @@ IAM 서비스에서 AWS 리소스에 대한 사용자와 역할을 생성할 수
 IAM 역할은 AWS 정책들을 가질 수 있고, 정책이란 리소스 접근 권한을 의미한다.
 
 
-### 5.2 AWS ElasticBeanstalk 생성
+### 6.2 AWS ElasticBeanstalk 생성
 
 소스를 배포하여 컨테이너들을 기동하기 위한 서버를 생성하는 것과 유사하다. 
 
@@ -250,7 +254,7 @@ IAM 역할을 설정하여 elasticbeanstalk 서버 리소스 접근에 대한 �
 반대로, elasticbeanstalk에 역할을 설정하지 않으면 리소스 접근이 불가능하다.
 
 
-### 5.3 IAM 사용자 생성
+### 6.3 IAM 사용자 생성
 
 IAM 사용자란 AWS 리소스 접근 제어에 대한 특정 권한을 부여받는 사용자를 의미한다.
 
@@ -258,7 +262,7 @@ IAM 사용자에 정책을 설정하여 권한을 부여할 수 있다.
 
 IAM 사용자를 생성할 때, ACCESS_KEY와 SECRET_ACCESS_KEY가 생성되고, 이를 활용하여 elastic beanstalk(리소스) 접근에 필요한 역할 자격을 얻을 수 있다.
 
-### 5.4 Git Action 연동
+### 6.4 Git Action 연동
 
 방법은 아래와 같다. ./github/workflows/deploy.yaml 파일을 이용하여 자동으로 AWS Elasticbeanstalk에 배포되도록 한다.
 
@@ -267,17 +271,17 @@ IAM 사용자를 생성할 때, ACCESS_KEY와 SECRET_ACCESS_KEY가 생성되고,
 + 3. AWS RDS(관계형 데이터베이스) 생성
 
 
-### 5.5 보안 그룹 생성
+### 6.5 보안 그룹 생성
 
 보안 그룹은 방화벽과 관련된 개념이다.
 
 보안 규칙(방화벽 등)을 설정된 보안 그룹을 만든 후, 이를 Elasticbeanstalk 구성 옵션에서 지정하여 사용할 수 있다.
 
-### 5.6 ElasticBeanstalk 환경변수(환경속성) 추가
+### 6.6 ElasticBeanstalk 환경변수(환경속성) 추가
 
 구성 옵션에서 RDS와 관련된 환경변수 추가가 필요하다. docker-compose.yaml 파일에서 참고하여 설정할 수 있다.
 
-### 5.7 git push
+### 6.7 git push
 
 ./github/workflows/deploy.yaml 파일이 존재하고, git push가 발생하면 자동으로 빌드하여 Elastic Beanstalk에 배포된다.
 
