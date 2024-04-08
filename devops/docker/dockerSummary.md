@@ -195,10 +195,48 @@ docker run -d -p [로컬_PORT:컨테이너_PORT] -v /usr/src/app/node_modules -v
 # node_modules는 로컬 호스트 디렉토리에 존재하지 않으므로 로컬을 참조하지 않고,
 # 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
 ```
+
 ## 4. Docker Network
 
+도커 네트워크는 컨테이너 간 원활한 통신을 위해 사용된다.
 
+도커 네트워크는 Bridge를 통해 컨테이너 간 통신을 할 수 있게 구성된다.
+
+예를 들어, 도커 엔진이 설치되면 docker0 네트워크 브릿지가 기본으로 생성되고, 별다른 네트워크 설정 없이 컨테이너를 기동하면 docker0 네트워크에 속하게 된다.
+
+```shell
+root@ip-XXX-XXX-XXX-XXX:~# docker network ls
+NETWORK ID     NAME                             DRIVER    SCOPE
+8d39ffd164a0   bridge                           bridge    local
+49cb691121e7   host                             host      local
+e853c2881850   none                             null      local
+...
+
+root@ip-XXX-XXX-XXX-XXX:~# docker inspect network bridge
+[
+    {
+        ...
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        ...
+        "Options": {
+            ...
+            "com.docker.network.bridge.name": "docker0",
+            ...
+        },
+    }
+]
 ```
+
+docker0 브릿지 게이트웨이 주소는 172.17.0.1이고, 해당 네트워크에서 컨테이너가 기동될 때 마다 순차적으로 
 
 ## 5. Docker Compose
 
