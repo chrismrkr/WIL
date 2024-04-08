@@ -196,13 +196,22 @@ docker run -d -p [로컬_PORT:컨테이너_PORT] -v /usr/src/app/node_modules -v
 # 나머지는 현재 로컬 호스트 디렉토리(pwd)에 있는 것을 /usr/src/app에 마운트하여 사용한다.
 ```
 
-## 4. Docker Network
+## 4. Docker Network 및 컨테이너 간 연동
 
 도커 네트워크는 컨테이너 간 원활한 통신을 위해 사용된다.
 
-도커 네트워크는 Bridge를 통해 컨테이너 간 통신을 할 수 있게 구성된다.
+도커 컨테이너들은 Bridge를 통해 도커 네트워크를 형성하여 통신한다.
 
-예를 들어, 도커 엔진이 설치되면 docker0 네트워크 브릿지가 기본으로 생성되고, 별다른 네트워크 설정 없이 컨테이너를 기동하면 docker0 네트워크에 속하게 된다.
+브릿지 네트워크를 새롭게 생성하여 해당 도커 네트워크에서 컨테이너를 기동할 수 있다.
+
+```shell
+docker create network [new-network]
+docker run --network [new-network] --name [컨테이너명] [컨테이너 이미지명]
+```
+
+물론, 도커 엔진이 설치되면 docker0 네트워크 브릿지가 기본으로 생성되고, 네트워크 설정 없이 컨테이너를 기동하면 docker0 네트워크에 속하게 된다.
+
+docker0 브릿지 게이트웨이 주소는 172.17.0.1이고, 해당 네트워크에서 컨테이너를 기동될 때 마다 순차적으로 ip를 할당한다.
 
 ```shell
 root@ip-XXX-XXX-XXX-XXX:~# docker network ls
@@ -235,12 +244,74 @@ root@ip-XXX-XXX-XXX-XXX:~# docker inspect network bridge
     }
 ]
 ```
+```shell
+root@ip-XXX-XXX-XXX-XXX:/# docker run -d --name my-redis redis
 
-docker0 브릿지 게이트웨이 주소는 172.17.0.1이고, 해당 네트워크에서 컨테이너가 기동될 때 마다 순차적으로 
+root@ip-XXX-XXX-XXX-XXX:/# docker inspect network bridge
+[
+    {
+        ...
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+
+        ...
+        "Containers": {
+            "af5b54880190e1360a901d0486b1412d914ddd099ae940babef19bdc6848524e": {
+                "Name": "my-redis",
+                ...
+                "IPv4Address": "172.17.0.2/16",
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+    }
+]
+```
+
+my-redis 컨테이너를 실행했으므로 현재 docker0 브릿지 네트워크 내에는 1개의 컨테이너가 연결되어있다.
+
+동일한 도커 네트워크 안에서의 컨테이너 끼리는 브릿지를 통해서 통신이 가능하다.
+
+그러나, 외부와 통신을 위해서는 컨테이너 ip(eth)와 실제 호스트 ip:port를 매핑해야 한다. 
+
+이를 위해서 포트 포워딩이 사용된다.
+
+```shell
+# 포트 포워딩
+docker run -p [호스트에 포워딩할 ip]:[컨테이너 ip] [컨테이너 이미지 명]
+```
+
+또한, 동일한 브릿지 네트워크 내에서 컨테이너 끼리 아래 방법을 통해 통신할 수 있다.
+
+- 컨테이너 서비스 이름
+- [도커 네트워크 게이트웨이 ip] : [도커 컨테이너 포트번호]
+
+도커 컨테이너 ip로도 가능하지만 컨테이너를 기동할 때 마다 변경되므로 추천하지 않는다.
+
+예를 들어, DB 컨테이너 이름 및 포트가 my-myysql과 3306이고, DB 컨테이너와 Spring Boot WAS를 연동하여 실행할 때 아래와 같이 properties를 설정하면 된다.
+
+```properties
+spring.datasource.url=jdbc:mysql://my-mysql:3306/test
+```
+
 
 ## 5. Docker Compose
 
-하나 이상의 컨테이너를 서로 네트워크적으로 연결하여 기동할 때 사용한다.
+하나 이상의 컨테이너를 서로 네트워크적으로 연결하여 한번에 기동하고자 할 때 사용한다.
 
 docker-compose.yml 파일을 설정한 후, 명령어를 통해 컨테이너를 실행할 수 있다.(Dockerfile과 함께 사용된다.)
 
