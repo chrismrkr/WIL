@@ -92,6 +92,11 @@ docker stop [컨테이너_이름/컨테이너_ID] # stop gracefully
 docker kill [컨테이너_이름/컨테이너_ID] # stop immediately
 ```
 
+### 컨테이너 로그 확인
+```shell
+docker logs -f [도커 컨테이너 이름 | id]
+```
+
 ### 컨테이너 삭제
 ```shell
 docker rm [컨테이너_이름]
@@ -138,9 +143,15 @@ Docker image를 생성하기 위한 대략적인 과정, Dockerfile의 토대, �
 ```Dockerfile
 FROM baseImage # Base Image를 명시함
 
-RUN command # 추가적으로 필요한 파일을 다운로드 함
+WORKDIR /usr/src/app # cd와 동일함. 컨테이너 이미지의 작업 환경을 변경함
 
-CMD ["execute shell"] # 컨테이너 시작 시 실행할 명령어 명시 
+COPY [로컬 디렉토리 경로] [이미지 디렉토리 경로] # 로컬 디렉토리 경로에 있는 파일을 이미지 디렉토리 경로로 복사함
+
+RUN command # 컨테이너 이미지에서 커맨드 실행함
+
+EXPOSE [포트번호]  # 컨테이너를 실행할 포트를 지정
+
+CMD ["execute shell"] # 컨테이너 시작 시 실행할 명령어 지정
 ```
 
 ```shell
@@ -160,9 +171,9 @@ docker run -p [로컬 port 번호]:[컨테이너 port 번호] [사용자 id]/[�
 
 ```Dockerfile
 FROM node:10             # 베이스 이미지를 node:10으로 하고,
-WORKDIR /usr/src/app     # 실행할 컨테이너의 WORKDIR을 /usr/src/app에 지정하고, 
+WORKDIR /usr/src/app     # 실행할 컨테이너의 WORKDIR을 /usr/src/app에 지정하고(cd와 동일한 명령어), 
 COPY ./ ./               # 현재 로컬 디렉토리에 있는 파일을 WORKDIR에 복사하고,
-RUN npm install          # npm install을 실행하여 관련 파일을 설치하고,
+RUN npm install          # npm install을 실행하여 관련 파일을 설치하고(도커 이미지 컨테이너 shell 실행),
 CMD ["node", "server.js"] # 컨테이너 생성 후, node server.js 커맨드를 통해 App을 실행한다.
 ```
 
