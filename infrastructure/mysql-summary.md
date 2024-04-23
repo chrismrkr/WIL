@@ -1,5 +1,5 @@
 # MySQL
-Real MySQL 서적 및 MySQL Document를 참고하여 요약함
+Real MySQL 8.0 서적 및 MySQL Document를 참고하여 요약함
 
 ## 1. 설정
 
