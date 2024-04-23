@@ -160,6 +160,85 @@ DB 커넥션 핸들링, SQL 파싱, 쿼리 최적화를 담당함
 - 동시 처리 스레드가 많아지는 상황에서는 데드락 감지 스레드가 느려짐
   - 잠금 대기 목록에 잠금을 걸고, 그 위에 또 잠금을 거는 것이 반복되는 상황
   - innodb_deadlock_detect=OFF 및 innodb_lock_wait_timeout 시스템 변수를 설정하여 대응할 수 있음
+#### 3.2.5 자동화된 장애 복구 지원
+- 데이터 파일은 일반적으로 깨지지 않으므로 MySQL 시작 시 완료되지 않은 작업을 자동으로 반영함
+- 그러나, InnoDB 스토리지 엔진이 자동 복구를 하지 못하는 경우, innodb_force_recovery 시스템 변수를 사용해야함
+#### 3.2.6 InnoDB 버퍼 풀
+- DML에 의해 발생하는 디스크 I/O 작업 횟수를 줄일 수 있음
+- 버퍼 풀 크기 설정
+  - 서버 전체 물리 메모리의 약 50% 정도로 설정하고, 상황을 모니터링 하며 늘리는 것이 좋음
+  - innodb_buffer_pool_size 시스템 변수로 버퍼 풀 메모리 전체 크기 설정 가능
+  - innodb_buffer_pool_instances 시스템 변수로 버퍼 풀 인스턴스 개수 설정 가능
+- 버퍼 풀 구조
+  - Free : 아직 사용되지 않은 버퍼 풀 Page
+  - LRU 리스트 : 디스크 읽기(OUT)가 있는 페이지를 저장하고, 자주 읽힐수록 앞쪽에 위치하고 일정 수준 뒤로 물러나면 제거됨
+  - Flush 리스트 : 더티 페이지(디스크 IN)를 관리하고 특정 시점에 더티 페이지를 디스크에 반영함
+    - 더티 페이지 발생 시, 이를 Redo Log에 반영함(항상 동기화되지 않고 스토리지 엔진 체크포인트에 동기화됨)
+- 버퍼 풀의 장점
+  - 캐시 기능 : 버퍼 풀을 통해 캐시를 지원하므로 읽기 성능을 높임(디스크 OUT)
+  - 쓰기 버퍼링 : 체크 포인트의 LSN보다 작은 Redo Log와 관련된 더티 페이지를 디스크에 동기화함
+    - Redo Log는 데이터의 변경 분만 갖고 있으므로 버퍼 풀과 크기가 동일해야 하는 것은 아님
+- 버퍼 풀 플러시
+  - 버퍼 풀을 디스크에 동기화하는 것을 의미하고 아래 2가지가 백그라운드 스레드에서 실행됨
+  - Flush 리스트 플러시
+    - 오래된 리두 공간을 지우고 더티 페이지를 디스크에 동기화함
+  - LRU 리스트 플러시
+    - 최근에 사용되지 않은 버퍼 풀을 제거함. 캐시가 꽉 찼을 때 발생함
+- 버퍼 풀 관련 InnoDB 시스템 변수 설정
+  - innodb_page_cleaners : Flush 리스트 플러시를 수행하는 스레드 수. 일반적으로 innodb_buffer_pool_instances와 동일하게 함
+  - innodb_max_dirty_pages_pct : 더티 페이지 차지 공간/버퍼 풀 전체 메모리 비율(기본 값 0.9)
+  - innodb_io_capacity : 일반적인 상황에서의 초당 디스크 I/O 작업 수(더티 페이지 동기화와 관련 있으나 Disk Read도 고려해야 함)
+  - innodb_io_capacity_max : 최대로 더티 페이지를 디스크에 쓸 수 있는 양
+    - innodb_io_capacity와 max는 디스크 장비가 처리할 수 있는 수준으로 설정할 것
+  - innodb_max_dirt_pages_pct_lwm : 일정 수준 이상의 더티 페이지가 쌓이면 조금씩 더티 페이지를 디스크에 기록함(기본 값 0.1)
+  - innodb_adaptive_flushing : innodb_io_capacity, max를 따르지 않고 Redo Log 생성 속도에 따라 디스크 I/O 수를 결정하는 새로운 알고리즘에 따르는 설정
+- 버퍼 풀 상태 백업 및 복구
+  - 버퍼 풀에 캐시되어 있으면 시작 직후 보다 성능이 좋음(Warm Up 상태)
+  - innodb_buffer_pool_dump_now=ON : 버퍼 풀 LRU 리스트 상태 백업
+  - innodb_buffer_pool_load_now=ON : 백업된 것 복구
+  - ```SHOW STATUS LIKE 'innodb_buffer_pool_dump_status';``` 명령어로 복구 진행 상황 확인 가능
+  - ```SET GLOBAL innodb_buffer_pool_load_abort_ON;``` : 버퍼 풀 복구를 중지하고 즉시 실행
+  - innodb_buffer_pool_dump_at_shutdown, innodb_buffer_pool_load_at_startup : 서버 시작 및 종료 시 자동으로 백업, 복구 되도록 설정
+- 버퍼 풀 적재 내용 확인
+  - information_schema.innodb_cached_indexes, innodb_tables, innodb_indexes 테이블을 적절히 조인하여 현재 차지하고 있는 버퍼 풀 데이터 페이지 수를 확인할 수 있음
+#### 3.2.7 Double Write Buffer
+- 더피 페이지 및 Redo 로그를 디스크에 동기화할 때, 하드웨어 오동작 등으로 비정상 종료될 수 있음
+- 이를 방지하기 위해 Double Write Buffer에 더티 페이지를 먼저 저장함
+- innodb_doublewrite로 제어 가능
+#### 3.2.8 Undo Log
+- 트랜잭션 격리 수준에 따라 DML 작업으로 데이터가 변경되기 전에 이전 버전을 백업하는 파일
+- 레코드마다 존재함
+#### 3.2.9 Redo Log 및 로그 버퍼
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
