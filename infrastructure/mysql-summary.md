@@ -65,8 +65,30 @@ systemctl start mysqld
 ### 2.3 비밀번호 관리 
 - 고수준 비밀번호 : componet_validate_password를 설치하여 패스워드 유효성 관리 가능
 - 이중 패스워드 : 햔재 패스워드, 이전 패스워드 중 하나만 일치해도 인증에 성공하는 방식
-  - ```ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password' RETAIN CURRENT PASSWORD```
-    - 새로운 패스워드를 설정하고 현재 패스워드는 이전 패스워드로 설정함 
+  - ```ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password' RETAIN CURRENT PASSWORD;```
+    - 새로운 패스워드를 설정하고 현재 패스워드는 이전 패스워드로 설정함
+  - ```ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password' DISCARD OLD PASSWORD;```
+    - 패스워드를 변경하고 현재 패스워드는 삭제함
+
+### 2.4 권한
+- ```GRANT``` 커맨드로 권한 부여
+- 객체 권한 : 데이터베이스나 테이블을 제어하기 위한 권한(DB, TABLE 지정 필요)
+- 글로벌(정적) 권한 : 데이터베이스, 테이블 이외의 객체를 제어하기 위한 권한
+- 동적 권한 : MySQL 서버가 시작하면서 동적으로 생성되는 권한
+- 권한 부여 방법
+  - 객체 권한 : ```GRANT [권한 목록(SELECT, UPDATE, ...)] ON [db].[table] TO '[사용자명]'@'[허용 호스트 ip]';```
+  - 정적 권한 : ```GRANT [정적 권한 목록] ON *.* TO '[사용자명]'.'[허용 호스트 ip]';```
+  - DB 권한 : ```GRANT [권한 목록] ON [db].* TO '[사용자명]'.'[허용 호스트 ip]';```
+
+### 2.5 역할
+
+
+
+
+
+
+
+
 
 
 
