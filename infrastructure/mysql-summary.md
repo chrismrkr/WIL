@@ -302,43 +302,36 @@ DB 커넥션 핸들링, SQL 파싱, 쿼리 최적화를 담당함
   - 커밋된 데이터까지 조회하는 격리 수준
   - non-repeatable read 문제가 발생할 수 있음
 - REPEATABLE READ
-  - 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  - MVCC를 보장하기 위해 특정 트랜잭션 번호의 구간 내 백업된 Undo Log 보존 필요(start trx - end trx 사이에 쌓인 Undo 로그)
+  - 순수 읽기는 Undo Log에 있는 레코드를 조회하므로 non-repeatable read 문제를 피할 수 있음
+  - 다만 백업된 Undo Log가 많아질수록 MySQL 서버 처리 성능이 떨어질 수 있음
+  - Phantom Read 문제가 발생할 수 있음
+    - 왜냐하면 SELECT ~ FOR UPDATE 는 순수 읽기가 아닌 잠금 읽기 이므로 Undo Log가 아닌 테이블에서 읽으므로, 이러한 문제가 발생함
+  - 그러나, MySQL은 갭 락(넥스트 키 락)을 사용하므로 REPEATABLE READ 격리 수준에서도 Phantom Read가 발생하지 않음
+    - 왜냐하면 SELECT ~ FOR UPDATE가 일어나는 시점에 레코드 및 갭 락이 걸리므로, 다른 트랜잭션에서도 DML 작업을 할 수 없기 때문임
+    - 하지만 아래의 경우에는 MySQL의 경우에도 Phantom Read가 발생하므로 주의가 필요함
+      - T1: ---SELECT----------------------SELECT FOR UPDATE---------
+      - T2: ------------INSERT-----COMMIT----------------------------
+- Serializable
+  - Write 뿐만 아니라 순수 Read에도 락을 걸음
+  - 다만 동시 처리 능력이 떨어짐(데드락 가능성 증가)
 
 ***
 
 ## 5. 인덱스
+### 5.1 인덱스 읽기 방식
+- HDD & SSD
+- 순차 I/O & 랜덤 I/O
+### 5.2 인덱스란?
+- DML(UPDATE, INSERT, DELETE) 성능을 희생하여 조회 성능을 높이는 방법
+- 인덱스는 유니크 인덱스일 수 있고 아닐 수 있음
+- 인덱스는 프라이머리 인덱스와 세컨더리 인덱스로 나뉨
+### 5.3 B-트리
+
+
+
+
+
 
 
 
