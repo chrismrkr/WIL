@@ -8,7 +8,7 @@ Network File System
 ## NFS 서버 설정
 - /etc/exportfs 파일에서 설정함
   - echo "/var/test-nfs 172.30.0.0/24(rw,no_root_squash)" >> /etc/exports
-    - [서버 디렉토리] [접속 허가 클라이언트 호스트](옵션)
+    - [서버 디렉토리] [접속 허가 클라이언트 호스트] (옵션)
     - 옵션 종류
       - root-squash : root 접근 권한 거부
       - no-root-squash: root 접근 권한 허용
