@@ -147,68 +147,17 @@
 - 삼바의 구성요소
   - smdb : 주요 서비스로 ip를 통해 직접 접속 가능(tcp : 445)
   - nmdb : UDP 포트(137, 138)로 호스트를 브로드 캐스팅 방식으로 검색 후, TCP 139 포트를 이용하여 호스트 이름으로 접속
-##### 1.3.1.2 삼바 서비스 설치와 구성
-- 삼바 관련 패키지 설치 : ```yum -y install samba samba-common samba-client```
-- 삼바 서비스 실행 : ```systemctl start smb.service nmb.service```
-  - 부팅 시 자동 실행하도록 설정 : ```systemctl enable smb.service nmb.service```
-- 삼바 서비스 설정 : /etc/samba/smb.conf
-- 삼바 서비스 사용자 등록 및 패스워드 설정
-  - /etc/samba/smbusers에서 리눅스 계정과 삼바 사용자 매핑
-    - WindowsUsername = LinuxUsername1, LinuxUsername2
-  - smbpasswd : 삼바 사용자 계정 활성화 및 패스워드 설정
-  - pdbedit : 삼바 사용자 목록 및 세부 내용 확인
-  - write list : 쓰기 가능한 사용자 지정
-  - valid users : 접근 가능 리눅스 사용자 지정(기본 값 : 모든 사용자)
-##### 1.3.1.3 삼바 서비스 이용하기
-- 삼바 관련 패키지 설치 : ```yum -y install samba-common samba-client```
-- 삼바 서버 접속
-  - smbclient 명령어
-    - smbclient -L : 삼바 서버의 공유 디렉토리 정보 표시
-    - smbclient -M : 메세지 전송
-    - smbclient -U : 사용자 이름 지정
-    - smbclient -p : TCP 포트번호 지정
-    
+##### 1.3.1.2 삼바 서비스 설치, 구성, 이용방법
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/samba-summary.md
+  
 #### 1.3.2 NFS(Network File System) 서비스 사용하기
-##### 1.3.2.1 NFS 서비스 개요
-- TCP/IP를 통해 원격 호스트에 있는 파일 시스템을 로컬 호스트에 마운트해서 사용하는 방식
-##### 1.3.2.2 NFS 서비스 설치 및 구성
-- NFS 관련 패키지 설치 : ```yum -y install rpcbind nfs-utils```
-- NFS 서버 설정
-  - /etc/exports 파일에서 NFS 서비스 설정
-  - echo "/var/test-nfs 172.30.0.0/24(rw,no_root_squash)" >> /etc/exports
-    - [서버 디렉토리] [접속 허가 클라이언트 호스트](옵션)
-    - 옵션 종류
-      - root-squash : root 접근 권한 거부
-      - no-root-squash: root 접근 권한 허용
-  - mkdir /var/test-nfs
-  - chmod 666 /var/test-nfs
-- NFS 관련 데몬 실행 : ```systemctl start rpcbind nfs-server``` ```systemctl enable rpcbind nfs-server```
-- NFS 서버 관련 명령어
-  - exportfs : export된 디렉토리 정보, 즉 공유 목록 관리
-##### 1.3.2.3 NFS 서비스 이용하기
-- NFS 서버 접속
-- 클라이언트 호스트에 디렉토리 마운트
-  - ```mount -t nfs [NFS 서버 ip]:[서버 디렉토리 경로] /var/test-local```
-  - /etc/fstab에서도 설정 가능
-    - ```[NFS 서버 ip]:[서버 디렉토리 경로] [로컬 디렉토리 경로] nfs ... ```
-- NFS 클라이언트 관련 명령어
-  - showmount : NFS 서버에서 export된 정보 확인
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/nfs-summary.md
     
 #### 1.3.3 FTP(File Transport Protocal)
-##### 1.3.3.1 FTP 개요
-- FTP 서버와 클라이언트 사이 파일 전송을 위한 프로토콜(TCP 20)
-- 능동 모드 : 클라이언트가 서버에 포트번호를 알리고 이를 통해 서버가 클라이언트로 접속
-- 수동 모드 : 서버가 포트번호를 지정하고, 이를 통해 클라이언트가 서버로 접속
-##### 1.3.3.2 FTP 서비스 설치와 구성
-- FTP 관련 패키지 설치 : ```yum -y install vsftpd```
-- FTP 서버 설정 : ```/etc/vsftpd/vsftpd.conf```
-  - ex. local_enable=YES : 일반 사용자(로컬 사용자) 접근 가능
-- vsftpd 데몬 실행 : ```systemctl start vsftpd.service```
-- /etc/vsftpd/ftpdusers : 서버에 접근할 수 **없는** 계정 기입
-##### 1.3.3.3 FTP 서비스 이용하기
-- FTP 클라이언트 설치 : ```yum -y install ftp```
-
-
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/ftp-summary.md
 
 ### 1.4 메일 관련 서비스
 #### 1.4.1 메일 관련 서비스의 개요
@@ -220,21 +169,9 @@
 - IMAP : TCP 143. 도착한 메일을 수신하는 프로토콜. POP3과 달리 메일을 서버에 남겨 두었다가 삭제할 수 있음
   - docvecot 프로그램 사용 
 ##### 1.4.1.2 메일 서비스 사용하기
-- 메일 관련 패키지 설치 : ```yum -y install sendmail```
-- sendmail 주요 설정 파일
-  - /etc/mail/sendmail.cf
-  - /etc/mail/access : 메일 서버에 접속하는 호스트의 접근을 제어하는 설정 파일
-    - ex. Connect:127.0.0.1  OK, From:abnormal@google.com   REJECT
-    - ```makemap hash /etc/mail/access < /etc/mail/access```
-  - /etc/aliases : 메일 별칭(특정 계정)으로 수신한 이메일을 다른 계정(이메일)으로 전달하는 것을 설정
-    - sendmail이 참조하는 파일은 /etc/aliases.db임
-    - /etc/aliases 수정 후, ```newaliases 또는 sendmail bi```로 변경
-  - 홈 디렉토리의 .forward 파일
-    - 외부 메일 서버로 전송하기 위해 사용
-  - /etc/mail/virtusertable : 가상의 도메인으로 들어오는 메일을 특정 계정으로 전달
-    - [가상 이메일 주소] [포워딩 이메일 주소]
-    - ```makemap hash /etc/mail/virtusertable < /etc/mail/virtusertable```
-  - /etc/mail/local-host-names : 로컬 도메인으로 처리할 호스트 이름 목록
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/sendmail-summary.md
+
 
 ### 1.5 DNS 관리 서비스
 #### 1.5.1 DNS의 개요
