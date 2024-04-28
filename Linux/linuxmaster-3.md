@@ -117,58 +117,8 @@
 - 아파치, MySQL, php 연동 테스트
 - 방화벽 설정
 ###### 1.1.3.6 아파치 웹 서버의 구조와 세부 설정
-- **실습 및 기출 문제 위주로 진행하며 정리할 것**
-- /etc/httpd/conf에 기본 환경설정 파일인 httpd.conf 파일이 존재함
-- httpd.conf 파일에서 Include conf.d/*.conf로 모든 설정 파일을 포함함
-- httpd.conf 주요 설정 항목
-  - ServerRoot : 아파치 서버의 주요 파일이 저장된 최상위 디렉터리 절대경로 설정
-  - Listen : 포트번호 지정
-  - LoadModules : DSO(Dynamic Shared Object) 방식으로 로드할 모듈 지정
-  - User : 데몬 실행 사용자 권한 지정
-  - Group : 데몬 실행 그룹 권한 지정
-  - ServerAdmin : 어드민 이메일 설정. 에러 발생 시 해당 메일로 에러 메세지 전달
-  - ServerName : 호스트명 입력
-  - DocumentDirectory : Docment Root 디렉토리를 지정함
-  - Directory : 지정한 디렉토리에 대한 권한, 제어, 옵션 등을 설정함
-  - FileMatch : 지정된 패턴에 맞는 파일에 대한 권한, 제어, 옵션 등을 설정함
-  - AllOverride
-  - LogLevel
-    - /etc/rsyslog.conf 내 우선순위와 동일함
-  - ifModule : 지정한 모듈에 대한 세부 동작 옵션 설정
-    - log_config_module : 로그 레벨
-    - mod_userdir.c : 사용자 별 홈 페이지 사용여부 설정(사용자 A는 a 홈페이지, B는 b 홈페이지..)
-- httpd-vhosts.conf
-  - 하나의 ip 주소로 여러개의 도메인(호스트)를 설정할 수 있음
-- default.conf, http-default.conf
-  - 기본 설정 값이 들어 있음
-- 예시
-```conf
-# 기본 설정
-ServerRoot "/etc/httpd"
-
-# 서버의 IP 주소와 포트 지정
-Listen 80
-
-# 서버의 이름 설정
-ServerName example.com
-
-# 로그 파일 위치 설정
-ErrorLog "/var/log/httpd/error_log"
-CustomLog "/var/log/httpd/access_log" common
-
-# 기본 디렉토리 설정
-DocumentRoot "/var/www/html"
-
-# 디렉토리 옵션 설정
-<Directory "/var/www/html">
-    Options FollowSymLinks
-    AllowOverride None
-    Require all granted
-</Directory>
-
-# 기본 인덱스 페이지 설정
-DirectoryIndex index.html
-```
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/apache-summary.md
 
 ### 1.2 인증 관련 서비스
 #### 1.2.1 인증 관련 서비스 개요
