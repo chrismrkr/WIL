@@ -137,40 +137,8 @@
     - CN : 전체 이름(성+이름)
     - SN : 성
 #### 1.2.2 NIS(Network Information Service) 사용하기
-##### 1.2.2.1 NIS 서버 설치 및 구성
-- RPC 데몬 구동
-  - 서버 및 클라이언트 모두 원격 통신을 위해 RPC 데몬 구동 필요
-  - ```systemctl start rpcbind```
-  - 호스트 파일에 도메인 등록 : /etc/hosts
-- NIS 서버 설치
-  - ```yum -y install ypserv```
-  - /usr/lib/systemd/system에 NIS 관련 서비스 파일이 설치됨
-- NIS 도메인명 등록
-  - 명령어 사용 : ```nisdomainname [도메인명]```
-  - **/etc/sysconfig/network**에 설정하면 재부팅 후에도 도메인이 사라지지 않음
-- NIS 사용자 계정 생성
-  - NIS 클라이언트에서 사용할 계정 생성 : ```useradd nisuser```
-- NIS 관련 데몬 실행
-  - ypserv : 서버 데몬으로 클라이언트에 네트워크 정보를 제공
-  - yppasswd : 사용자 패스워드 변경
-  - ypxfrd : 클라이언트에 NIS 맵을 전송
-- NIS 정보 갱신 및 적용 : ```make -c /var/yp```
-##### 1.2.2.2 NIS 클라이언트 설치와 구성
-- RPC 데몬 구동
-- NIS 클라이언트 설치 : ```yum -y install ypbind yp-tools```
-- NIS 도메인명 설정
-- NIS 서비스(서버)와 도메인 정보 설정
-   - **/etc/yp.conf**에 설정
-- NIS 클라이언트 데몬(ypbind) 실행
-##### 1.2.2.3 NIS 관련 주요 명령어
-- nisdomainname : NIS 도메인 이름 설정 또는 도메인 확인
-- ypwhich : NIS를 통해 로그인 후, 인증에 사용한 NIS 서버 도메인 확인
-- ypcat : NIS 클라이언트에서 NIS 서버 구성파일(map) 확인
-- yptest : NIS 클라이언트에서 NIS 동작, 설정, 도메인명, 사용자 계정 정보 등 확인
-- yppasswd : 사용자 비밀번호 변경
-- ypchsh : 사용자 셸 변경
-- ypchfn : 사용자 정보 변경
-- yppush : 서버에서 클라이언트로 서버 구성 파일(map) 전송 및 업데이트
+- 아래 링크 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/nis-summary.md
 
 ### 1.3 파일 관련 서비스
 #### 1.3.1 삼바(SAMBA) 서비스 사용하기
