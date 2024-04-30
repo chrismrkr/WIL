@@ -216,8 +216,9 @@
 - inetd, standalone 방식 사용. Access Control을 위한 TCP Wrapper
 - xinted(/etc/xinted)
 ##### 1.7.1.2 TCP Wrapper
-- inetd 데몬에 의해 관리되는 서비스에 대한 접근 제어를 함
-- /etc/hosts.allow, /etc/hosts.deny 파일 이용
+- 아래 주소 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/tcpwrapper-summary.md
+  
 #### 1.7.2 프록시 서비스
 ##### 1.7.2.1 프록시 개요
 ##### 1.7.2.2 리눅스 프록시 서버(squid)
