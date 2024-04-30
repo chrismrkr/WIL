@@ -223,22 +223,9 @@
 ##### 1.7.2.1 프록시 개요
 ##### 1.7.2.2 리눅스 프록시 서버(squid)
 - TCP 3128을 기본으로 사용함
-- /etc/squid/squid.conf 사용
-- acl : 별칭 지정
-- http_access allow : 특정 대역만 사용하도록 허가함
-- http_access deny : 특정 대역에서 접근을 불허함
-#### 1.7.3 DHCP 서비스
-##### 1.7.3.1 DHCP 서비스의 개요
-- 호스트가 사용할 ip 주소, 게이트워이 주소, 네임 서버 주소 등을 자동으로 할당하는 서비스
-- DHCP 데몬 설정 파일 위치 : /etc/dhcp/dhcpd.conf
-  - log-facility :  syslog에서 전달한 로그 facility 지정
-```
-subnet 192.168.10.0 netmask 255.255.255.0 {
-  range 192.168.10.0 192.168.10.200;
-  option domain-name "temp-dhcp.com";
-  ...
-}
-```
+- 아래 주소 참고
+- https://github.com/chrismrkr/WIL/blob/main/Linux/squid-summary.md
+  
 #### 1.7.4 VNC 서비스
 ##### 1.7.4.1 VNC 서비스의 개요
 - Virtual Network Computing의 약자로 GUI 방식으로 원격 컴퓨터 접속 및 사용 기능 제공
