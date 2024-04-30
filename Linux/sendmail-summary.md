@@ -8,7 +8,7 @@
 ## 메일 서버 관련 설정 파일
 - /etc/mail/sendmail.cf : sendmail 기본 설정 파일
 - /etc/mail/sendmail.mc : sendmail.cf를 보조하는 파일
-  - m4 sendmail.mc > sendmail.cf 명령어로 m4 유틸리티 생성
+  - ```m4 sendmail.mc > sendmail.cf``` 명령어로 m4 유틸리티 생성
 
 - /etc/mail/access : 메일 서버에 접속하는 호스트 접근 제어
   - Connect:127.0.0.1 OK
