@@ -9,7 +9,7 @@
   - ```yum -y install ypserv```
 - NIS 도메인명 등록
   - ```nisdomainname [도메인명]```
-  - ```echo "NISDOMAIN=[도메인명]``` >> /etc/sysconfig/network
+  - ```echo "NISDOMAIN=[도메인명]"``` >> /etc/sysconfig/network
 - NIS 계정 생성
   - 아이디 생성 : ```useradd [계정명]```
   - 패스워드 설정 : ```passwd [계정명]```
