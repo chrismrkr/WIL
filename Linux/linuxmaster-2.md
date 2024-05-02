@@ -227,7 +227,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - 물리 메모리 공간이 부족할 때 디스크 공간을 활용하는 기법
 - 스왑 파일 또는 파티션 형태로 존재함
 ##### 1.2.3.2 스왑 파일 생성
-- dd 명령어로 스왑 파일 생성 : ```dd if=/dev/zero of=/swapfile bs=1024 count=1048576
+- dd 명령어로 스왑 파일 생성 : ```dd if=/dev/zero of=/swapfile bs=1024 count=1048576```
 - 권한 설정 : ```chmod 600 /swapfile```
 - 파일 초기화(스왑 파일 초기화) : ```mkswap /swapfile```
 - 파일 시스템에 인식(스왑 파일 활성화) : ```swapon /swapfile```
