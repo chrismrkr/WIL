@@ -30,7 +30,8 @@
 
 ## NIS 관련 주요 명령어
 - nisdomainname : NIS 도메인 이름 설정 또는 도메인 확인
-- ypwhich : NIS를 통해 로그인 후, 인증에 사용한 NIS 서버 도메인 확인
+- ypwhich : 클라이언트에서 NIS를 통해 로그인 후, 인증에 사용한 NIS 서버 이름 확인
+  - ypwhich -m : 
 - ypcat : NIS 클라이언트에서 NIS 서버 구성파일(map) 확인
 - yptest : NIS 클라이언트에서 NIS 동작, 설정, 도메인명, 사용자 계정 정보 등 확인
 - yppasswd : 사용자 비밀번호 변경
