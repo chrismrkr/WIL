@@ -11,8 +11,8 @@
 - /etc/samba/smb.conf에서 설정함. man.cnf로 확인 가능
 - Global Setting
   - [global]로 시작함
-  - work group
-  - server string
+  - work group : 공유 그룹 명
+  - server string : 서버에 대한 설명
   - netbios name : 윈도우에서 이름으로 검색하기 위한 키워드
   - hosts allow
   - hosts deny
