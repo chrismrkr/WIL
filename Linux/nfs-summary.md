@@ -27,6 +27,6 @@ Network File System
   - showmount : NFS 서버에서 export된 정보 확인
 
 ## NFS 관련 기타 명령어
-- rpcinfo
-- nfsstat
+- rpcinfo : rpc 관련 정보 확인
+- nfsstat : NFS 서버 또는 NFS 클라이언트에서 NFS 관련 상태 정보를 출력
 
