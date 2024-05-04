@@ -10,6 +10,7 @@
 ## 설치 및 환경설정 파일 확인
 - yum -y install dhcp
 - rpm -qc dhcp
+- man dhcpd.conf
 
 ## 특정 호스트에 고정 IP 할당하기
 ```
