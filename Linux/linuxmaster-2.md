@@ -248,10 +248,12 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - /etc/fstab에 설정
   - 4번째 필드에 usrquota와 grpquota를 설정
 ##### 1.2.4.2 디스크 쿼터 관련 명령어
-- quotacheck : 파일 시스템 사용량 체크하여 기록 파일 생성
+- edquota : edit quota(setquota, xfs_quota). vi 편집기를 이용하여 사용자 혹은 그룹 디스크 쿼터 설정
+- repquota : 현재 파일 시스템의 쿼터 정보를 요약하여 출력
 - quota : 사용자 및 그룹 디스크 쿼터 정보 출력
-- edquota : edit quota(setquota, xfs_quota)
-- repquota : report quota. 현재 파일 쿼터 정보 출력
+- quotacheck : 파일 시스템을 검사하여 쿼터 설정 최신으로 갱신
+- quotaon : 파일 시스템의 쿼터 기능 활성화
+- quotaoff : 파일 시스템의 쿼터 기능 중지
 
 ### 1.3 프로세스 관리
 #### 1.3.1 프로세스 관련 명령어
@@ -281,7 +283,7 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 #### 1.3.2 프로세스 관련 파일
 ##### 1.3.2.1 /proc 디렉토리
 - 가상의 파일 시스템으로 파일 접근 명령어(ls, cd) 및 시스템 조회 가능
-- /proc/[PID] 에 프로세스 정보 존재
+- /proc/[PID] 에 프로세스 정보 존재. 해당 PID가 어떤 프로세스를 실행 중인지 확인 가능
   - /proc/meminfo : 물리적 메모리 및 스왑 메모리 정보
   - /proc/uptime : 시스템 가동 시간
   - /proc/cmdline : 커널이 시작될 때 전달되는 커널 관련 옵션
@@ -319,23 +321,25 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - 패키지 도구 : 시스템에 소프트웨어를 편리하게 설치하기 위한 도구
 - rpm, yum, apt-get, apt
 ##### 1.4.1.2 저수준 패키지 도구
+- whereis [명령어] : 해당 명령어가
 - rpm 패키지 명령어로 설치. 먼저 설치가 필요한 라이브러리가 없으면 에러가 발생할 수 있음
 - 옵션
   - -V : 검증(Validate)
-  - -i : 설치(install)
+  - -i : 설치(install) (--force : 설치되어있더라도 강제로 재설치하는 옵션)
   - -U : 업데이트(Update)
   - -e : 제거(eliminate)
-  - -q [패키지명] : 패키지 설치 여부 확인(question)(dpkg -L)
-  - -qa : 설치된 모든 패키지 확인(question all)(dpkg -l)
-  - -qf [파일명] : 파일이 설치되어 있는 패키지 확인(question file)(dpkg -S)
-  - -ql [패키지명] : 패키지에 설치된 파일 목록 확인(question list)(dpkg -s)
-  - -qi [패키지명] : 패키지 정보 확인(question information)
+  - -q [패키지명] : 패키지 설치 여부 확인(question)
+  - -qa : 설치된 모든 패키지 확인(question all)
+  - -qf [파일명] : 파일이 설치되어 있는 패키지 확인(question file)
+  - -ql [패키지명] : 패키지에 설치된 파일 목록 확인(question list)
+  - -qi [패키지명] : 패키지의 크기, 사이즈, 요약, 설명 등 패키지 정보 확인(question information)
 ##### 1.4.1.3 고수준 패키지 도구
-- 패키지 검색 : ```yum(apt) search [package-name]```
-- 패키지 설치 : ```yum(apt-get) install(update) [package-name]```
-- 패키지 제거 : ```yum(apt-get) erase(remove) [package-name]```
+- 패키지 검색 : ```yum search [문자열]```
+- 패키지 설치 : ```yum install [package-name]```
+- 패키지 제거 : ```yum erase [package-name]```
   - 환경설정까지 제거하려면 purge 옵션 사용
-- 패키지 정보 출력 : ```yum(apt) info(show) [package-name]```
+- 패키지 정보 출력 : ```yum info [package-name]```
+- 패키지 리스트 출력 : ```yum list``` (installed 추가 시 설치된 패키지 리스트만 출력)
 #### 1.4.2 레드햇 패키지 관리와 데비안 패키지 관리
 ##### 1.4.2.1 레드햇 패키지 관리(RPM)
 - 설치 및 업데이트 : rpm -i, rpm -U
@@ -390,20 +394,25 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - ```uname -r``` 명령어로 커널 버전 확인 가능
 ##### 2.1.1.2 커널 컴파일 순서
 - 소스 다운로드 및 압축 해제
-- yum, apt-get 등으로 컴파일에 필요한 도구 설치
-- 컴파일 이전 커널 환경설정 제거 및 작업 초기화
-  - ```make mrproper```
-    - ```make clean``` : 컴파일 이전 상태로 원복함
-    - ```make dep``` : 소스 파일과 헤더 의존성 검사(/usr/src/linux/.depend 생성)
-  - ```make menuconfig```
-    - 이전 환경 설정을 복사해둔 후 변경하는 것이 좋음 : ```cp /boot/config-$(uname -r)```
+- 컴파일 이전 작업
+  - yum, apt-get 등으로 컴파일에 필요한 도구 설치
+  - make : Makefile을 이용하여 실행 파일 생성
+  - make install : make 명령어로 생성된 실행 파일을 target 디렉토리로 복사
+  - make distclean : 커널 컴파일 실행 전 기존에 생성된 환경설정 파일, 백업 파일, 패치 파일 등 모든 관련 파일 삭제
+  - make mrproper : 컴파일에 영향을 주는 정보 삭제
+    - make dep : 소스 파일 및  ㅢ존성 검사(/usr/src/linx/.depend 생성)
+  - make menuconfig : 텍스트 기반의 메뉴를 제공하여 옵션을 선택할 수 있음
+    - make xconfig : X 윈도우 환경 기반 설정도구로 옵션 선택
+    - make nconfig : 텍스트 기반 메뉴를 제공하여 옵션 선택(색상 및 F1-F9 단축키 지원)
+    - 이전 환경설정 정보는 /boot/config-$(uname -r)에 존재함
 - 컴파일 진행
-  - ```make bzImage``` : 커널 이미지 생성
-  - ```make modules``` : 커널에서 사용할 모듈 컴파일
-    - 설치 전 ```make help``` 명령어로 도움말 확인 가능
-  - ```sudo make install``` : 모듈을 /lib/modules/kernel-version 이하에 설치
-  - ```sudo make modules_install``` : 커널 이미지 복사 및 커널 시스템 설치
-  - ```sudo reboot``` : 시스템 재기동
+  - make bzImage : 커널 이미지 생성
+  - make modules : 커널에서 사용할 모듈 컴파일
+    - 설치 전 make help 명령어로 도움말 확인 가능
+  - sudo make install : 모듈을 /lib/modules/{kernel-version} 이하에 설치
+  - sudo make modules_install : 커널 이미지 복사 및 커널 시스템 설치
+  - sudo reboot : 시스템 재기동
+  - make clean : 컴파일 이전 상태로 복구함
 #### 2.1.2 모듈
 - 설명 및 명령어 위주로 살펴볼 것
 ##### 2.1.2.1 모듈의 개요
@@ -411,14 +420,15 @@ su [계정명] # 계정 권한만 획득하고 환경변수 및 현재 작업 �
 - 모듈을 통해 커널 기능을 동적으로 로드하여 효율적임
 ##### 2.1.2.2 모듈 관련 명령어
 - lsmod : 현재 로드된 모듈 리스트 출력
-- lnsmod : 모듈을 로드함. ```/lib/modules/$(uname -r)```에서 파일을 찾아 로드 가능
+- lnsmod : 모듈을 로드함. ```/lib/modules/$(uname -r)```에서 파일을 찾아 로드
+  - ```cat /lib/modules/$(uname -r)/modules.dep``` 명령어로 커널 모듈 간의 의존성 정보 확인 가능
 - rmmod : 모듈 언로드
 - modprobe : 모듈 의존성을 고려하여 로드 및 언로드
   - modprobe -l : 로드 가능한 모든 모듈 리스트 출력
   - modprode -r : 의존성을 고려하여 언로드
   - modprobe.config 파일을 이용함
 - modinfo : 지정한 모듈 정보 출력
-- depmod : 커널 모듈 로드를 위해 의존성을 점겅하는 명령어로 modules.dep 파일 이용
+- depmod : 모듈 간 의존성을 검사하여 modules.dep 파일을 갱신함
 
 ### 2.2 주변장치 관리
 #### 2.2.1 디스크 확장
@@ -624,6 +634,12 @@ dateext
 - 공개키 방식의 암호화 기법 재공
 ##### 3.2.4.6 John the Ripper
 - 사용자 보안 강화를 위해 단순한 패스워드를 설정한 사용자를 찾아서 경고 조치하기 위해 사용
+##### 3.2.4.7 sysctl
+- 커널 매개 변수를 제어하는 명령어
+- /etc/sysctl.conf 파일에 영구적으로 저장할 수 있음
+- ex. ```sysctl -w net.ipv4.icmp_echo_ignore_all=1``` : ping 명령에 응답하지 않도록 설정
+
+
 
 ### 3.3 시스템 백업
 #### 3.3.2 파일 백업
@@ -652,6 +668,13 @@ dateext
 - 파티션이나 디스크 단위로 백업할 때 사용
 - 백업 시 블록 단위로 지정 가능
 - tar 보다 느림
+- 명령어 옵션(man dd)
+  - if= : input 파일 지정
+  - of= : output 파일 지정
+  - bs= : 블록 사이즈 지정
+  - count= : 파일 크기 지정
+
+
 ##### 3.3.3.3 restore
 - dump로 생성한 백업 파일 복원
 ##### 3.3.3.4 stat
@@ -662,6 +685,11 @@ dateext
 - root 권한 불필요
 - 로컬 시스템 백업 시에는 별다른 설정 필요 없음
 - rcp에 비해 속도가 빠르며 다양한 기능 제공
+- rsync 명령어 사용법
+  - -v : 백업 과정 자세히 출력
+  - -a : 백업 모드로 동작
+  - -z : 데이터 압축 지원
+  - ex. rsync -avz root@192.168.12.22:/home /backup 
 
 
 
