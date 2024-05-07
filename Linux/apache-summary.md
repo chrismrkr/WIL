@@ -33,7 +33,7 @@
   - Group : 데몬 실행 그룹 권한 지정
   - ServerAdmin : 어드민 이메일 설정. 에러 발생 시 해당 메일로 에러 메세지 전달
   - ServerName : 호스트명 입력
-  - DocumentDirectory : Docment Root 디렉토리를 지정함
+  - DocumentRoot : Docment Root 디렉토리를 지정함
   - <Directory [디렉토리경로]> ... : 지정한 디렉토리에 대한 권한, 제어, 옵션 등을 설정함
     - Options : 해당 디렉토리 및 하위 디렉토리 제어
     - AllowOverride
