@@ -33,7 +33,7 @@ $TTL 1D
 @  IN SOA ns.ihd.or.kr. kait.ihd.or.kr (
   20240030306  ;Serial
   7200         ;Refresh
-)
+) ; 도메인은 ihd.or.kr, 관리자 계정은 kait@ihd.or.kr임
 IN NS ns.ihd.or.kr.
 IN A 192.168.12.22
 IN MX 10 ihd.or.kr.
