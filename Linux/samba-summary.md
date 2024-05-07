@@ -8,7 +8,7 @@
 - ```systemctl [start | restart | enable] nmb.service```
 ### 환경 설정
 - ```rpm -qc samba```로 확인
-- /etc/samba/smb.conf에서 설정함. man.cnf로 확인 가능
+- /etc/samba/smb.conf에서 설정
 - Global Setting
   - [global]로 시작함
   - work group : 공유 그룹 명
