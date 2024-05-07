@@ -15,7 +15,7 @@
   - 패스워드 설정 : ```passwd [계정명]```
 - NIS 서버 관련 서비스 실행
   - ```systemctl [start | restart | enable] ypserv.service```
-  - ```systemctl [start | restart | enable] yppasswd.service```
+  - ```systemctl [start | restart | enable] yppasswdd.service```
   - ```systemctl [start | restart | enable] ypxfrd.service```
 - NIS 서버 정보 갱신
   - ```make -c /var/yp```
