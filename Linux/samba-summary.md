@@ -37,8 +37,7 @@
   - [윈도우계정명] = [리눅스 계정 명]
   - ex. root = administrator admin smbrootuser
   - ex. nobody = guest pcguest smbguest
-  - adduser [삼바 클라이언트 계정명] 명령어로 아이디 생성 가능
-  - passwd [삼바 클라이언트 계정명] 명령어로 패스워드 등록 가능
+  - smbpasswd 명령어로 계정 생성 및 패스워드 설정 가능
 - 패스워드 설정 : pdbedit
   - ```man pdbedit```에서 확인 가능
 
