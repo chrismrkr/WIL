@@ -11,7 +11,7 @@
   - Fw : 여러 개의 도메인명을 수신 호스트의 이름으로 이용할 경우, 관련 설정 파일 지정(/etc/mail/local-host-names)
   - Dj : 발신 도메인을 강제로 변경함
   - Dn : sendmail이 에러 등의 이유로 회신할 때 사용할 사용자 이름
-  - FR-o : Relay를 허용ㅇ할 도메인 설정(/etc/mail/relay-domains)
+  - FR-o : Relay를 허용할 도메인 설정(/etc/mail/relay-domains)
 - /etc/mail/sendmail.mc : sendmail.cf를 보조하는 파일
   - ```m4 sendmail.mc > sendmail.cf``` 명령어로 m4 유틸리티 생성
 
