@@ -45,7 +45,34 @@ K8s 클러스터에는 마스터 노드와 워커 노드들로 구성되어 있�
   - https://minikube.sigs.k8s.io/docs/start/
 
 - kubectl 명령어를 통해 Pod를 워커 노드에 배포할 수 있음
-- kubectl 명령 시, 마스터 노드가 이를 전달받아 스케줄러가 실행 중인 Pod를 분석하고 워커 노드를 선택하여 적절한 장소에 배포함
+- Pod는 Deployment 객체를 통해 클러스터에 배포되며, Service 객체를 통해 클러스터 내 다른 Pod와 통신하고 외부에 노출됨
+  - Pod 객체
+    - 1개 이상의 컨테이너를 갖는 객체
+    - Pod는 클러스터 내 고유 IP를 갖음
+      - 다만, 재시작 또는 교체될 때 마다 변경됨
+    - k8s는 pod를 적절한 워커 노드에 배치함
+  - Deployment 객체
+    - k8s가 Deployment 객체에 명령을 전달하고, Deployment 객체는 Pod를 생성하여 노드에 배치함
+    - Pod당 하나의 Deployment 객체를 갖는다고 볼 수 있음
+    - Deployment 객체를 통해 k8s는 pod를 자동으로 적절한 워커 노드에 할당하고, 배포 중 문제 시 롤백하고, 스케일링을 할 수 있음
+  - Service 객체
+    - pod를 클러스터 내 다른 pod나 외부에 노출시키기 위해 사용함
+    - service 객체는 pod 그룹을 나누고 이곳에 공유 IP 를 할당함
+    - 공유 IP를 통해 외부에서 Pod에 접근할 수 있음
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
