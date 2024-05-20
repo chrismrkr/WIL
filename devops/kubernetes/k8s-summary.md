@@ -38,7 +38,7 @@ K8s 클러스터에는 마스터 노드와 워커 노드들로 구성되어 있�
 - API 서버, kubelet 등 k8s 관련 소프트웨어 설치
 - 파일 시스템, 로드밸렌서 등 클러스터 내 리소스 생성
 
-## Minikube로 쿠버네티스 실습 1 : 클러스터 내 Pod 배포하기
+## Minikube로 쿠버네티스 실습 1 : Pod 명령적 배포
 - 로컬환경 내에 Minikube(단일 노드 클러스터)를 설치하고, kubectl 명령어를 통해 해당 클러스터에 명령어를 전달할 수 있음
   - kubectl 설치 in MacOS : brew install kubectl
   - Minikube 설치 in MacOS : brew install minikube > minikube start
@@ -59,6 +59,348 @@ K8s 클러스터에는 마스터 노드와 워커 노드들로 구성되어 있�
     - pod를 클러스터 내 다른 pod나 외부에 노출시키기 위해 사용함
     - service 객체는 pod 그룹을 나누고 이곳에 공유 IP 를 할당함
     - 공유 IP를 통해 외부에서 Pod에 접근할 수 있음
+
+- deployment 객체로 pod 생성
+  - ```kubectl create deployment [pod 이름] --image='[docker-hub id]/[image-name]:[tag]'```
+  - docker hub에 이미지가 있어야 함. 왜냐하면, 클러스터 내에는 도커 이미지가 존재하지 않기 때문임
+  - ```kubectl get pods``` 명령어로 생성된 pod 확인 가능
+  - ```kubectl delete [이름]``` 명령어로 pod 삭제 가능
+
+- service 객체로 pod 노출
+  - ```kubectl expose deployment [pod 이름] --port=[포트번호] -type [type]```
+  - type 종류
+    - NodePort : 워커 노드 IP로 expose
+    - LoadBalancer : 클러스터 내 로드밸랜서 IP로 노출
+    - ClusterIP : 외부로 노출하지 않음
+  - ```kubectl get services``` 명령어로 확인 가능
+
+## Minikube로 쿠버네티스 실습 2 : Pod 선언적 배포
+- 환경설정 파일을 통해서 Pod를 배포할 수 있음
+- **Example 1**
+  - auth-api 도커 이미지를 Pod 내 컨테이너로 배포
+  - users-api 도커 이미지를 Pod 내 컨테이너로 배포
+  - 단, 두 컨테이너는 동일한 Pod에 속함
+  - auth-api는 외부에 노출되지 않고, users-api는 외부에 노출함
+
+```yaml
+# users-auth-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-auth-deployment
+  labels:
+    app: users-auth 
+spec:
+  replicas: 1 # 복제할 pod 수 지정
+  selector:
+    matchLabels:
+      app: users-auth # deployment 객체에서 관리할 파드의 label 지정
+  template:
+    metadata:
+      labels:
+        app: users-auth
+    spec:
+      containers:
+      - name: users-api
+        image: my-docker-repo/users-api:latest
+      - name: auth-api
+        image: my-docker-repo/auth-api:latest
+```
+
+```yaml
+# users-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+  labels:
+    app: users-auth
+spec:
+  selector:
+    app: users-auth
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+
+```
+kubectl apply -f=users-auth-deployment.yaml
+kubectl apply -f=users-service.yaml
+minikube service users-service
+```
+
+- 결과
+  - 동일 Pod 내에서는 localhost로 통신이 가능하므로 users-api, auth-api는 localhost로 통신하면 됨
+  - users-service 실행 시 노출된 IP로 외부에서 user-api에 접근할 수 있음
+***
+
+- **Example 2**
+  - users-api, auth-api 도커 이미지를 서로 다른 pod에 컨테이너로 배포
+  - users-api 컨테이너는 클러스터 내의 auth-api를 호출할 수 있어야 함
+  - auth-api는 외부에 노출하지 않고, users-api만 외부에 노출함
+```yaml
+# users-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+  labels:
+    app: users-api
+spec:
+  replicas: 1  # 복제할 pod 수 지정
+  selector:
+    matchLabels:
+      app: users-api # deployment 객체에서 관리할 파드의 label 지정
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+      - name: users-api
+        image: my-docker-repo/users-api:latest
+        env:
+          - name: AUTH_ADDRESS
+          - value: "auth-service.default:80"
+```
+
+```yaml
+# auth-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  labels:
+    app: auth-api 
+spec:
+  replicas: 1  # 복제할 pod 수 지정
+  selector:
+    matchLabels:
+      app: auth-api # deployment 객체에서 관리할 파드의 label 지정
+  template:
+    metadata:
+      labels:
+        app: auth-api
+    spec:
+      containers:
+      - name: auth-api
+        image: my-docker-repo/auth-api:latest
+```
+
+```yaml
+# users-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec:
+  selector:
+    app: users-api
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+```
+
+```yaml
+# auth-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth-api
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+
+```
+kubectl apply -f=users-deployment.yaml -f=auth-deployment.yaml
+kubectl apply -f=users-service.yaml -f=auth-service.yaml
+minikube service users-service
+minikube service auth-service
+```
+
+- 결과
+  - 서로 다른 deployment 객체를 통해 독립적인 pod에 users-api와 auth-api 컨테이너를 배포함
+  - users-api 컨테이너는 env.AUTH_ADDRESS 변수를 이용해 auth-api를 호출할 수 있음
+    - auth-api ClusterIP를 직접 사용할 수 있음
+    - k8s 클러스터 내 DNS 서비스를 이용할 수 있음
+      - 해당 방식을 선택함
+    - 자동 할당된 환경변수를 이용할 수 있음(AUTH_SERVICE_SERVICE_HOST)
+  - users-service는 LoadBalancer를 통해 IP를 외부에 노출하였고, auth-service는 ClusterIP를 통해 클러스터 내에서만 IP가 공유되도록 함
+
+
+## Minikube로 쿠버네티스 실습 3 : Volume
+- 쿠버네티스 클러스터에서 컨테이너 실행 시, 볼륨 마운트도 가능함
+- **Example1. emptyDir Volume**
+  - 생명주기가 pod와 동일함
+  - 만약 pod가 삭제/재시작하면 volume도 삭제/재시작됨
+  - 여러 pod가 하나의 volume을 공유해야하는 상황에서는 적절하지 않음
+
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template: 
+    metadata:
+      labels:
+        app: app
+    spec: 
+      containers:
+        - name: app
+          image: my-docker-hub/app:lastest
+          env:
+            - name: APP_FOLDER
+              value: 'app'
+          volumeMounts:
+            - mountPath: /app/story
+              name: app-volume 
+      volumes:
+        - name: app-volume
+          emptyDir: {}
+```
+
+- 결과
+  - env.APP_FOLDER 환경변수를 통해 컨테이너 내 로컬 디렉토리 경로를 Application Level에서 설정할 수 있음
+    - ex. path.join(__dirname, process.env.APP_FOLDER, 'text.txt');
+  - volumeMounts.mountPath로 pod 내 마운트할 디렉토리를 설정함
+  - volumeMounts.name과 volumes.name을 매칭하여 emptyDir Volume을 매핑함
+
+***
+- **Example2. host Path**
+  - 여러 pod가 호스트 머신의 동일한 경로의 디렉토리를 마운트함(노드 종속적)
+  - 여러 호스트간 공유가 어렵다는 단점이 있음
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app
+  template: 
+    metadata:
+      labels:
+        app: app
+    spec: 
+      containers:
+        - name: app
+          image: my-docker-hub/app:lastest
+          env:
+            - name: APP_FOLDER
+              value: 'app'
+          volumeMounts:
+            - mountPath: /app/story
+              name: app-volume 
+      volumes:
+        - name: app-volume
+          hostPath:
+            path: /data
+            type: DirectoryOrCreate
+```
+- 결과
+  - 호스트의 /data 디렉토리를 여러 파드에서 마운트함
+
+***
+- **Example3. Persistent Volume**
+  - pod 라이프 사이클과 완전히 독립됨
+  - 영구적이며 노드에 비의존적
+  - 호스트 내의 Persistent Volume Claim을 통해 PV와 액세스함
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app
+  template: 
+    metadata:
+      labels:
+        app: app
+    spec: 
+      containers:
+        - name: app
+          image: my-docker-hub/app:lastest
+          env:
+            - name: APP_FOLDER
+              value: 'app'
+          volumeMounts:
+            - mountPath: /app/story
+              name: app-volume 
+      volumes:
+        - name: app-volume
+          persistentVolumeClaim:
+            claimName: host-pvc
+```
+
+```yaml
+# host-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: host-pvc
+spec:
+  volumeName: host-pv
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 1Gi # capacity: 1Gi
+```
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: host-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  storageClassName: standard
+  accessModes: 
+    - ReadWriteOnce # 하나의 노드 내에서 RW 
+    # - ReadOnlyMany # 여러 노드 사이에서 R
+    # - ReadWrtieMany # 여러 노드 사이에서 RW
+  hostPath: 
+    path: /data
+    type: DirectoryOrCreate
+```
+
+## Minikube로 쿠버네티스 실습 4 : Network
+
+
+
+
+
+
+
+
+
+
 
 
 
