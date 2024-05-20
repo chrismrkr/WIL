@@ -372,6 +372,7 @@ spec:
 ```
 
 ```yaml
+# host-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
