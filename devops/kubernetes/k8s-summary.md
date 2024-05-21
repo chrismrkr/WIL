@@ -393,6 +393,127 @@ spec:
 
 ## Minikube로 쿠버네티스 실습 4 : Network
 
+- **Example 1**
+  - users-api, auth-api, tasks-api 컨테이너는 모두 독립적인 pod에 존재함
+  - users-api와 tasks-api는 auth api를 호출할 수 있어야함
+  - auth-api는 외부에 노출되지 않고, users-api, tasks-api는 외부에 노출되어야함
+
+```yaml
+# users-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: my-docker-hub/users-api:latest
+          env:
+            - name: AUTH_ADDRESS
+              value: "auth-service.default" # 클러스터 내부 도메인명
+```
+
+```yaml
+# auth-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: my-docker-hub/auth-api:latest
+```
+
+```yaml
+# tasks-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasks
+  template:
+    metadata:
+      labels:
+        app: tasks
+    spec:
+      containers:
+        - name: tasks
+          image: my-docker-hub/tasks-api:latest
+          env:
+            - name: AUTH_ADDRESS
+              value: "auth-service.default" # 클러스터 내부 도메인명
+```
+
+```yaml
+# services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec:
+  selector:
+    app: users
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasks-service
+spec:
+  selector:
+    app: tasks
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+
+```
+kubectl apply -f=users-deployment.yaml -f=auth-deployment.yaml -f=tasks-deployment.yaml
+kubectl apply -f=services.yaml
+```
+
 
 
 
