@@ -515,32 +515,15 @@ kubectl apply -f=services.yaml
 ```
 
 
+## AWS EKS로 쿠버네티스 클러스터 배포
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
+### AWS Elastic Kubernetes Service 생성
+- 클러스터 이름 생성
+- Service Role 지정
+  - **K8s Control Plane**이 리소스를 관리할 수 있도록 허용하는 역할 생성
+  - IAM에서 생성할 수 있고, 어떤 리소스를 관리할 수 있는지 지정 가능
+  - EKSClusterPolicy를 선택하면 됨
+- VPC 설정
+  - 클러스터에 설정할 네트워크 구성함
 
 
