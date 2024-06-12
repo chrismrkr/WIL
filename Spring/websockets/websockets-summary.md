@@ -102,7 +102,7 @@ public class GreetingController {
 - 클라이언트는 localhost:8080/portfolio로 웹 소켓 연결함. 연결 완료되면 STOMP 메세지를 주고받을 수 있음
 
 #### Step 2
-- /topic/greeting Topic에 해당되는 메세지를 처리하는 MessageBroker를 생성함
+- /topic/{...} Topic에 해당되는 메세지를 처리하는 MessageBroker를 생성함
   - 클라이언트가 /topic/greeting으로 메세지를 PUB하면, ClientInboundChannel을 통해 MessageBroker로 전달됨
   - MessageBroker는 /topic/greeting을 SUB 중인 클라이언트에게 ClientOutboundChannel을 통해 메세지를 전달함
     - (MessageBroker 또한 메세지를 처리하므로 MessageHandler로 분류되나 설명을 위해 구분하였음)
