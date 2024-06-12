@@ -65,7 +65,7 @@ const connect = () => {
 ### 4. 메세지 흐름
 - STOMP Endpoint가 노출되면 Spring App은 웹 소켓 연결된 클라이언트의 MessageBroker로 동작함
 - STOMP 메세지 흐름을 파악하기 위해서는 아래 개념을 알아야 함
-  - MessageHandler : 전달받은 메세지를 처리하는 객체 또는 메소드
+  - MessageHandler : 전달받은 메세지를 처리하는 메소드
   - ClientInboundChannel : 클라이언트가 PUB한 메세지를 MessageHandler 또는 MessageBroker로 전달하는 채널
   - ClientOutboundChannel : MessageBroker가 클라이언트에 메세지를 전달하는 채널
   - BrokerChannel : MessageHandler가 MessageBroker에게 메세지를 전달하는 채널 
@@ -126,15 +126,41 @@ public class GreetingController {
   - 단순히 MessageHandler가 BrokerChannel을 통해 MessageBroker로 메세지만 전달한다면, 현재 컨테이너가 아닌 다른 컨테이너에 연결된 클라이언트는 메세지를 받을 수 없음
   - **그러므로 MessageHandler가 다른 컨테이너로 메세지를 Broadcast할 수 있도록 커스터마이징이 필요하기 때문에 MessageHandler는 필요함**
 
-### 5. 관련 Annotation
+### 5. Annotated Controller
+- @Controller 클래스에 MessageHandler를 메소드로 생성할 수 있음 
+- 해당 클래스 또는 서브 클래스에서 아래의 Annotation을 선언할 수 있음
 
+#### @MessageMapping
+- 목적지에 메세지를 라우팅하기 위해서 사용함
+- 해당 Annotation이 붙은 메소드는 MessageHandler가 됨
+- 목적지는 Ant-style path pattern임
+  - ex. /thing*, /thing/**, /thing/{id}
+- 지원되는 Method Arguments
+  - Message: PUB된 전체 메세지에 접근
+  - MessageHeaders: PUB된 메세지 Header에 접근
+  - @Payload: 메세지의 Payload에 접근. 설정된 MessageConverter에 의해 변환됨
+  - @Header: 헤더의 특정 값을 접근
+  - @Headers: 헤더 전체를 접근. 타입은 Map이어야 함
+  - @DestinationVariable: 목적지 path의 pathvariable에 접근
+  - Principal: Websocket Handshake 시 로깅된 사용자 정보 접근
+- Return Values
+  - Default: MessageConverter를 통해 변환된 Payload를 brokerChannel로 전달
+    - @MessageMapping("/thing")이고, /thing/topic으로 메세지를 PUB하면 /topic으로 메세지를 라우팅함
+  - @Send: 메세지의 라우팅 목적지를 커스터마이징함
+  - @SendToUser: 특정 사용자에게만 메세지가 전달되도록 함
+    - @SendToUser와 @Send는 동시에 사용될 수 있음. 해당 Annotation이 있는 경우 다른 Annotation을 Override함
+  - @MessageMapping에 @SendTo 또는 @SendToUser를 사용하는 대신 SimpMessagintTemplate을 직접 사용할 수 있음
 
+#### @SubscribeMapping
+- @MessageMapping과 동일한 Method Parameter를 제공하나 Subscription만 담당하는 MessageHandler임
+- 메세지는 BrokerChannel을 거치지 않고 바로 ClientOutboundChannel을 통해서 전달함
+- 웹 소켓에서의 일반적인 전송 흐름: PUB Message -> @MessageMapping Message Handler -> BrokerChannel -> MessageBroker -> Broadcast SUB Client
+- 이와 달리 @SubscribeMapping을 사용하면 구독하는 즉시 메세지를 클라이언트에 전달함
+- 주로 클라이언트에 초기 데이터를 내릴 때 사용함
 
-
-
-
-
-
+#### @MessageExceptionHandler
+- @MessageMapping 메소드에서 발생하는 Exception을 처리하는 메소드
+- 
 
 
 
