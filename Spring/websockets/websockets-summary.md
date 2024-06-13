@@ -202,9 +202,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 ```
 
 ### 8. External Broker
+- 웹 소켓 컨테이너가 클러스터링 되는 상황에서 사용됨
 #### MessageBroker에서 External Broker로 전달하는 방법
 - ```enableSimpleBroker``` 대신 ```enableStompBrokerRelay```를 사용함
 - 특정 path에 해당되는 메세지가 MessageBroker에 전달되는 경우에 External Broker에 메세지를 전달함
+- External Broker는 메세지를 모든 웹 소켓 컨테이너에 Broadcast하여 클라이언트가 메세지를 받을 수 있음
 - RabbitMQ와 같은 SMOTP를 지원하는 External Broker를 아래와 같이 사용할 수 있음
 ```java
 @Configuration
