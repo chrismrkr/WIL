@@ -203,6 +203,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 ### 8. External Broker
 #### MessageBroker에서 External Broker로 전달하는 방법
+- ```enableSimpleBroker``` 대신 ```enableStompBrokerRelay```를 사용함
 - 특정 path에 해당되는 메세지가 MessageBroker에 전달되는 경우에 External Broker에 메세지를 전달함
 - RabbitMQ와 같은 SMOTP를 지원하는 External Broker를 아래와 같이 사용할 수 있음
 ```java
@@ -232,7 +233,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 public class WebSocketController {
 
     @MessageMapping("/send")
-    @SendTo("/topic/messages") // MessageBroker가 /topic/* 메세지를 받으면 External Broker로 Broadcast함
+    @SendTo("/topic/messages") // MessageBroker가 /topic/** 메세지를 받으면 External Broker로 Broadcast함
     public String sendMessage(String message) {
         return message;
     }
@@ -269,7 +270,7 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "my_topic", groupId = "my_group")
     public void consume(String message) {
         // WebSocket 클라이언트로 메시지 전송
-        messagingTemplate.convertAndSend("/topic/messages", message);
+        messagingTemplate.convertAndSend("/topic", message);
     }
 }
 ```
