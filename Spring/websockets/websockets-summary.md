@@ -118,13 +118,7 @@ public class GreetingController {
 #### /topic과 /app/topic의 차이
 - /topic으로 메세지를 전송하면 클라이언트는 MessageBroker를 통해 직접 통신함
 - /app/topic으로 메세제를 전송하면 @MessageMapping이 선언된 MessageHandler가 이를 받아서 BrokerChannel로 전달 및 처리하도록 위임함
-
-#### BrokerChannel과 관련된 MessageHandler가 존재하는 이유는?
-- MessageHandler가 BrokerChannel을 통해 메세지를 단순히 MessageBroker로 전달하는 역할만 하는 경우(기본 설정)
-  - MessageHandler를 사용하지 않고 MessageBroker를 통한 직접 통신만을 해도 됨
-- 그러나, 웹 소켓 컨테이너가 여러 대, 즉, MessageBroker가 여러개인 상황에서는 MessageHandler 역할이 변경되어야함
-  - 단순히 MessageHandler가 BrokerChannel을 통해 MessageBroker로 메세지만 전달한다면, 현재 컨테이너가 아닌 다른 컨테이너에 연결된 클라이언트는 메세지를 받을 수 없음
-  - **그러므로 MessageHandler가 다른 컨테이너로 메세지를 Broadcast할 수 있도록 커스터마이징이 필요하기 때문에 MessageHandler는 필요함**
+  - 그러므로, MessageHandler를 이용하면 웹 소켓을 통한 통신 이외의 추가적인 작업을 할 수 있음
 
 ### 5. Annotated Controller
 - @Controller 클래스에 MessageHandler를 메소드로 생성할 수 있음 
@@ -184,13 +178,13 @@ public class GreetingController {
 ### 7. Simple Broker
 - Built-in Simple Message Broker는 Message Subscription, Storing, Broadcasting을 담당함
 - TaskScheduler를 통해 클라이언트와의 HeartBeat를 체크할 수 있음
+  - TaskScheduler는 직접 구현하여 @Lazy로 의존성 주입해야함
 - 아래 설정을 통해서 MessageBroker를 설정할 수 있었음
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-	// 직접 구현해야 함
-	private TaskScheduler messageBrokerTaskScheduler;
+	private TaskScheduler messageBrokerTaskScheduler; 
 
 	@Autowired
 	public void setMessageBrokerTaskScheduler(@Lazy TaskScheduler taskScheduler) {
@@ -206,6 +200,81 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 }
 ```
+
+### 8. External Broker
+#### MessageBroker에서 External Broker로 전달하는 방법
+- 특정 path에 해당되는 메세지가 MessageBroker에 전달되는 경우에 External Broker에 메세지를 전달함
+- RabbitMQ와 같은 SMOTP를 지원하는 External Broker를 아래와 같이 사용할 수 있음
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+	// implementation 'org.springframework.boot:spring-boot-starter-amqp' dependency 추가 필요
+        config.enableStompBrokerRelay("/topic")
+              .setRelayHost("external-broker-host")
+              .setRelayPort(61613)
+              .setClientLogin("guest")
+              .setClientPasscode("guest");
+
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws").withSockJS();
+    }
+}
+
+@Controller
+public class WebSocketController {
+
+    @MessageMapping("/send")
+    @SendTo("/topic/messages") // MessageBroker가 /topic/* 메세지를 받으면 External Broker로 Broadcast함
+    public String sendMessage(String message) {
+        return message;
+    }
+}
+```
+
+#### MessageHandler에서 External Broker로 전달하는 방법
+- MessageHandler, 즉 @MessageMapping된 메소드는 External Broker로 메세지를 명시적으로 전달할 수 있음
+- 그리고, 메세지를 SUB하여 SimpMessagingTemplate를 통해 Broker Channel로 전달할 수 있음
+- kafka를 사용하는 예시는 아래와 같음
+```java
+@Controller
+@RequiredArgsConstructor
+public class WebSocketController {
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @MessageMapping("/send")
+    public void pubMessage(String message) {
+        // 메시지를 Kafka로 전송
+        kafkaTemplate.send("my_topic", message);
+    }
+
+    @SendTo("/topic)
+    public String subMessage(@RequestBody String message) {
+	return message;
+    }
+}
+
+@Service
+@RequiredArgsConstructor
+public class KafkaConsumerService {
+    private SimpMessagingTemplate messagingTemplate;
+
+    @KafkaListener(topics = "my_topic", groupId = "my_group")
+    public void consume(String message) {
+        // WebSocket 클라이언트로 메시지 전송
+        messagingTemplate.convertAndSend("/topic/messages", message);
+    }
+}
+```
+
+
 
 
 
