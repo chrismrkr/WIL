@@ -181,6 +181,31 @@ public class GreetingController {
 }
 ```
 
+### 7. Simple Broker
+- Built-in Simple Message Broker는 Message Subscription, Storing, Broadcasting을 담당함
+- TaskScheduler를 통해 클라이언트와의 HeartBeat를 체크할 수 있음
+- 아래 설정을 통해서 MessageBroker를 설정할 수 있었음
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+	// 직접 구현해야 함
+	private TaskScheduler messageBrokerTaskScheduler;
+
+	@Autowired
+	public void setMessageBrokerTaskScheduler(@Lazy TaskScheduler taskScheduler) {
+		this.messageBrokerTaskScheduler = taskScheduler;
+	}
+
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry registry) {
+		registry.enableSimpleBroker("/queue/", "/topic/")
+				.setHeartbeatValue(new long[] {10000, 20000})
+				.setTaskScheduler(this.messageBrokerTaskScheduler);
+		// ...
+	}
+}
+```
 
 
 
