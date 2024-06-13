@@ -154,13 +154,32 @@ public class GreetingController {
 #### @SubscribeMapping
 - @MessageMapping과 동일한 Method Parameter를 제공하나 Subscription만 담당하는 MessageHandler임
 - 메세지는 BrokerChannel을 거치지 않고 바로 ClientOutboundChannel을 통해서 전달함
-- 웹 소켓에서의 일반적인 전송 흐름: PUB Message -> @MessageMapping Message Handler -> BrokerChannel -> MessageBroker -> Broadcast SUB Client
 - 이와 달리 @SubscribeMapping을 사용하면 구독하는 즉시 메세지를 클라이언트에 전달함
+  - 웹 소켓에서의 일반적인 전송 흐름: PUB Message -> @MessageMapping Message Handler -> BrokerChannel -> MessageBroker -> Broadcast SUB Client
 - 주로 클라이언트에 초기 데이터를 내릴 때 사용함
 
 #### @MessageExceptionHandler
 - @MessageMapping 메소드에서 발생하는 Exception을 처리하는 메소드
-- 
+- @ControllerAdvice와 함께 사용 가능
+
+### 6. BrokerChannel로 Message 전달하는 방법
+- @MessageMapping을 통해 기본적으로 BrokerChannel로 메세지 전달이 가능함
+- @MessageMapping을 사용하지 않거나, 전달하고자 하는 BrokerChannel 커스터마이징이 필요할 때는 아래 클래스 사용
+
+```java
+@Controller
+@RequiredArgsConstructor
+public class GreetingController {
+	// 아래 클래스 사용하여 BrokerChannel로 메세지 전달 가능함
+	private SimpMessagingTemplate template;
+
+	@RequestMapping(path="/greetings", method=POST)
+	public void greet(String greeting) {
+		String text = "[" + getTimestamp() + "]:" + greeting;
+		this.template.convertAndSend("/topic/greetings", text);
+	}
+}
+```
 
 
 
