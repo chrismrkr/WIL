@@ -170,14 +170,15 @@ kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그�
 ## 3. Producer
 
 ### 3.1 메세지 Produce 흐름
-- 1. Producer 설정은 properties에서 설정함
+- Producer 설정은 properties에서 설정함
   - 예를 들어, Spring boot Server가 Producer이면 application.properties를 통해 설정함
-- 2. KafkaProducer 객체 생성
-- 3. 토픽 명, 메세지 Key, 메세지 Value를 입력하여 ProducerRecord 객체 생성
-- 4. KafkaProducer의 send() 메소드로 메세지 전송을 시작
-  - sync, async 전송을 모두 지원하나 기본적으로 async
+- KafkaProducer 객체 생성
+- 토픽명, 메세지 Key, 메세지 Value를 입력하여 ProducerRecord 객체 생성
+  - ```Future<RecordMetaData>```를 사용함
+- KafkaProducer의 send() 메소드로 메세지 전송을 시작
+  - Broker 쪽으로의 sync, async 전송을 모두 지원하나 기본적으로 async
   - Kafka Producer 내부의 전송용 Thread가 배치 단위로 메세지를 Broker에 전송함
-- 5. KafkaProducer의 close() 메소드로 종료
+- KafkaProducer의 close() 메소드로 종료
 
 
 
