@@ -222,21 +222,25 @@ public class ProducerRecord<K, V> {
 - Record는 Batch 단위로 저장되어 있음
 - Batch는 특정 조건에 의해 Broker로 전송됨
 - 관련 파라미터
-  - buffer.memory: Record Accumulator에 저장될 수 있는 레코드들의 최대 메모리
-  - linger.ms: sender thread가 broker로 배치 단위로 메세지 전송을 위해 대기하는 최대 시간
-  - batch.size: Batch 당 저장할 수 있는 레코드 수를 결정. 만약, linger.ms 전에 배치가 꽉 차면 전송함
+  - buffer.memory : Record Accumulator에 저장될 수 있는 레코드들의 최대 메모리
+  - linger.ms : sender thread가 broker로 배치 단위로 메세지 전송을 위해 대기하는 최대 시간
+  - batch.size : Batch 당 저장할 수 있는 레코드 수를 결정. 만약, linger.ms 전에 배치가 꽉 차면 전송함
 
 #### 3.2.5 기타 중요 파라미터
-- max.block.ms: producer가 send 후 Ack를 받을 때 까지 대기하는 최대 시간. 초과 시 Timeout Exception
-- request.timeout.ms: broker로 전송하는 thread가 메세지를 전송하고 대기하는 최대 시간
+- max.block.ms : producer가 send 후 Ack를 받을 때 까지 대기하는 최대 시간. 초과 시 Timeout Exception
+- request.timeout.ms : broker로 전송하는 thread가 메세지를 전송하고 대기하는 최대 시간
   - 그러므로, 적어도 ```max.block.ms >= ligner.ms + request.timeout.ms```를 만족해야함
-- delivery.timeout.ms: broker로 전송하는 thread의 메세지 재전송을 멈추는 시간
-- retry.backoff.ms: 재전송 주기
+- delivery.timeout.ms : broker로 전송하는 thread의 메세지 재전송을 멈추는 시간
+- retry.backoff.ms : 재전송 주기
 - 위 파라미터를 해석하면 아래와 같음
   - producer가 send하면 배치 단위로 thread가 broker로 메세지를 전달함
   - producer는 max.block.ms를 대기하고, thread는 request.timeout.ms를 대기함
   - request.timeout.ms가 지난 후에도 Ack가 도착하지 않으면 retry.backoff.ms 주기로 재전송함
   - 만약 delivery.timeout.ms에 도달하거나, max.block.ms에 도달하면 재전송을 중지함
+- max.in.flight.requests.per.connection : 한번에 보낼 수 있는 메세지 배치 개수
+  - 만약 해당 값이 2 이상이면, 메세지 도착 순서가 달라질 수 있음
+- enable.idempotence=true : PID, SEQ를 통해 Broker에서 메세지 중복 및 순서를 제어할 수 있음
+
 
 
 
