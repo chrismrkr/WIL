@@ -241,8 +241,15 @@ public class ProducerRecord<K, V> {
   - 만약 해당 값이 2 이상이면, 메세지 도착 순서가 달라질 수 있음
 - enable.idempotence=true : PID, SEQ를 통해 Broker에서 메세지 중복 및 순서를 제어할 수 있음
 
-
-
+#### 3.2.6 Custom Partitioner
+- Producer.send() 시, serializer -> partitioner -> Record Accumulator -> Broker 순서로 전달됨
+- 아래 인터페이스를 구현하여 Partitioner를 직접 구현할 수 있음
+```java
+public interface Partitioner extends Configurable, Closeable {
+  int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster);
+  ...
+}
+```
 
 
 
