@@ -180,7 +180,7 @@ kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그�
   - Kafka Producer 내부의 전송용 Thread가 배치 단위로 메세지를 Broker에 전송함
 - KafkaProducer의 close() 메소드로 종료
 
-### 3.2 Producer 관련 심화 내용
+### 3.2 Producer Deep Dive
 #### 3.2.1 Ack
 - ack = 0
   - Producer는 Broker의 메세지 정상 수신을 확인하지 않고 계속 전송함
@@ -217,13 +217,26 @@ public class ProducerRecord<K, V> {
 ```
 
 #### 3.2.4 Record Accumulator
-- Producer가 메세지를 전송하면, Serializer와 Partitioner를 Record Accumulator에 저장함
+- Producer가 메세지를 전송하면, Serializer와 Partitioner를 거쳐서 Record Accumulator에 저장함
 - Record Accumulator는 파티션 - 토픽 2가지 기준으로 분류하여 Record를 저장함
 - Record는 Batch 단위로 저장되어 있음
 - Batch는 특정 조건에 의해 Broker로 전송됨
 - 관련 파라미터
-  - buffer.memory: 
+  - buffer.memory: Record Accumulator에 저장될 수 있는 레코드들의 최대 메모리
+  - linger.ms: sender thread가 broker로 배치 단위로 메세지 전송을 위해 대기하는 최대 시간
+  - batch.size: Batch 당 저장할 수 있는 레코드 수를 결정. 만약, linger.ms 전에 배치가 꽉 차면 전송함
 
+#### 3.2.5 기타 중요 파라미터
+- max.block.ms: producer가 send 후 Ack를 받을 때 까지 대기하는 최대 시간. 초과 시 Timeout Exception
+- request.timeout.ms: broker로 전송하는 thread가 메세지를 전송하고 대기하는 최대 시간
+  - 그러므로, 적어도 ```max.block.ms >= ligner.ms + request.timeout.ms```를 만족해야함
+- delivery.timeout.ms: broker로 전송하는 thread의 메세지 재전송을 멈추는 시간
+- retry.backoff.ms: 재전송 주기
+- 위 파라미터를 해석하면 아래와 같음
+  - producer가 send하면 배치 단위로 thread가 broker로 메세지를 전달함
+  - producer는 max.block.ms를 대기하고, thread는 request.timeout.ms를 대기함
+  - request.timeout.ms가 지난 후에도 Ack가 도착하지 않으면 retry.backoff.ms 주기로 재전송함
+  - 만약 delivery.timeout.ms에 도달하거나, max.block.ms에 도달하면 재전송을 중지함
 
 
 
