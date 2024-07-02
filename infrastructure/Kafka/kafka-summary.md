@@ -169,19 +169,60 @@ kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그�
 
 ## 3. Producer
 
-### 3.1 메세지 Produce 흐름
-- Producer 설정은 properties에서 설정함
+### 3.1 Producer의 메세지 생성 흐름
+- Step1. Producer는 properties 파일에서 환경변수를 설정함
   - 예를 들어, Spring boot Server가 Producer이면 application.properties를 통해 설정함
-- KafkaProducer 객체 생성
-- 토픽명, 메세지 Key, 메세지 Value를 입력하여 ProducerRecord 객체 생성
+- Step2. KafkaProducer 객체 생성
+- Step3. 토픽명, 메세지 Key, 메세지 Value를 입력하여 ProducerRecord 객체 생성
   - ```Future<RecordMetaData>```를 사용함
-- KafkaProducer의 send() 메소드로 메세지 전송을 시작
-  - Broker 쪽으로의 sync, async 전송을 모두 지원하나 기본적으로 async
+- Step4. KafkaProducer의 send() 메소드로 메세지 전송을 시작
+  - Broker로 메세지 전송 시 sync, async 전송을 모두 지원하나 기본적으로 async
   - Kafka Producer 내부의 전송용 Thread가 배치 단위로 메세지를 Broker에 전송함
 - KafkaProducer의 close() 메소드로 종료
 
+### 3.2 Producer 관련 심화 내용
+#### 3.2.1 Ack
+- ack = 0
+  - Producer는 Broker의 메세지 정상 수신을 확인하지 않고 계속 전송함
+  - 그러므로, 수신 실패로 인한 재전송이 없음
+- ack = 1
+  - Producer는 Leader Broker의 정상 수신 여부를 확인함
+  - 그러므로, Follower에 정상적으로 복제되었는지 알 수 없음
+- ack = all
+  - Producer는 Leader 및 Follower Broker의 정상 수신 여부를 모두 확인함
+  - 그러므로, 상대적으로 전송속도가 느릴 수 있음
 
+#### 3.2.2 Sync, Async
+- Sync
+  - Kafka Producer 스레드가 Broker로 메세지를 전송 후, 응답이 올 때 까지 Block
+  - Ack = 0 인 경우에는 대기하는 것 없음
+  - ```RecordMetaData recordMetaData = KafkaProducer.send().get()```
+- Async
+  - Kafka Producer 스레드가 Broker로 메세지 전송 후 Block 하지 않고 계속 진행
+  - 수신 응답이 오면 Callback을 통해 새로운 스레드 실행
+  - ```producer.send(productRecord, new Callback() { ... })```
+ 
+#### 3.2.3 ProducerRecord 구조
+- 아래와 같음
+- Mssage = Record = Event
+```java
+public class ProducerRecord<K, V> {
+  private final String topic;
+  private final Integer partition;
+  private final Headers headers;
+  private final K key;
+  private final V values;
+  private final Long timeStamp;
+}
+```
 
+#### 3.2.4 Record Accumulator
+- Producer가 메세지를 전송하면, Serializer와 Partitioner를 Record Accumulator에 저장함
+- Record Accumulator는 파티션 - 토픽 2가지 기준으로 분류하여 Record를 저장함
+- Record는 Batch 단위로 저장되어 있음
+- Batch는 특정 조건에 의해 Broker로 전송됨
+- 관련 파라미터
+  - buffer.memory: 
 
 
 
