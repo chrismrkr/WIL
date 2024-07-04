@@ -169,7 +169,7 @@ kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그�
 
 ## 3. Producer
 
-### 3.1 Producer의 메세지 생성 흐름
+### 3.1 Producer 실행 및 Message 생성 흐름
 - Step1. Producer는 properties 파일에서 환경변수를 설정함
   - 예를 들어, Spring boot Server가 Producer이면 application.properties를 통해 설정함
 - Step2. KafkaProducer 객체 생성
