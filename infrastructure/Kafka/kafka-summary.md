@@ -252,9 +252,24 @@ public interface Partitioner extends Configurable, Closeable {
 ```
 
 ## 4. Consumer
-
-
-
+### 4.1 Consumer 생성 및 Message Consume & Poll 흐름
+- Step1. Consumer 환경 설정(Properties 객체 이용)
+- Step2. KafkaConsumer 생성
+- Step3. Topic subscribe()
+- Step4. 주기적으로 Topic poll()
+  
+### 4.2 Consumer poll() 관련 모듈
+#### 4.2.1 poll
+- 브로커나 Consumer 내부 Queue에 데이터가 있으면 데이티러르 반환함
+- 만약 데이터가 없으면, 일정 시간 동안 브로커로 부터 데이터를 Fetch함
+```java
+ConsumerRecords<K, V> consumerRecords = KafkaConsumer.poll(Duration.ofMillis(1000));
+for(ConsumerRecord consumerRecord : consumerRecords) {
+  String key = consumerRecord.key();
+  String value = consumerRecord.value();
+}
+```
+#### 4.2.2 Fetcher
 
 
 
