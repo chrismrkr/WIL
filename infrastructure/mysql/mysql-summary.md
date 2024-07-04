@@ -285,9 +285,9 @@ DB 커넥션 핸들링, SQL 파싱, 쿼리 최적화를 담당함
   - AUTO_INCREMENT
 #### 4.3.2 인덱스와 잠금
 - 조회 시 레코드 락이 발생하는데, 레코드 자체가 아닌 인덱스에 락을 검
-- 예를 들어, ```UPDATE employees SET hire_date = now() WHERE first_name = 'gildong' and last_name = 'hong';```
-- 인덱스가 first_name에만 있고 last_name에 없다면, first_name = 'gildong'과 관련된 인덱스를 모두 잠근 후 검색함
-- 만약 인덱스가 전혀 없다면, 기본키 클러스터 인덱스에 락을 걸어 모든 레코드를 잠금 후 테이블을 full scan함
+- Ex. ```UPDATE employees SET hire_date = now() WHERE first_name = 'gildong' and last_name = 'hong';```
+  - 인덱스가 first_name에만 있고 last_name에 없다면, first_name = 'gildong' 인덱스로 검색 후 Lock & Scan
+  - 만약 인덱스가 전혀 없다면, 기본키 클러스터 인덱스에 락을 걸어 모든 레코드를 잠금 후 테이블을 full scan함
 #### 4.3.3 레코드 수준의 잠금 확인 및 해제
 - MySQL 5.1 이상 버전에서 레코드 잠금 및 잠금 대기 메타 데이터 조회가 가능함
 - information_schema 데이터베이스의 INNODB_LOCKS, INNODB_TRX, INNODB_LOCK_WAITS 테이블을 조인하여 조회 가능
