@@ -17,6 +17,7 @@ Non-Blocking I/O 동작 방식에 대해서 설명함
 - 이에 따라, Java I/O는 느리고 내부 버퍼도 GC 대상이므로 성능 저하로 이어질 수 있음
 ### 1.4 Java I/O 지연 해결 방법
 - JDK 1.4 이상에서 ByteBuffer 클래스를 통해 커널 버퍼에 직접 접근할 수 있게 되었음
+  - 물론, GC 대상이 아니므로 메모리 관리에 주의하지 않으면 누수가 발생할 수 있음
 - ByteBuffer와 추가적인 개념을 통해 Blocking I/O의 단점을 해결하고자 나온 아키텍처가 NIO(Non-blocking I/O)임
 
 ## 2. Non-blocking I/O
