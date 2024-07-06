@@ -22,8 +22,37 @@ Non-Blocking I/O 동작 방식에 대해서 설명함
 ## 2. Non-blocking I/O
 ### 2.1 비유
 - Blocking 및 Non-blocking I/O 동작 방식을 가게 고객 응대 예시로 비유하면 아래와 같음
-  - Blocking I/O : 고객이 주문하면, 점주는 주문을 처리하고 고객은 주문이 완료되어 상품이 나올 때 까지 점주를 기다리고 있어야 함
-  - Non-Blocking I/O : 고객이 주문하면, 점주는 주문을 처리하고 고객은 점주를 기다리지 않고 본인 할 일을 하다가 완료되었다는 알림 이벤트를 받으면 그때 상품을 받아감
+  - Blocking I/O : 고객이 주문하면, 1건 당 점원 1명이 맡아서 주문을 처리함. 점원은 처리가 끝날 때 까지 다음 고객을 받을 수 없음.
+  - Non-Blocking I/O : 고객이 주문하면, 고객은 번호표를 받고 기다리고 점원은 주문을 처리함. 처리가 완료되면 번호표에 맞는 알림을 보냄.
 ### 2.2 Non-blocking I/O 관련 개념
 - Socket Channel : 클라이언트 요청이 올 때 마다 생성됨. 클라이언트는 Channel을 통해 요청을 보내고 응답을 받음
-- ByteBuffer : 
+- ByteBuffer : 클라이언트 요청 & 응답 관련 Stream을 임시로 저장해놓기 위한 버퍼(Kernel Buffer)
+- Selector : Socket Channel 지속적 모니터링을 담당함. Socket Channel 상태에 따라 데이터를 처리함
+- Thread : 클라이언트의 요청의 비즈니스적인 부분을 담당하여 처리하는 스레드
+### 2.3 Non-blocking I/O 동작 방식
+- 1. 클라이언트 요청으로 인한 SocketChannel 생성
+```java
+ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+serverSocketChannel.bind(new InetSocketAddress(8080));
+serverSocketChannel.configureBlocking(false);
+// Socket Channel이 생성되면, Selector에 Socket Channel 상태를 OP_ACCEPT로 등록함
+serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT); 
+```
+- 2. Selector의 Channel 감지 후 처리
+```java
+while (true) {
+    selector.select(); // 하나 이상의 채널이 준비될 때까지 대기
+    Set<SelectionKey> selectedKeys = selector.selectedKeys(); // 준비된 키들을 가져옴
+    for (SelectionKey key : selectedKeys) {
+        if (key.isAcceptable()) {
+            // 연결 수락 수행 
+        } else if (key.isReadable())) {
+            // 읽기 작업 수행
+        } else if (key.isWritable()) {
+            // 쓰기 작업 수행
+        }
+    }
+    selectedKeys.clear(); // 처리 완료된 키를 제거
+}
+```
+- 이를 통해, 클라이언트 요청이 들어오더라도 비즈니스 로직을 처리하는 스레드가 커넥션 수 만큼 Block되지 않음
