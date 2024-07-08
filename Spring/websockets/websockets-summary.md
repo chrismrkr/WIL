@@ -205,9 +205,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 - 웹 소켓 컨테이너가 클러스터링 되는 상황에서 사용됨
 #### MessageBroker에서 External Broker로 전달하는 방법
 - ```enableSimpleBroker``` 대신 ```enableStompBrokerRelay```를 사용함
-- 특정 path에 해당되는 메세지가 MessageBroker에 전달되는 경우에 External Broker에 메세지를 전달함
-- External Broker는 메세지를 모든 웹 소켓 컨테이너에 Broadcast하여 클라이언트가 메세지를 받을 수 있음
-- RabbitMQ와 같은 SMOTP를 지원하는 External Broker를 아래와 같이 사용할 수 있음
+- 특정 path에 해당되는 메세지가 MessageHandler에 전달되는 경우에 External Broker에 메세지를 전달함
+  - STOMP는 기본적으로 RabbitMQ, ActiveMQ를 External Broker로 사용할 수 있도록 지원함
+- 클라이언트는 External Broker를 구독하여 메세지를 받을 수 있음
+- 예시는 아래와 같음(https://github.com/chrismrkr/chat-app/blob/main/src/main/java/websocket/example/chatting_server/chat/config/RabbitMQMessageBrokerConfig.java 참고)
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
@@ -231,20 +232,50 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 }
 
-@Controller
+@RestController
+@RequiredArgsConstructor
 public class WebSocketController {
-
-    @MessageMapping("/send")
-    @SendTo("/topic/messages") // MessageBroker가 /topic/** 메세지를 받으면 External Broker로 Broadcast함
-    public String sendMessage(String message) {
-        return message;
+    private final RabbitTemplate rabbitMQTemplate;
+    @MessageMapping("/send/{id}")
+    public void sendMessage(String message) {
+        rabbitMQTemplate.convertAndSend("send.exchange", "id."+roomId, message);
     }
+}
+
+@Configuration
+@EnableRabbit
+public class RabbitMQMessageBrokerConfig {
+    private static final String CHAT_QUEUE_NAME = "send.queue";
+    private static final String CHAT_EXCHANGE_NAME = "send.exchange";
+    private static final String ROUTING_KEY = "id.*";
+    ...
+
+    //Queue 등록
+    @Bean
+    public Queue queue() {
+        return new Queue(CHAT_QUEUE_NAME, true);
+    }
+    //Exchange 등록
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange(CHAT_EXCHANGE_NAME);
+    }
+    // Exchange와 Queue 바인딩
+    @Bean
+    public Binding binding(Queue queue, TopicExchange exchange){
+        return BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(ROUTING_KEY);
+    }
+    ...
 }
 ```
 
-#### MessageHandler에서 External Broker로 전달하는 방법
-- MessageHandler, 즉 @MessageMapping된 메소드는 External Broker로 메세지를 명시적으로 전달할 수 있음
-- 그리고, 메세지를 SUB하여 SimpMessagingTemplate를 통해 Broker Channel로 전달할 수 있음
+#### MessageBroker로 Broadcast하는 방법
+- ClientInboundChannel을 통해 메세지를 받은 후, ExternalBroker에 메세지를 전달함
+- External Broker는 웹 소켓 서버에 메세지를 BroadCast를 함
+- 그리고, 웹 소켓 서버는 SimpMessagingTemplate를 통해 Broker Channel -> ClientOutboundChannel로 전달함
 - kafka를 사용하는 예시는 아래와 같음
 ```java
 @Controller
