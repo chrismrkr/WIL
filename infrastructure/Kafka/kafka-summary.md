@@ -260,16 +260,21 @@ public interface Partitioner extends Configurable, Closeable {
   
 ### 4.2 Consumer poll() 관련 모듈
 #### 4.2.1 poll
-- 브로커나 Consumer 내부 Queue에 데이터가 있으면 데이티러르 반환함
-- 만약 데이터가 없으면, 일정 시간 동안 브로커로 부터 데이터를 Fetch함
+- 브로커나 Consumer 내부 Queue에 데이터가 있으면 데이터를 반환함
+- 만약 데이터가 없으면, 일정 시간 동안 브로커로부터 데이터를 Fetch함
 ```java
-ConsumerRecords<K, V> consumerRecords = KafkaConsumer.poll(Duration.ofMillis(1000));
+ConsumerRecords<K, V> consumerRecords = KafkaConsumer.poll(Duration.ofMillis(1000)); // 1000ms 동안 poll
 for(ConsumerRecord consumerRecord : consumerRecords) {
   String key = consumerRecord.key();
   String value = consumerRecord.value();
 }
 ```
-#### 4.2.2 Fetcher
+#### 4.2.2 Fetcher, ConsumerNetworkClient
+- ConsumerNetworkClient는 비동기 I/O로 브로커로부터 데이터를 주기적으로 가져와서 Queue에 쌓음
+- Fetcher는 Queue에서 데이터를 poll하고, 데이터가 없으면 ConsumerNetworkClient에 데이터를 가져오도록 요청함
+- Fetcher 관련 파라미터
+  - fetch.min.bytes : fetcher가 데이터를 읽어들이는 최소 byte.
+  - 
 
 
 
