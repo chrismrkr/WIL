@@ -5,16 +5,12 @@ Spring Framework Documentation을 참고하여 STOMP를 정리함
 
 ### 1. 개요
 - STOMP는 메세지 브로커 연결을 위해 생성된 프로토콜이지만 TCP 연결 및 웹 소켓에서도 사용되는 프로토콜
-- 메세지 브로커 연결 목적으로 생성되었으므로 PUBlish, SUBscribe 개념이 존재함
-  - 사용자가 메세지를 Message Broker에 PUB하면, 다른 사용자는 Message Broker를 통해 SUB함
-- STOMP를 사용하는 웹 소켓 서버는 실제로는 웹 소켓이지만 메세지 브로커와 동일한 인터페이스를 제공함
-  - 웹 소켓 서버는 SUB 중인 클라이언트에 메세지를 라우팅함 : 웹 소켓 기능을 PUB/SUB 형태로 제공함
-  - 웹 소켓 서버는 Kafka, RabbitMQ와 같은 메세지 브로커와 연결을 맺어 다른 웹 소켓 서버로 메세지를 전달함 : 다중 웹 소켓 서버를 구성할 수 있음
+- 초창기 메세지 브로커 연결 목적으로 생성되었으므로 PUBlish, SUBscribe으로 동작하나 이벤트 기반이 아닌 웹 소켓 기반임 
 - 해당 프로토콜은 텍스트 또는 바이너리 메세지만을 다룸
 
 ### 2. 장점
 - 웹 소켓 메세지를 위한 프로토콜을 새롭게 개발하지 않아도 됨
-- @Controller로 등록된 모든 객체의 메소드에서 STOMP 기반 메세지 라우팅이 가능함 
+- @Controller로 등록된 빈 메소드에서 STOMP 기반 메세지 라우팅이 가능함 
 - Kafka, RabbitMQ와 같은 메세지 브로커를 연동하여 사용할 수 있음
 - Spring Security와의 연동이 가능함
 
@@ -24,12 +20,10 @@ Spring Framework Documentation을 참고하여 STOMP를 정리함
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/portfolio"); // ---- 1
 	}
-
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
 		config.setApplicationDestinationPrefixes("/app"); // ---- 2
@@ -63,12 +57,12 @@ const connect = () => {
 ```
 
 ### 4. 메세지 흐름
-- STOMP Endpoint가 노출되면 Spring App은 웹 소켓 연결된 클라이언트의 MessageBroker로 동작함
+- Spring boot Web App에 웹 소켓 서버, 메세지 브로커가 모두 포함됨
 - STOMP 메세지 흐름을 파악하기 위해서는 아래 개념을 알아야 함
-  - MessageHandler : 전달받은 메세지를 처리하는 메소드
   - ClientInboundChannel : 클라이언트가 PUB한 메세지를 MessageHandler 또는 MessageBroker로 전달하는 채널
-  - ClientOutboundChannel : MessageBroker가 클라이언트에 메세지를 전달하는 채널
+  - MessageHandler : 전달받은 메세지를 처리하는 메소드
   - BrokerChannel : MessageHandler가 MessageBroker에게 메세지를 전달하는 채널 
+  - ClientOutboundChannel : MessageBroker가 클라이언트에 메세지를 전달하는 채널
 - 아래 코드를 통해 STOMP 메세지의 기본적인 흐름에 대해 자세히 설명함
   
 ```java
@@ -103,9 +97,8 @@ public class GreetingController {
 
 #### Step 2
 - /topic/{...} Topic에 해당되는 메세지를 처리하는 MessageBroker를 생성함
-  - 클라이언트가 /topic/greeting으로 메세지를 PUB하면, ClientInboundChannel을 통해 MessageBroker로 전달됨
+  - 클라이언트가 /topic/greeting으로 메세지를 PUB하면, ClientInboundChannel을 통해 최종적으로 MessageBroker로 전달됨
   - MessageBroker는 /topic/greeting을 SUB 중인 클라이언트에게 ClientOutboundChannel을 통해 메세지를 전달함
-    - (MessageBroker 또한 메세지를 처리하므로 MessageHandler로 분류되나 설명을 위해 구분하였음)
     
 #### Step 3
 - /app/으로 시작되는 요청을 처리하는 MessageHandler를 설정함
