@@ -365,20 +365,81 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
   - 웹 소켓 세션이 유지되는 동안에는 SecurityContext가 소멸되지 않음
 
 ### 11. User Destination
+- 토픽이 아닌 클라이언트를 target하여 메세지를 전송하는 방식
+  - 실시간 공지사항 기능 등에 활용됨
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefixes("/user");  // 사용자 목적지 접두사 설정
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+    }
+}
+```
+```java
+@Controller
+public class WebSocketController {
+
+    @MessageMapping("/message")
+    @SendToUser("/queue/reply")
+    public UserResponse handlePrivateMessage(Principal principal, Message message) {
+        String responseMessage = "Hello, " + HtmlUtils.htmlEscape(message.getFrom()) + "! Your message: " + HtmlUtils.htmlEscape(message.getText());
+        return new UserResponse(message.getFrom(), responseMessage);
+    }
+}
+```
+- 사용 방법
+  - Subscriber : /user/queue/reply 경로로 메세지를 구독할 수 있음
+    - subscriber마다 고유 값을 갖으며 이는 principal에 할당됨
+  - Publisher : /app/message로 메세지 전송
+  - @SendToUser는 DestinationVariable을 사용할 수 없음
 
 
+### 12. 웹 소켓 Event
+- BrokerAvailabilityEvent: BrokerRelay와 Broker가 일시적으로 연결이 끊기거나 실제로 끊기는 상황을 감지하는 이벤트
+- SessionConnectEvent: STOMP 클라이언트 연결 시작 시 발생하는 이벤트
+- SessionConnectedEvent: STOMP 클라이언트 연결 완료 시 발생하는 이벤트
+- SessionSubscribeEvent: STOMP 클라이언트가 메세지 SUB 시도했을 때 발생하는 이벤트
+- SessionUnsubscribeEvent: STOMP 클라이언트가 메세지 SUB 종료했을 때 발생하는 이벤트
+- SesssionDisconnectEvent: STOMP 클라이언트가 연결 종료될 때 발생하는 이벤트
+  - 연결 종료 이벤트가 여러번 발생하여 이벤트 처리를 하더라도 그 결과가 항상 동일해야함(멱등성)
+  - 예를 들어, 클라이언트가 Disconnect 메세지를 보내고, Websocket이 닫히면서 Disconnect 이벤트가 발생하여 총 2번 발생할 수 있음
+  - STOMP 클라이언트는 BrokerRelay와 달리 자체적인 reconnect 기능이 없으므로 직접 구현이 필요함
 
+### 13. Interceptor
+- 인터셉터를 추가하여 웹 소켓 Event가 발생하는 시점을 Catch하여 특정 메소드를 실행할 수 있음
+- WebsocketMessageBrokerConfig 클래스의 아래 함수를 오버라이드하여 인터셉터 등록 가능
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-
-
-
-
-
-
-
-
-
-
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(new MyChannelInterceptor());
+	}
+	@Override
+	public void configureClientOutboundChannel(ChannelRegistration registration) {
+		registration.interceptors(new MyChannelInterceptor());
+	}
+}
+``` 
+- Interceptor는 ChannelInterceptor 또는 ExecutorChannelInterceptor 인터페이스를 구현하여 생성할 수 있음
+  - ChannelInterceptor: StompHeaderAccessor 또는 SimpMessageHeaderAccessor 클래스를 통해 메세지에 접근할 수 있음
+    - 메세지가 웹 소켓을 통해 동기적으로 전송되는 시점의 이벤트에 접근할 수 있음
+  - ExecutorChannelInterceptor: ChannelInterceptor를 확장한 인터페이스
+    - 동기적으로 메세지 전송하기 이전에 비동기적으로 메세지를 핸들링 하는 Event를 다룰 수 있음
+   
+### 14.
 
 
 
