@@ -5,7 +5,7 @@ Spring Framework Documentation을 참고하여 STOMP를 정리함
 
 ### 1. 개요
 - STOMP는 메세지 브로커 연결을 위해 생성된 프로토콜이지만 TCP 연결 및 웹 소켓에서도 사용되는 프로토콜
-- 초창기 메세지 브로커 연결 목적으로 생성되었으므로 PUBlish, SUBscribe으로 동작하나 이벤트 기반이 아닌 웹 소켓 기반임 
+- 메세지 브로커 목적으로 생성되었으므로 PUBlish, SUBscribe 지원
 - 해당 프로토콜은 텍스트 또는 바이너리 메세지만을 다룸
 
 ### 2. 장점
@@ -14,8 +14,7 @@ Spring Framework Documentation을 참고하여 STOMP를 정리함
 - Kafka, RabbitMQ와 같은 메세지 브로커를 연동하여 사용할 수 있음
 - Spring Security와의 연동이 가능함
 
-### 3. STOMP 활성화 방법
-- STOMP 활성화 방법에 대해 간단히 살펴봄
+### 3. STOMP 설정 방법
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
@@ -57,7 +56,8 @@ const connect = () => {
 ```
 
 ### 4. 메세지 흐름
-- Spring boot Web App에 웹 소켓 서버, 메세지 브로커가 모두 포함됨
+- Spring boot Web App에 웹 소켓 서버, 메세지 브로커가 내장됨
+- 필요한 경우 메세지 브로커로 RabbitMQ 같은 External Broker를 사용할 수 있음
 - STOMP 메세지 흐름을 파악하기 위해서는 아래 개념을 알아야 함
   - ClientInboundChannel : 클라이언트가 PUB한 메세지를 MessageHandler 또는 MessageBroker로 전달하는 채널
   - MessageHandler : 전달받은 메세지를 처리하는 메소드
@@ -103,7 +103,7 @@ public class GreetingController {
 #### Step 3
 - /app/으로 시작되는 요청을 처리하는 MessageHandler를 설정함
   - /app/topic/greeting 요청이 ClientInboundChannel을 통해 유입되면, 이를 MessageHandler에서 받음
-    - MessageHandler는 @Controller 객체 내 @MessageMapping이 선언된 메소드를 의미함
+    - MessageHandler는 @Controller Bean 내 @MessageMapping이 선언된 메소드를 의미함
   - MessageHandler는 BrokerChannel로 전달함
   - BrokerChannel은 /topic/greeting을 처리할 수 있는 MessageBroker에게 전달함
   - MessageBroker는 ClientOutboundChannel을 통해 메세지를 클라이언트에 전달함
@@ -196,12 +196,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 ### 8. External Broker
 - 웹 소켓 컨테이너가 클러스터링 되는 상황에서 사용됨
-#### MessageBroker에서 External Broker로 전달하는 방법
+#### External Broker로 전달하는 방법
 - ```enableSimpleBroker``` 대신 ```enableStompBrokerRelay```를 사용함
-- 특정 path에 해당되는 메세지가 MessageHandler에 전달되는 경우에 External Broker에 메세지를 전달함
+- 특정 path에 해당되는 메세지가 MessageHandler에 전달되는 경우, StompBrokerRelay를 통해 External Broker로 메세지를 전달함
   - STOMP는 기본적으로 RabbitMQ, ActiveMQ를 External Broker로 사용할 수 있도록 지원함
-- 클라이언트는 External Broker를 구독하여 메세지를 받을 수 있음
-- 예시는 아래와 같음(https://github.com/chrismrkr/chat-app/blob/main/src/main/java/websocket/example/chatting_server/chat/config/RabbitMQMessageBrokerConfig.java 참고)
+- External Broker에 연결된 웹 소켓 서버에 메세지를 전달함
+- https://github.com/chrismrkr/chatapp/blob/main/src/main/java/websocket/example/chatting_server/chat/config/RabbitMQMessageBrokerConfig.java 참고)
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
@@ -265,11 +265,10 @@ public class RabbitMQMessageBrokerConfig {
 }
 ```
 
-#### MessageBroker로 Broadcast하는 방법
+#### Kafka를 External Broker로 사용하는 방법
 - ClientInboundChannel을 통해 메세지를 받은 후, ExternalBroker에 메세지를 전달함
 - External Broker는 웹 소켓 서버에 메세지를 BroadCast를 함
 - 그리고, 웹 소켓 서버는 SimpMessagingTemplate를 통해 Broker Channel -> ClientOutboundChannel로 전달함
-- kafka를 사용하는 예시는 아래와 같음
 ```java
 @Controller
 @RequiredArgsConstructor
@@ -301,7 +300,71 @@ public class KafkaConsumerService {
 }
 ```
 
+### 9. Dot(.) 분리자
+- 일반적으로 /(slash)를 분리자로 사용하나 메세징 방식에서는 .(dot)를 분리자로 사용하는 것이 컨벤션임
+- 아래의 예시에서는 /app/red.blue.green123123321 등으로 메세지 발행 가능
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+	// ...
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry registry) {
+		registry.setPathMatcher(new AntPathMatcher("."));
+		registry.enableStompBrokerRelay("/queue", "/topic");
+		registry.setApplicationDestinationPrefixes("/app");
+	}
+}
+```
+```java
+@Controller
+@MessageMapping("red")
+public class RedController {
 
+	@MessageMapping("blue.{green}")
+	public void handleGreen(@DestinationVariable String green) {
+		// ...
+	}
+}
+```
+
+### 10. Authentication & Authorization
+- 쿠키 세션 인증
+  - SecurityContext가 유효하다면 추가적인 인증은 필요하지 않음
+    - 로그인 기능 등으로 SecurityContext가 이미 저장됨
+- 토큰 인증
+  - STOMP 프로토콜 헤더를 통해서 인증 토큰을 전달함
+  - 그리고, ClientInboundChannel 또는 ClientOutboundChannel에 STOMP 클라이언트가 CONNECT 메세지를 보내는 시점을 Intercept하여 인증 토큰 처리함
+
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+@Order(Ordered.HIGHEST_PRECEDENCE + 99) // Spring Security 보다 먼저 실행되어야 함
+public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(new ChannelInterceptor() {
+			@Override
+			public Message<?> preSend(Message<?> message, MessageChannel channel) {
+				StompHeaderAccessor accessor =
+						MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+				if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+					/* CONNECT 되는 메세지를 받아서 인증 토큰 처리하는 로직이 필요함 */
+					// Authentication user = ... ; // access authentication header(s)
+					// accessor.setUser(user);
+				}
+				return message;
+			}
+		});
+	}
+}
+```
+
+- Authorization
+  - 웹 소켓 세션이 유지되는 동안에는 SecurityContext가 소멸되지 않음
+
+### 11. User Destination
 
 
 
