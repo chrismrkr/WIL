@@ -30,3 +30,6 @@
 - https://www.rabbitmq.com/tutorials/tutorial-five-spring-amqp
 
 ### 5. RPC
+- https://www.rabbitmq.com/tutorials/tutorial-six-spring-amqp
+
+## Publish
