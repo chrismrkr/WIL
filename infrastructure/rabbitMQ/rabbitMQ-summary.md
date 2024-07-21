@@ -32,4 +32,23 @@
 ### 5. RPC
 - https://www.rabbitmq.com/tutorials/tutorial-six-spring-amqp
 
-## Publish
+## Consumer Acknowledgments & Publisher Confirms
+
+신뢰성 있는 데이터 전달을 위해 Publisher는 broker에 정상적으로 전달이 되었는지 확인해야 함
+
+또한, Broker는 Consumer가 메세지를 정상적으로 수신했는지 확인할 수 있는 메커니즘 필요
+
+참고: https://www.rabbitmq.com/docs/confirms
+
+### 1. Consumer Acknowledgments
+- Ack를 통해 Broker에게 메세지 수신 여부를 전달함
+- fire-and-shot: Ack를 사용하지 않음
+- Positive Ack: Subscriber는 메세지 수신 시, 브로커에 Ack를 보냄
+  - 메세지를 수신받을 때 마다 Ack를 보내는 방식과 Batch 단위로 Ack를 보내는 방식 모두 존재함
+- Negative Ack: Subscriber가 해당 메세지를 수신하지 않겠다고 브로커에게 알리는 Ack
+  - 현재 Subscriber가 메세지를 처리하기 어려운 상황에 사용함
+  - Broker가 메세지를 다른 큐로 재전송하거나 버릴 수 있음
+- 주의사항: 네트워크 지연 등으로 Broker가 Ack를 받지 못하여 재전송을 했을 때, 멱등성을 위해 Subscriber는 중복된 메세지를 처리하는 프로세스를 자체적으로 구현해야함
+  - 그렇지 않은 경우에는 동일한 메세지를 중복하여 수신할 수 있음
+
+
