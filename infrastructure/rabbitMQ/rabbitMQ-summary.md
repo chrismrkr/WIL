@@ -39,10 +39,10 @@
 참고: https://www.rabbitmq.com/docs/confirms
 
 ### 1. Consumer Acknowledgments
-- Consumer가 Ack를 통해 Broker에게 메세지 수신 여부를 전달함
+- Consumer가 Ack를 통해 Broker에게 메세지 수신 여부를 알림
 - Ack
   - Automatic Ack: Broker가 메세지를 전송한 후, Ack를 기다리지 않음(fire-and-forget)
-  - Manual Ack: Broker가 메세지를 전송한 후, Ack를 기다림. Positive & Negative Ack로 구분됨
+  - Mannual Ack: Broker가 메세지를 전송한 후, Ack를 기다림. Positive & Negative Ack로 구분됨
 - Positive Ack: Consumer는 메세지 수신 시, 브로커에 Ack를 보냄
   - One Message at once: Consumer가 하나의 메세지를 수신받을 때 마다 Ack를 보내는 방식
   - Multiple Message at once: Consumer가 여러 개의 메세지를 수신받은 후, 마지막에 전송한 메세지에 대해서만 Ack를 보내는 방식
@@ -58,4 +58,21 @@
   - 이에 따라, 동일한 메세지가 중복해서 Consumer에 전달될 수 있으므로 멱등성(Idempotency)을 위한 메커니즘을 자체적으로 구현해야함
 
 ### 2. Publisher Confirms
-
+- publisher가 전달한 메세지가 broker에 정상적으로 전달되었는지 Ack를 통해 확인하는 메커니즘을 publisher confirms라 함
+- confirm mode: publisher confirms을 사용하는 기능
+  - channel을 통해 confirm.select, confirm.select-ok를 통해 confirm mode가 활성화됨
+- 동작 방식
+  - ack: broker가 메세지를 수신하여 Queue와 Disk에 저장하면, publisher에게 Ack를 전송함
+    - durable mode가 동작하지 않으면 Queue에 저장되었을 때만 Ack를 전송함
+    - 수신 받은 메세지에 대한 Ack를 여러개 묶어서 한번에 보내는 옵션도 존재함
+  - nack: broker가 메세지를 정상적으로 처리할 수 없는 상황임을 알림
+- 디스크 저장 방식
+  - broker는 메세지를 일정 주기로 디스크에 저장함
+  - 그러므로, 성능을 높이기 위해 배치 단위로 메세지를 주고 받거나 publisher는 Ack를 비동기적으로 처리해야함
+- 메세지 순서
+  - broker는 publisher가 전송한 메세지를 순서대로 받음
+  - 그러나, Ack는 비동기적으로 전달되므로 publisher의 Ack 수신은 순서대로가 아님에 주의해야함
+- 디스크 기록 실패
+  - publisher가 메세지를 보낸 후 Ack를 받지 못하면, broker가 Disk Write에 실패했을 수도 있음
+  - 만약 Disk Write에 실패했다면, broker는 재시작됨
+  - 이에 따라, consumer는 메세지를 받을 수 없음
