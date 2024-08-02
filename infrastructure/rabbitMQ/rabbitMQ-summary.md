@@ -43,7 +43,7 @@
 - Ack
   - Automatic Ack: Broker가 메세지를 전송한 후, Ack를 기다리지 않음(fire-and-forget)
   - Mannual Ack: Broker가 메세지를 전송한 후, Ack를 기다림. Positive & Negative Ack로 구분됨
-- Positive Ack: Consumer는 메세지 수신 시, 브로커에 Ack를 보냄
+- Positive Ack: Consumer는 메세지 수신 성공 시, 브로커에 Ack를 보냄
   - One Message at once: Consumer가 하나의 메세지를 수신받을 때 마다 Ack를 보내는 방식
   - Multiple Message at once: Consumer가 여러 개의 메세지를 수신받은 후, 마지막에 전송한 메세지에 대해서만 Ack를 보내는 방식
 - Negative Ack: Consumer가 해당 메세지를 수신하지 않겠다고 브로커에게 알리는 Ack
@@ -76,3 +76,24 @@
   - publisher가 메세지를 보낸 후 Ack를 받지 못하면, broker가 Disk Write에 실패했을 수도 있음
   - 만약 Disk Write에 실패했다면, broker는 재시작됨
   - 이에 따라, consumer는 메세지를 받을 수 없음
+
+## Clustering
+### 1. 주요 개념
+- Identifier : RabbitMQ 노드마다 하나씩 부여되고, Identifier를 통해 식별하여 클러스터링할 수 있음
+  - 환경변수 ```RABBITMQ_NODENAME```를 통해서 Identifier를 설정할 수 있음
+  - [prefix]@[hostname] 형태로 되어있고, hostname을 찾기 위한 DNS 또는 host 파일 설정이 필요함
+- Port Access : 아래 포트가 허용되어 있어야함
+  - 4369, 6000-6500, 25672, 35672-35682
+### 2. 클러스터 내 노드 특징
+- 복제 대상
+  - RabbitMQ를 실행하는데 필요한 모든 데이터/상태는 노드들끼리 복제하여 사용함
+  - 메세지 큐는 특정 노드에만 존재함
+  - 단, Queue Mirroring 기법 등을 통해서 노드마다 개별적으로 메세지 큐를 갖도록 할 수 있음
+- Equal Peers
+  - 노드들은 Leader, Follower가 존재하지 않고 모두 동일하므로 어느 노드에서 조회하더라도 클러스터 정보를 조회할 수 있음
+  - 클러스터 내 노드끼리는 동일한 Erlang Cookie를 공유하여 통신할 수 있음
+    - cookie는 로컬에 파일로 존재하며 600 이상의 권한 필요
+    - /var/lib/rabbitmq/.erlang.cookie(서버), $HOME/.erlang.cookie(CLI tool)
+- 클러스터 노드 개수는 홀수를 권장함. 왜냐하면, 장애상황으로 노드가 정상적으로 클러스터링되지 않을 때도 quorum을 형성하기 위함임
+### 3. 클러스터링 방법
+- 
