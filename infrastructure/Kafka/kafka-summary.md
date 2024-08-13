@@ -273,8 +273,13 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
 - ConsumerNetworkClient는 비동기 I/O로 브로커로부터 데이터를 주기적으로 가져와서 Queue에 쌓음
 - Fetcher는 Queue에서 데이터를 poll하고, 데이터가 없으면 ConsumerNetworkClient에 데이터를 가져오도록 요청함
 - Fetcher 관련 파라미터
-  - fetch.min.bytes : fetcher가 데이터를 읽어들이는 최소 byte.
-  - 
+  - fetch.min.bytes : 최신 offset부터 데이터를 읽는 경우, fetcher가 파티션 별 데이터를 읽어들이는 최소 byte
+  - fetch.max.wait.ms : fetch.min.bytes 만큼 데이터가 쌓이지 않았으면 해당 파라미터만큼 대기
+  - max.partition.fetch.bytes : 오래된 offset부터 데이터를 읽는 경우, 해당 파라미터만큼 파티션에서 읽은 후 대기 
+  - max.poll.records : fetcher가 한번에 가져올 수 있는 최대 레코드 수
+  - auto.offset.reset : consumer group이 topic partition에 대한 offset를 갖고 있지 않으면, 새로운 consumer가 partition의 첫 offset부터 데이터를 가져올지 아니면 마지막 offset부터 데이터를 가져올지를 결정함
+    - auto.offset.reset = earliest (첫 offset부터 READ)
+    - auto.offset.reset = latest (마지막 offset부터 READ)
 
 
 
