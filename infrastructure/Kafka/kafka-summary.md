@@ -180,7 +180,7 @@ kafka-console-consumer --bootstrap-server localhost:9092 --delete --group [그�
   - Kafka Producer 내부의 전송용 Thread가 배치 단위로 메세지를 Broker에 전송함
 - KafkaProducer의 close() 메소드로 종료
 
-### 3.2 Producer Deep Dive
+### 3.2 Producer Details
 #### 3.2.1 Ack
 - ack = 0
   - Producer는 Broker의 메세지 정상 수신을 확인하지 않고 계속 전송함
@@ -258,7 +258,7 @@ public interface Partitioner extends Configurable, Closeable {
 - Step3. Topic subscribe()
 - Step4. 주기적으로 Topic poll()
   
-### 4.2 Consumer poll() 관련 모듈
+### 4.2 Consumer Details
 #### 4.2.1 poll
 - 브로커나 Consumer 내부 Queue에 데이터가 있으면 데이터를 반환함
 - 만약 데이터가 없으면, 일정 시간 동안 브로커로부터 데이터를 Fetch함
@@ -281,5 +281,8 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
     - auto.offset.reset = earliest (첫 offset부터 READ)
     - auto.offset.reset = latest (마지막 offset부터 READ)
 
-
+#### 4.2.3 Group Coordinator
+- counsumer group에 어떤 consumer가 존재하는지 확인하고, consumer가 생성되고 소멸 시 발생하는 Rebalancing을 담당함
+  - Rebalance : healthCheck 실패, consumer 종료, consumer 조인, partition 추가 이벤트가 발생할 때, partition을 어느 consumer에 할당할지 결정하는 작업
+- Static Group Membership : 
 
