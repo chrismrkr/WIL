@@ -284,5 +284,13 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
 #### 4.2.3 Group Coordinator
 - counsumer group에 어떤 consumer가 존재하는지 확인하고, consumer가 생성되고 소멸 시 발생하는 Rebalancing을 담당함
   - Rebalance : healthCheck 실패, consumer 종료, consumer 조인, partition 추가 이벤트가 발생할 때, partition을 어느 consumer에 할당할지 결정하는 작업
-- Static Group Membership : 
+- Static Group Membership : Rebalance로 인한 오버헤드를 줄이기 위해서 등장함
+  - session.timeout.ms 이내에 다시 연결되면 rebalance가 발생하지 않음
+  - max.poll.interval.ms 이내에 poll() 성공에 실패하면 rebalance가 발생함
+- partition.assignment.strategy : 해당 파라미터를 통해 파티션 할당 전략을 결정함
+  - round-robin, sticky는 Eager Protocol이므로 consume lag가 발생할 수 있음
+
+#### 4.2.4 subscribe, poll, commit
+- 
+
 
