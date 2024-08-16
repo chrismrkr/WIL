@@ -304,5 +304,5 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
     - consumer가 poll 관련 프로세스를 실패하여 Rebalance가 발생, 이에 따라 commit 실패 상황이 발생할 수 있음
     - 이는 메세지 중복 수신으로 이어지므로 이를 보완하기 위한 Idempotence 관련 로직이 필요함
     
-
+ 
 
