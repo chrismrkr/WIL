@@ -256,7 +256,7 @@ public interface Partitioner extends Configurable, Closeable {
 - Step1. Consumer 환경 설정(Properties 객체 이용)
 - Step2. KafkaConsumer 생성
 - Step3. Topic subscribe()
-- Step4. 주기적으로 Topic poll()
+- Step4. Topic poll()
   
 ### 4.2 Consumer Details
 #### 4.2.1 poll
@@ -290,7 +290,19 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
 - partition.assignment.strategy : 해당 파라미터를 통해 파티션 할당 전략을 결정함
   - round-robin, sticky는 Eager Protocol이므로 consume lag가 발생할 수 있음
 
-#### 4.2.4 subscribe, poll, commit
-- 
+#### 4.2.4 poll, commit
+- poll : consumer가 broker partition으로부터 메세지를 가져옴.
+  - Fetcher 관련 파라미터에 따라 읽어오는 메세지 수가 달라짐
+- commit
+  - broker의 __consumer_offset에 (consumer_group, topic, partition, current_offset)을 저장하는 행위
+  - Auto Commit(auto.enable.commit=true)
+    - auto.commit.interval.ms 주기마다 consumer가 자동으로 commit을 broker에 보냄
+    - 메세지 유실 및 중복 문제가 발생할 수 있음
+  - Manual Commit(auto.enable.commit=false)
+    - 메세지 배치를 poll()을 통해 읽어오고, 마지막 offset을 브로커에 commit함
+    - 동기 및 비동기 방식을 모두 지원함
+    - consumer가 poll 관련 프로세스를 실패하여 Rebalance가 발생, 이에 따라 commit 실패 상황이 발생할 수 있음
+    - 이는 메세지 중복 수신으로 이어지므로 이를 보완하기 위한 Idempotence 관련 로직이 필요함
+    
 
 
