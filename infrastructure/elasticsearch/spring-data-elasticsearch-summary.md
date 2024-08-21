@@ -68,3 +68,80 @@ Collection 타입의 매개변수도 가능하며, 위 쿼리는 아래의 Elast
   }
 }
 ```
+
+#### Example 3
+```java
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+        {
+          "bool":{
+            "must":[
+              {
+                "term":{
+                  "name": "#{#name}"
+                }
+              }
+            ]
+          }
+        }
+        """)
+    Page<Book> findByName(String name, Pageable pageable);
+}
+```
+SpEL 표현식도 가능하며, 위 쿼리 결과는 아래와 같이 변환됨
+```java
+{
+  "bool":{
+    "must":[
+      {
+        "term":{
+          "name": "John"
+        }
+      }
+    ]
+  }
+}
+```
+#### Example 4
+아래와 같이 QueryParameter 클래스 객체를 통해서도 파라미터 생성도 가능함
+```java
+public record QueryParameter(String value) {
+  ...
+}
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "term":{
+                      "name": "#{#parameter.value}"
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(QueryParameter parameter, Pageable pageable);
+}
+```
+#### Exmaple 5
+Bean으로 등록되어 있는 이름이 ```queryParamBean```이라면, 아래와 같은 방법으로도 가능함
+```java
+interface BookRepository extends ElasticsearchRepository<Book, String> {
+    @Query("""
+            {
+              "bool":{
+                "must":[
+                  {
+                    "term":{
+                      "name": "#{@queryParameter.value}"
+                    }
+                  }
+                ]
+              }
+            }
+            """)
+    Page<Book> findByName(Pageable pageable);
+}
+```
