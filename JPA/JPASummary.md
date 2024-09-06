@@ -1187,15 +1187,28 @@ for(Member member : members) {
 
 ## 7. 트랜잭션과 락, 2차 캐시
 
-JPA에서의 Isolation level은 영속성 컨텍스트의 특징에 의해 repeatable-read이다.
+JPA에서의 Isolation level은 영속성 컨텍스트의 특성 때문에 repeatable-read이다.
 
-만약 더 높은 수준의 격리수준이 필요하다면, 낙관적 락 또는 비관적 락을 이용해야 한다.
+더 높은 수준의 격리수준을 위해 @Transactional 격리수준, 낙관적 락 또는 비관적 락을 이용할 수 있다.
 
-### 7.1 낙관적 락
+### 7.1 @Transactional
+
+해당 Annotation이 있는 클래스 내의 메소드, 또는 메소드는 하나의 Transaction으로 처리됨을 의미한다.(ACID)
+
+#### Isolation Level
+- READ_UNCOMMITED
+- READ_COMMITED
+- REPEATABLE_READ
+- SERIALIZABLE
+
+
+### 7.2 낙관적 락
 
 대부분의 트랜잭션은 충돌이 일어나지 않을 것이라 가정하는 애플리케이션에서 제공하는 락 기법이다.
 
-Version 정보를 이용하여 특정 칼럼에 낙관적 락을 제공한다. 낙관적 락은 두번의 갱신 내역 분실 문제를 해결할 수 있다. 
+Table Column에 Version을 추가하여 테이블 데이터 Update 시, Version 값이 달라졌으면 변경이 이미 일어난 것으로 감지하여 트랜잭션 Rollback 하는 방법이다.
+
+낙관적 락은 두번의 갱신 내역 분실 문제를 해결할 수 있다. 
 
 두번의 갱신 내역 분실은 아래와 같은 시나리오에서 발생한다.
 
@@ -1215,29 +1228,23 @@ Version 정보를 이용하여 특정 칼럼에 낙관적 락을 제공한다. �
 + 3. 사용자1이 수정 후 수정 완료 버튼 클릭(version1 -> version2)
 + 4. 사용자2가 수정 후 수정 완료 버튼 클릭(version2로 바뀌었으므로 변경 불가)
 
-@Version 애노테이션을 통해서 특정 칼럼에 대해 낙관적 락을 사용할 수 있지만, 옵션을 사용할 수도 있다.
+@Version 애노테이션을 통해서 특정 칼럼에 대해 낙관적 락을 사용할 수 있고, 3가지 옵션이 존재한다.
 
-+ NONE: UPDATE를 할 때, version을 체크한다. dirty read, non-repeatable read 문제가 발생한다.
++ NONE: 데이터에 어떠한 Lock도 걸리지 않으며 조회용으로만 사용됨
++ OPTIMISTIC : 데이터 READ는 LOCK을 걸지 않고, UPDATE할 때 VERSION 업데이트를 함
++ OPTIMISTIC_FORCE_INCREMENT : 데이터 READ WRITE 모두 VERSION을 업데이트함
 
-T1: -----Read(A)----------------Read(A)------------
-
-T2:-----------------Update(A)-------------commit--- \<dirty read>
-
-T1: ------Read(A)----------------------------Read(A)
-
-T2: --------------Update(A)----commit-------------- \<non-repeatable read>
-                                                              
-+ OPTIMISTIC : UPDATE 뿐만 아니라 SELECT를 할 때도 version을 체크한다. dirty-read, non-repeatable read를 방지한다.
-+ OPTIMISTIC_FORCE_INCREMENT : 연관관계에 있는 엔티티의 버전 정보를 강제로 증가시킬 때 사용한다. OPTIMISTIC이 확장된 옵션이다.
-
-만약, 게시물(1)과 첨부파일(N)이 서로 연관관계에 있다고 하자. 만약, 첨부 파일이 update되면 해당 첨부파일의 version은 상승한다.
+게시물(1)과 첨부파일(N)이 서로 연관관계에 있다. 만약, 첨부 파일이 update되면 해당 첨부파일의 version은 상승한다.
 
 그러나, 논리적으로 version 정보가 변경되어야 함에도 불구하고 게시물의 version은 변경되지 않는다. 
-  
-**JPA에서는 영속성 컨텍스트를 통한 repeatable read 격리 수준, 필요한 경우 낙관적 락을 사용할 것을 추천한다.**
 
-### 7.2 비관적 락
+### 7.3 비관적 락
 
+#### PESSIMISTIC_READ
+트랜잭션에서 데이터를 READ 하면, 다른 트랜잭션에서 해당 데이터에 대한 WRITE 작업을 할 수 없도록 잠금
+
+#### PESSIMISTIC_WRITE
+트랜잭션에서 데이터를 WRITE 하면, 다른 트랜잭션에서 해당 데이터에 대한 READ & WRITE 작업을 할 수 없도록 잠금
 
 ***
 
