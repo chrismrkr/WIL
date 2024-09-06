@@ -153,12 +153,16 @@ m.getTeam(); // <- throw LazyInitialaztionException. 객체 m 조회 후, 트랜
 + @GeneratedValue(strategy= ..): 기본 키를 자동 생성함. (생략시 기본 키 직접 할당 필요)
 
 
-### 기본 키(Primary Key) 자동 생성 전략?
+### 기본 키(Primary Key) 자동 생성 전략
+@GeneratedValue(strategy=...)를 통해 자동으로 기본 키를 생성할 전략을 결정함
+
 + IDENTITY 전략: 기본 키 생성을 데이터베이스에 위임함.
-  + 그러므로, DB에 아직 저장되지 않은 영속 상태인 엔티티의 기본 키를 조회하면 데이터베이스 조회가 필요하다.
+  + ```AUTO_INCREMENT```를 통해 기본 키를 할당함
   
   
-+ SEQUENCE 전략: 시퀀스는 유일한 값을 순서대로 생성하는 데이터베이스 오브젝트임. 아래의 코드 예시를 통해 확인하고 작동 과정을 살펴보도록 한다.
++ SEQUENCE 전략: DB Sequence를 통해서 기본 키를 생성함. MySQL, MariaDB에서는 지원하지 않음
+  + NoopOptimizer, HiLoOptimizer, PooledOptimizer, PooledLoOptimizer, PooledLoThreadLocalOptimizer 등을 Sequence Generator로 사용할 수 있음
+  + 예시는 아래와 같음
   
   ```java
   @Entity
@@ -180,9 +184,10 @@ m.getTeam(); // <- throw LazyInitialaztionException. 객체 m 조회 후, 트랜
     + 첫 em.persist() 시 DB로 부터 초기값 1과 50을 가져와 영속성 컨텍스트에 저장한다.
     + em.persist()가 발생할 때 마다 영속성 컨텍스트에 저장된 1부터 51까지의 값을 순서대로 지정한다. 그러므로, IDENTITY 전략에 비해 네트워킹으로 인한 비용이 적다.
     + em.persist()시 영속성 컨텍스트에 저장된 값이 모두 사용되었다면, 마찬가지로 101을 가져와 영속성 컨텍스트에 저장한다.
-  + 이 과정을 반복한다.
+    + 이 과정을 반복한다.
 
-+ TABLE 전략: 키 생성 전용 테이블을 하나 만들고 칼럼을 만들어 데이터베이스 시퀀스를 흉내내도록 한다.
++ TABLE 전략: 키 생성 전용 테이블을 하나 만들고 칼럼을 만들어 데이터베이스 시퀀스를 흉내냄
+  + 동시성이 가장 떨어짐
   ```java
   @Entity
   @TableGenerator (
@@ -199,8 +204,6 @@ m.getTeam(); // <- throw LazyInitialaztionException. 객체 m 조회 후, 트랜
    ...
    }
   ```
- 바람직한 기본 키 생성 전략은? Long형 + (IDENTITY | SEQUENCE | TABLE) + 자체 로직
-
 
 ***
 
