@@ -303,6 +303,47 @@ for(ConsumerRecord consumerRecord : consumerRecords) {
     - 동기 및 비동기 방식을 모두 지원함
     - consumer가 poll 관련 프로세스를 실패하여 Rebalance가 발생, 이에 따라 commit 실패 상황이 발생할 수 있음
     - 이는 메세지 중복 수신으로 이어지므로 이를 보완하기 위한 Idempotence 관련 로직이 필요함
-    
- 
+
+## 5. Clustering
+Kafka 클러스터 구성, 설정 및 운영 방법에 대해서 정리하였음
+
+### 5.1 Kafka 클러스터 구성
+
+Kafka 클러스터는 하나의 토픽에 대해서 여러 Broker를 갖는 구성이며 특징은 아래와 같음
++ Broker들은 서로 다른 설정을 갖음(server.properties)
++ log.dirs와 broker.id, 그리고 포트번호도 독립적으로 갖음 
+
+### 5.2 Replication
++ 가용성을 보장하기 위해 파티션들을 복제하는 것을 의미함
++ Topic 생성 시, ```--replication-factor```를 설정을 통해 Replication 생성 가능함
+  + 예를 들어, ```--replication-factor 3```은 원본 포함한 replication 파티션들을 총 3개를 생성함을 의미함
++ Replication은 Broker 수보다 많을 수 없으나, 동일하게 유지하는 것이 일반적임
+
+#### 5.2.1 Replication 동작 방식
++ Producer & Consumer는 Leader Partition을 통해 데이터 Read & Write 가능함
++ 단방향 복제: Leader Partition에서 Follower Partition 방향으로 데이터가 복제됨
++ Producer 설정이 acks=all일 때, ```min.insync.replicas```가 2이고 ```--replication-factor```가 3이라면 2개의 Broker에만 복제되어도 ack됨
+
+### 5.3 Zookeeper
+Kafka Broker를 관리하는 역할을 수행함.
++ Controller Broker 지정: 동일한 Topic을 가진 여러 Broker 중 Zookeeper에 가장 먼저 참여한 경우에 해당됨
++ Broker Membership 관리: Broker Join/Leave를 모니터링함
+  + ```zookeeper.session.timeout.ms``` 이내에 Broker로부터 HeartBeat를 받지 못하면 Controller Broker에 해당 내용을 전달함
+  + 그리고, Controller는 Partition Leader를 ISR 내에서 선출함
+
+**ISR 이란?**
++ In-Sync Replicas
++ Follower Partition에서 Leader Partition 데이터를 ```replica.lag.time.max.ms``` 이내에 가져와야 ISR 내에서 관리됨
++ Broker Rebalance 대상은 ISR 내에서 결정됨
+
+### 5.4 Preferred Leader Election vs Unclean Leader Election
+#### Prefered Leader Election
++ 파티션 별로 최초 할당된 Leader/Follower 설정을 그대로 유지함
++ Broker가 재기동되어도 Preferred Leader는 변경되지 않음
++ ```auto.leader.rebalance.enable=true```로 설정
+#### Unclean Leader Election
++ 기존 Leader Broker가 오랜 기간 살아나지 않은 경우, 완벽하게 복제되지 않은 Follower Broker가 Leader가 될 수 있음
++ ```unclean.leader.election.enable=true```
+
+
 
