@@ -345,5 +345,8 @@ Kafka Broker를 관리하는 역할을 수행함.
 + 기존 Leader Broker가 오랜 기간 살아나지 않은 경우, 완벽하게 복제되지 않은 Follower Broker가 Leader가 될 수 있음
 + ```unclean.leader.election.enable=true```
 
+### 5.5 기타 주요 설정
++ controlled.shutdown.enable=true: log recovery를 위해 모든 로그를 동기화한 후 종료하는 옵션(graceful shutdown)
++ 
 
 
