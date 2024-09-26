@@ -514,16 +514,126 @@ kubectl apply -f=users-deployment.yaml -f=auth-deployment.yaml -f=tasks-deployme
 kubectl apply -f=services.yaml
 ```
 
++ metadata.name, metadata.labels.app : Deployment, Service, ReplicaSet 자체에 할당되는 이름과 Label을 설정
++ spec.template.metadata.labels.app : Deployment 및 ReplicaSet 객체 내에서 생성되는 Pod에 대한 Label을 설정
++ spec.selector.matchLabels : Deployment 내의 어떤 Label을 가진 Pod를 관리할지 선택하기 위한 값임
 
-## AWS EKS로 쿠버네티스 클러스터 배포
+## Kubernetes Basics
 
-### AWS Elastic Kubernetes Service 생성
-- 클러스터 이름 생성
-- Service Role 지정
-  - **K8s Control Plane**이 리소스를 관리할 수 있도록 허용하는 역할 생성
-  - IAM에서 생성할 수 있고, 어떤 리소스를 관리할 수 있는지 지정 가능
-  - EKSClusterPolicy를 선택하면 됨
-- VPC 설정
-  - 클러스터에 설정할 네트워크 구성함
+Kubernetes 기초 개념에 대해서 소개함
+
+### Pod Scale-out
+Replication Controller 객체를 통해 Pod를 Scale-out할 수 있음
+
+### Deployment
+Pod 배포 및 관리를 위해 사용되는 객체. Replication Controller, Replica Set보다 더 많이 활용됨.
+
+예시는 아래와 같음.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+```
+
+### 주요 명령어
++ ```kubectl get deployments```: 현재 Deployment 객체 정보를 표시함
++ ```kubectl get pods --show-labels```: 현재 Pod 정보를 label과 함께 표시함
++ ```kubectl rollout status <current-deployment-object-name>```: Deployment 객체 정보를 표시함
++ ```kubectl set image <current-deployment-object-name> <image>=<image>:<version>```: deployment에서 배포한 pod 이미지를 변경함
++ ```kubectl edit <current-deployment-object>```: Deployment 객체를 수정함
++ ```kubectl rollout history <current-deployment-object>```: Deployment 객체 rollout Histor를 표시
++ ```kubectl rollout undo <current-deployment-object>```: 이전 버전으로 rollback
++ ```kubectl rollout undo <current-deployment-object> --to-revision=<n>: 특정 버전으로 rollback
+
+### Service
+Pod Endpoint를 외부에 노출하여 사용자가 접근할 수 있도록 만드는 객체
+
++ ClusterIP: 클러스터 내부에서만 접근할 수 있는 IP를 Pod에 부여. 즉, Virtual IP 생성
++ NodePort: Node와 동일한 IP를 Pod에 부여하여 외부에서 접근할 수 있도록 함. NodeIP 및 Port 노출
++ LoadBalancer: Cloud Provider(ELB)가 제공하고, External Traffic을 노드로 전달할 수 있는 IP를 제공함
+
+DNS도 사용할 수 있음. 예시는 아래와 같음
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-service
+spec:
+  ports:
+  - port: 31001
+    nodePort: 31001
+    targetPort: nodejs-port
+    protocol: TCP
+  selector:
+    app: helloworld
+  type: NodePort
+```
+
+### Labels
+객체에 부여될 수 있는 key:value Tag. 객체는 여러 개의 Label을 가질 수 있음
+
+예를 들어, Deployment 객체에서 특정 Pod를 선택하여 관리하기 위해 Pod Label을 사용함. 예시는 앞선 Minikube Example에서 확인할 수 있음
+
+**Node에도 Label을 부여할 수 있음. 이를 통해 Pod가 특정 Node에서만 동작하도록 만들 수 있음.**
+
+즉, 특정 컨테이너를 특정 노드에만 배포되도록 하고자 할 때 유용하게 사용될 수 있음
+
+```
+kubectl label nodes <node-name> hardware=helloworld-only-node
+```
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+nodeSelector:
+  hardware: helloworld-only-node
+```
+
+위의 예시에 따르면, Deployment 객체 생성 시 ```helloworld-only-node``` Label을 가진 노드에만 Pod가 배포됨.
+
+### Health Check
+
+
+
+
+
+
+
 
 
