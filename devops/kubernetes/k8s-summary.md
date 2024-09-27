@@ -522,9 +522,6 @@ kubectl apply -f=services.yaml
 
 Kubernetes 기초 개념에 대해서 소개함
 
-### Pod Scale-out
-Replication Controller 객체를 통해 Pod를 Scale-out할 수 있음
-
 ### Deployment
 Pod 배포 및 관리를 위해 사용되는 객체. Replication Controller, Replica Set보다 더 많이 활용됨.
 
@@ -629,9 +626,249 @@ nodeSelector:
 
 ### Health Check
 
+kubenetes에서 실행 중인 Pod에 주기적으로 Health Check 보내며, pod가 정상 응답하는지 확인함.(Liveness Probe)
 
+만약 Health Check에 실패한다면, 자동으로 새로운 Pod를 재시작함.
 
+예시는 아래와 같음.
 
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: nodejs-port // port 대신 pod 이름을 지정할 수 있음
+          initialDelaySeconds: 15
+          timeoutSeconds: 30
+```
+
+### Readiness Probe
+
+Pod가 정상적으로 기동되어 준비된 상태인지 확인함.
+
+운영환경에서 Liveness Probe & Readiness Probe를 적극적으로 사용함.
+
+예시는 아래와 같음.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-readiness
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: nodejs-port
+          initialDelaySeconds: 15
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: nodejs-port
+          initialDelaySeconds: 15
+          timeoutSeconds: 30
+```
+
+### Pod State & Condition
+
+#### Pod State
++ running : Pod가 정상적으로 실행 중
++ pending : Pod가 컨테이너를 정상적으로 받았으나 아직 실행 중이지 않은 상태
++ succeeded : Pod 내 컨테이너들이 정상적으로 종료된 상태(재시작 하지 않음)
++ Failed : Pod 내 모든 컨테이너가 종료되었고, 컨테이너 중 적어도 1대가 에러를 응답함
++ Unknown : Pod 상태가 결정될 수 없음
+
+#### Pod Condition
++ PodScheduled : pod가 node에 배포되도록 schedule 됨
++ Ready : pod가 request/response할 준비가 완료됨
++ Unscheduled : 리소스 부족 등의 이유로 인한 pod schedule 실패
++ ContainersReady : Pod 내 모든 컨테이너가 Ready 상태
+
+### Pod LifeCycle
+Pod는 아래의 LifeCycle을 갖음.
+
+```[init container] -> [post start] -> [liveness & readiness probe] -> [pre stop]```
+
+컨테이너 시작 직후, 또는 종료 직전에 hook을 통해 특정 프로세스를 실행할 수 있음.
+
+예시는 아래와 같음.
+
+```yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: lifecycle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lifecycle
+  template:
+    metadata:
+      labels:
+        app: lifecycle
+    spec:
+      initContainers:
+      - name:           init
+        image:          busybox
+        command:       ['sh', '-c', 'sleep 10']
+      containers:
+      - name: lifecycle-container
+        image: busybox
+        command: ['sh', '-c', 'echo $(date +%s): Running >> /timing && echo "The app is running!" && /bin/sleep 120']
+        readinessProbe:
+          exec:
+            command: ['sh', '-c', 'echo $(date +%s): readinessProbe >> /timing']
+          initialDelaySeconds: 35
+        livenessProbe:
+          exec:
+            command: ['sh', '-c', 'echo $(date +%s): livenessProbe >> /timing']
+          initialDelaySeconds: 35
+          timeoutSeconds: 30
+        lifecycle:
+          postStart:
+            exec:
+              command: ['sh', '-c', 'echo $(date +%s): postStart >> /timing && sleep 10 && echo $(date +%s): end postStart >> /timing']
+          preStop:
+            exec:
+              command: ['sh', '-c', 'echo $(date +%s): preStop >> /timing && sleep 10']
+
+```
+
+### Secrets
+Credentials, Keys, Passwords, Secret 등의 목적으로 이용하기 위해 Kubernetes에서 제공하는 객체임
+
+Secret 객체를 환경변수 또는 파일로 활용할 수 있음
+
+kubectl을 이용하여 secret을 생성하는 방법은 아래와 같음
+```
+echo -n "root" > ./username.txt
+echo -n "password" > ./password.txt
+kubectl create secret generic <secret-name> --from-file=./username.txt --from-file=./password.txt 
+```
+
+SSH key 또는 SSL 인증서용 secret도 생성할 수 있음
+
+```
+kubectl create secret generic ssl-certificate --from-file=ssh-privatekey=~/.ssh/id_rsa --ssl-cert=ssl-cert=mysslcert.crt
+```
+
+Secret을 환경변수로 사용하는 예시는 아래와 같음
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: wordpress:6-php8.0
+        ports:
+        - name: http-port
+          containerPort: 80
+        env:
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wordpress-secrets
+                key: db-password
+          - name: WORDPRESS_DB_HOST
+            value: 127.0.0.1
+          - name: WORDPRESS_DB_USER
+            value: root
+          - name: WORDPRESS_DB_NAME
+            value: wordpress
+      - name: mysql
+        image: mysql:8
+        ports:
+        - name: mysql-port
+          containerPort: 3306
+        env:
+          - name: MYSQL_DATABASE
+            value: wordpress
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wordpress-secrets
+                key: db-password
+```
+
+secret을 파일 형태로 제공하는 예시는 아래와 같음
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+        volumeMounts:
+        - name: cred-volume
+          mountPath: /etc/creds // /etc/creds/db-secrets/username, /etc/creds/db-secrets/password
+          readOnly: true
+      volumes:
+      - name: cred-volume
+        secret:
+          secretName: db-secrets
+```
 
 
 
