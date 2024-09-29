@@ -1169,8 +1169,71 @@ spec:
 
 ### StatefulSets
 
+상태를 가진 App을 배포하고 관리하기 위해 사용하는 객체임. 주로 DB, 분산 스토리지, 캐시 서버 등에 사용됨.
 
-  
+특징은 아래와 같음.
+
++ 1. Pod의 고유성: Pod는 고유 이름과 고정 ID를 갖음
++ 2. 순차적 생성 및 종료: 순차적인 시작과 종료를 보장함
++ 3. 고정된 네트워크 ID: Pod는 고유한 DNS 이름을 갖음
++ 4. Persistent Volume: Pod는 고유한 스토리지를 갖음
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-app
+spec:
+  serviceName: "my-app"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app-container
+        image: my-app-image
+        volumeMounts:
+        - name: my-storage
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: my-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+### Daemon Sets
+
+특정 클러스터 내 모든 노드당 1개의 Pod를 실행하기 위해 사용됨. 로깅, 모니터링, 네트워크 플러그인에 사용되며 예시는 아래와 같음.
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+spec:
+  selector:
+    matchLabels:
+      name: node-exporter
+  template:
+    metadata:
+      labels:
+        name: node-exporter
+    spec:
+      containers:
+      - name: node-exporter
+        image: prom/node-exporter
+        ports:
+        - containerPort: 9100
+```
 
 
 
