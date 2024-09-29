@@ -871,6 +871,310 @@ spec:
 ```
 
 
+## Kubernetes Advanced Topics
+
+Kubernetes 관련 심화 개념에 대해서 정리함
+
+### Service Discovery
+
+동일한 Node 내의 Pod들은 localhost 내에 존재하므로 port 번호를 통해 서로 통신할 수 있음.
+
+하지만, 동일한 Cluster 및 Namespace에 소속되나 서로 다른 Node 내에 있는 Pod 끼리는 Master Node의 kube-dns를 통해 서로 서비스를 찾을 수 있음.
+
+Pod는 통신하고자 하는 Service의 metadata.name(Service 이름)을 이용하여 통신할 수 있음. 예시는 아래와 같음
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld-db
+  template:
+    metadata:
+      labels:
+        app: helloworld-db
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        command: ["node", "index-db.js"]
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+        env:
+          - name: MYSQL_HOST
+            value: database-service // database 관련 service 이름(metadata.name)
+          - name: MYSQL_USER
+            value: root
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: helloworld-secrets
+                key: rootPassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: helloworld-secrets
+                key: database
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-service
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    app: database
+  type: NodePort
+```
+
+### ConfigMap
+
+Key-Value를 저장하여 클러스터 내 다른 객체에서 참조하기 위해 사용함.
+
+ConfigMap은 Secrets 객체와 동일하게 환경변수, 파일 등으로 관리되고 마운트될 수 있음. 그러나, 암호화되지 않음.
+
+추가로 key-value가 아닌 파일 전체를 저장할 수도 있음. Nginx 설정 파일을 ConfigMap으로 관리하는 예시는 아래와 같음.
+
+```yaml
+# reverseproxy.conf
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        proxy_bind 127.0.0.1;
+        proxy_pass http://127.0.0.1:3000;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+```
+
+```kubectl create configmap nginx-config --from-file=reverseproxy.conf``` 커맨드로 ConfigMap을 생성한 후, 아래와 같이 Pod 객체에 적용
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: helloworld-nginx
+  labels:
+    app: helloworld-nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.11
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/nginx/conf.d
+  - name: k8s-demo
+    image: wardviaene/k8s-demo
+    ports:
+    - containerPort: 3000
+  volumes:
+    - name: config-volume
+      configMap:
+        name: nginx-config
+        items:
+        - key: reverseproxy.conf
+          path: reverseproxy.conf
+```
+
+### Ingresss
+
+외부의 Connection을 Cluster 내부로 허용하는 객체.
+
+LoadBalancer, NodePort의 대안으로 사용하며 예시는 아래와 같음.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: helloworld-rules
+spec:
+  rules:
+  - host: helloworld-v1.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: helloworld-v1
+            port:
+              number: 80
+  - host: helloworld-v2.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: helloworld-v2
+            port:
+              number: 80
+```
+
+### External DNS
+
+External DNS는 인터넷망에 도메인-IP를 추가하여 외부에서 클러스터로 접속할 수 있도록 함.
+
+External DNS와 Ingress를 활용하여 LoadBalancer 비용을 줄일 수 있으며 방법은 아래와 같음.
+
++ 1. IAM 정책 생성 : AWS Route53에서 External-DNS를 추가할 수 있도록 권한 변경
++ 2. Ingress Service 생성
++ 3. LoadBalancer Service 생성(L4 역할)
++ 4. kOps 설정
++ 5. External DNS 및 ingress rule 적용
+
+### Volumes
+
+Pod 외부에 데이터를 저장하기 위해 사용함.
+
+데이터베이스, 파일 등을 외부(Local Volume, EBS Storage, NFS 등)에 저장하기 위해 사용됨.
+
+AWS EBS를 생성하여 이를 Volume으로 마운트하는 예시는 아래와 같음.
+
+```
+# Volume 생성
+aws ec2 create-volume --size 10 --region <your-region> --availability-zone <your-zone> --volume-type gp2 --tag-specifications 'ResourceType=volume, Tags=[{Key= KubernetesCluster, Value=kubernetes.domain.tld}]'
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: wardviaene/k8s-demo
+        ports:
+        - name: nodejs-port
+          containerPort: 3000
+        volumeMounts:
+        - mountPath: /myvol
+          name: myvolume
+      volumes:
+      - name: myvolume
+        awsElasticBlockStore:
+          volumeID: # insert AWS EBS volumeID here
+```
+
+### Volume Provision
+
+yaml 파일을 통해서 Volume을 자동으로 생성할 수 있음. 방법은 아래와 같음
+
++ 1. Volume Claim 생성
+```yaml
+# storage.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: standard
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zone: eu-west-1a
+```
++ 2. 용량 및 이름 설정
+```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: db-storage
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "standard"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+```
++ 3. 자동 생성된 Volume Mount
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: wordpress-db
+spec:
+  replicas: 1
+  selector:
+    app: wordpress-db
+  template:
+    metadata:
+      name: wordpress-db
+      labels:
+        app: wordpress-db
+    spec:
+      containers:
+        # ... 생략
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: mysql-storage
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: db-storage # Volume Claims에서 지정한 이름(metadata.name) 사용
+```
+
+### Pod Presets
+
+런타임에 Pod로 정보를 주입하기 위해 사용되는 객체
+
+예를 들어, 다수의 Pod를 운영 중인 상황에서 특정 Label을 가진 Pod에만 환경변수 등을 추가하기 위해서 사용됨. 예시는 아래와 같음
+
+```yaml
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: share-credential
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  env:
+    - name: MY_SECRET
+      value: "123456"
+  volumeMounts:
+    - mountPath: /share
+      name: share-volume
+  volumes:
+    - name: share-volume
+      emptyDir: {}
+```
+
+### StatefulSets
+
+
+  
+
+
+
+
 
 
 
