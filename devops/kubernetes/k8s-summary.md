@@ -881,7 +881,11 @@ Kubernetes 관련 심화 개념에 대해서 정리함
 
 하지만, 동일한 Cluster 및 Namespace에 소속되나 서로 다른 Node 내에 있는 Pod 끼리는 Master Node의 kube-dns를 통해 서로 서비스를 찾을 수 있음.
 
-Pod는 통신하고자 하는 Service의 metadata.name(Service 이름)을 이용하여 통신할 수 있음. 예시는 아래와 같음
+Pod는 통신하고자 하는 Service의 metadata.name(Service 이름)을 이용하여 통신할 수 있음. 
+
+모든 Pod의 /etc/resolv.conf 내에 DNS 관련 내용이 저장되어 있음
+
+예시는 아래와 같음
 
 ```yaml
 apiVersion: apps/v1
@@ -938,7 +942,7 @@ spec:
 
 ### ConfigMap
 
-Key-Value를 저장하여 클러스터 내 다른 객체에서 참조하기 위해 사용함.
+Key-Value를 저장하여 클러스터 내 다른 객체에서 참조하기 위해 사용함. 그러므로, App을 다시 빌드하지 않고 Config만 변경할 수 있음.
 
 ConfigMap은 Secrets 객체와 동일하게 환경변수, 파일 등으로 관리되고 마운트될 수 있음. 그러나, 암호화되지 않음.
 
@@ -1234,6 +1238,79 @@ spec:
         ports:
         - containerPort: 9100
 ```
+
+### Resource Usage Monitoring
+
+클러스터 모니터링 및 성능 분석을 위해 사용됨. Pod Auto-scaling을 위한 필수 조건임.
+
+Heapster을 통해 REST Endpoint를 제공하고, Heapster는 다양한 Backend와 결합될 수 있음.
+
+모니터링을 위해 ```kubectl top pods```, Metric Server, Grafana 등 다양한 tool과 연동할 수 있음
+
+### Autoscaling
+
+Heapster를 통해 자동으로 Pod를 Scale할 수 있는 객체임.
+
+CPU 사용률을 기반으로 자동으로 Scale하고, 주기적으로 Pod에 Query하여 리소스 사용률을 파악하고 조건에 맞는 경우에 Scale함.
+
+0.2초에 한번씩 쿼리하여 CPU 사용률이 50%를 넘었는지 확인하는 예시는 아래와 같음.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hpa-example
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hpa-example
+  template:
+    metadata:
+      labels:
+        app: hpa-example
+    spec:
+      containers:
+      - name: hpa-example
+        image: gcr.io/google_containers/hpa-example
+        ports:
+        - name: http-port
+          containerPort: 80
+        resources:
+          requests:
+            cpu: 200m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpa-example
+spec:
+  ports:
+  - port: 31001
+    nodePort: 31001
+    targetPort: http-port
+    protocol: TCP
+  selector:
+    app: hpa-example
+  type: NodePort
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-example-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hpa-example
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+```
+
+### Node Affinity & anti-Affinity
+
+Node에 특정 Pod를 배치할 것인지 아닌지를 결정함. NodeSelector보다 더욱 복잡한 방법으로 가능함.
 
 
 
