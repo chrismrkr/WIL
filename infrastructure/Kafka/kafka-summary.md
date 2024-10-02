@@ -332,21 +332,23 @@ Kafka Broker를 관리하는 역할을 수행함.
   + 그리고, Controller는 Partition Leader를 ISR 내에서 선출함
 
 **ISR 이란?**
-+ In-Sync Replicas
++ In-Sync Replicas : Leader Parition과 동기화된 복제본
 + Follower Partition에서 Leader Partition 데이터를 ```replica.lag.time.max.ms``` 이내에 가져와야 ISR 내에서 관리됨
 + Broker Rebalance 대상은 ISR 내에서 결정됨
 
 ### 5.4 Preferred Leader Election vs Unclean Leader Election
 #### Prefered Leader Election
-+ 파티션 별로 최초 할당된 Leader/Follower 설정을 그대로 유지함
-+ Broker가 재기동되어도 Preferred Leader는 변경되지 않음
-+ ```auto.leader.rebalance.enable=true```로 설정
++ 파티션 별로 최초 할당된 Leader 설정을 그대로 유지하는 과정
++ auto.leader.rebalance.enable : 파티션에 대한 Leader 불균형이 발생했을 때, 자동으로 해소할지를 결정하는 환경변수
++ leader.imbalance.check.interval.seconds : Leader 불균형을 점검하는 주기
+
 #### Unclean Leader Election
-+ 기존 Leader Broker가 오랜 기간 살아나지 않은 경우, 완벽하게 복제되지 않은 Follower Broker가 Leader가 될 수 있음
++ 기존 Leader Broker가 오랜 기간 살아나지 않은 경우, ISR 이외에 완벽하게 복제되지 않은 Follower를 Leader로 승격하는 과정
 + ```unclean.leader.election.enable=true```
+
+### 5.5 
 
 ### 5.5 기타 주요 설정
 + controlled.shutdown.enable=true: log recovery를 위해 모든 로그를 동기화한 후 종료하는 옵션(graceful shutdown)
-+ 
 
 
