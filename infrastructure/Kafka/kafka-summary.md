@@ -348,7 +348,20 @@ Kafka Broker를 관리하는 역할을 수행함.
 
 ### 5.5 
 
-### 5.5 기타 주요 설정
-+ controlled.shutdown.enable=true: log recovery를 위해 모든 로그를 동기화한 후 종료하는 옵션(graceful shutdown)
+### 5.5 기타 kafka 설정
+- broker.id : Broker 고유 ID로 브로커를 구분하기 위해 사용함
+- listeners : Broker가 외부에서의 연결을 수신하기 위한 네트워크 프로토콜, IP, Port 사용함
+- advertised.listeners : 클러스터 외부 클라이언트들이 Broker에 연결하기 위해 사용할 수 있는 외부 IP 주소 및 포트를 지정함
+  - IP 대신 호스트명, 도메인 등을 입력할 수 있음(/etc/hosts, resolv.conf)
+- num.network.threads : 클라이언트 요청을 이벤트 루프 기반으로 처리하기 위한 네트워크 I/O 스레드 수
+- num.io.threads : 파일 입출력 작업을 처리할 때 사용하는 I/O 스레드 수
+- socket.send.buffer.bytes : Broker가 클라이언트에 메세지를 송신할 때 사용하는 버퍼의 크기
+- socket.receive.buffer.bytes : Broker가 클라이언트로부터 메세지를 수신할 때 사용하는 버퍼의 크기
+- socket.request.max.bytes : Broker가 클라이언트로부터 받을 수 있는 전체 최대 요청 크기. 이 값을 넘으면 에러를 반환함
+- message.max.bytes : Broker가 클라이언트로부터 받을 수 있는 단일 메세지 최대 크기
+- auto.create.topics.enable : 클라이언트가 존재하지 않는 토픽에 접근할 때, Kafka가 자동으로 Topic을 생성할지를 결정함
+- logs.dir : 메세지 로그 파일을 저장할 경로
+- num.partitions : 토픽 생성 시 기본 파티션 개수
+- controlled.shutdown.enable=true : log recovery를 위해 모든 로그를 동기화한 후 종료하는 옵션(graceful shutdown)
 
 
