@@ -346,8 +346,6 @@ Kafka Broker를 관리하는 역할을 수행함.
 + 기존 Leader Broker가 오랜 기간 살아나지 않은 경우, ISR 이외에 완벽하게 복제되지 않은 Follower를 Leader로 승격하는 과정
 + ```unclean.leader.election.enable=true```
 
-### 5.5 
-
 ### 5.5 기타 kafka 설정
 - broker.id : Broker 고유 ID로 브로커를 구분하기 위해 사용함
 - listeners : Broker가 외부에서의 연결을 수신하기 위한 네트워크 프로토콜, IP, Port 사용함
@@ -363,5 +361,11 @@ Kafka Broker를 관리하는 역할을 수행함.
 - logs.dir : 메세지 로그 파일을 저장할 경로
 - num.partitions : 토픽 생성 시 기본 파티션 개수
 - controlled.shutdown.enable=true : log recovery를 위해 모든 로그를 동기화한 후 종료하는 옵션(graceful shutdown)
+
+## 6. Kafka 로그 파티션 및 세그먼트
+
+Kafka 로그 메세지는 세그먼트에 저장되며 일정 시간이 지나거나 용량이 차면 close되고 read-only 상태가 됨.
+
+그리고, 새로운 세그먼트를 생성하여 이 곳에 로그 메세지를 저장함. 이러한 세그먼트를 active 세그먼트라하며 read-write 모두 가능함.
 
 
