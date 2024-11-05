@@ -518,6 +518,33 @@ kubectl apply -f=services.yaml
 + spec.template.metadata.labels.app : Deployment 및 ReplicaSet 객체 내에서 생성되는 Pod에 대한 Label을 설정
 + spec.selector.matchLabels : Deployment 내의 어떤 Label을 가진 Pod를 관리할지 선택하기 위한 값임
 
+## kOps를 활용한 AWS에 K8s 클러스터 배포 방법
+### 1. 환경 설정
+- 클러스터 관리용 호스트에 kOps를 설치함
+- AWS cli 설치 및 /usr/local/bin 디렉토리로 이동
+- AWS 콘솔에서 IAM 계정 생성 및 Access Key 생성 : access Key 및 private access key 저장 필요
+- 클러스터 관리용 호스트에 AWS IAM 계정 설정
+  - ```aws configure``` 입력 후 access key 및 private access key 등록
+- kOps 상태 저장을 위한 S3 Bucket 생성
+- 도메인 생성
+  - namecheap과 같은 사이트를 통해 도메인을 발급함
+- AWS Route53을 활용한 DNS 호스트 Zone 생성
+- kubectl 설치 및 /usr/local/bin 이동
+- ssh key 생성
+  - ```ssh-keygen -f .ssh/id_rsa```
+    - Private Key : kOps에서 클러스터에 접속하기 위해 사용함
+    - Public Key : 클러스터에서 kOps 접속을 받기 위해 사용함 
+### 2. 클러스터 생성
+- 아래 커맨드를 입력하여 kOps를 통해 클러스터 설정을 생성함(worker node 2, master node 1)
+- Route 53에서 생성한 DNS가 적용되고, S3에 설정을 생성하는 명령어임
+- ```kops create cluster --name=[Route 53 DNS] --state=s3://[S3 Bucket name] --zones=ap-northeast-2a --node-count=2 --node-size=t3.micro --master-size=t3.micro --dns-zone=[Route 53 DNS] --ssh-public-key ~/.ssh/id_rsa.pub```
+
+
+### 3. 컨테이너 배포 및 서비스 실행
+
+
+
+
 ## Kubernetes Basics
 
 Kubernetes 기초 개념에 대해서 소개함
