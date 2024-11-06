@@ -37,7 +37,16 @@
   - <Directory [디렉토리경로]> ... : 지정한 디렉토리에 대한 권한, 제어, 옵션 등을 설정함
     - Options : 해당 디렉토리 및 하위 디렉토리 제어
     - AllowOverride
-    - Allow from, Deny forom
+    - Allow from, Deny from
+    - ex.
+      - AllowOverride AuthConfig : 디렉토리에 대해 인증을 적용함
+      - [디렉토리경로]/.htaccess 파일에 인증 설정 추가할 수 있음
+      - AuthType : 인증 방식을 설정함(ex. Basic: 이름/비밀번호)
+      - AuthName : 인증 대화 상자에 나타낼 메세지(ex: "INSERT ID AND PW")
+      - AuthUserFile : 인증에 사용할 사용자 자격 증명(ID, PW)를 저장한 파일 경로 지정
+      - Require : 접속 허가할 사용자 지정
+
+
   - <FileMatch [파일명]> : 지정된 패턴에 맞는 파일에 대한 권한, 제어, 옵션 등을 설정함
   - LogLevel
     - /etc/rsyslog.conf 내 우선순위와 동일함
