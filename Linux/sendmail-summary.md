@@ -21,18 +21,18 @@
   - To:gildong-mail.com RELAY
   - ```makemap hash /etc/mail/access < /etc/mail/access``` 명령어로 /etc/mail/access.db에 적용
 
-- /etc/aliases : 메일 별칭으로 수신한 이메일을 다른 계정(이메일)로 전달하는 것을 설정
+- /etc/aliases : 로컬 시스템 사용자에게 수신된 이메일을 다른 사용자로 전달하거나 별칭을 설정하는 데 사용
   - /etc/aliases 수정 후, ```newaliases``` 또는 ```sendmail bi``` 명령어로 변경
   - /etc/aliases.db를 참조함
 
-- /etc/mail/virtusertable : 가상의 메일 계정으로 수신한 메일을 특정 호스트 계정으로 전달
+- /etc/mail/virtusertable : 가상 도메인의 이메일을 특정 사용자나 다른 이메일 주소로 전달하기 위해 사용
   - [가상 이메일 계정] [호스트 계정]
   - ex. virtmailaddress@email.com host1
   - ```makemap hash /etc/mail/virtusertable < /etc/mail/virtusertable``` 명령어로 /etc/mail/virtusertable.db에 적용
 
 - /etc/mail/local-host-names : 메일 수신지(도메인 및 호스트)를 설정함
   - 예를 들어, 위 파일에 tmp.or.kr을 입력하면, 그것이 메일 수신 도메인이 됨
-- ~/*.forward : 개인이 수신한 메일을 다른 메일로 포워딜할 때 설정하는 파일
+- ~/forward :  특정 사용자(개인)가 자신의 메일을 다른 이메일 주소로 자동 전달하기 위해 사용
 
 
 
