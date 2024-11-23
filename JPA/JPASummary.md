@@ -1193,13 +1193,33 @@ JPA에서의 Isolation level은 영속성 컨텍스트의 특성 때문에 repea
 
 ### 7.1 @Transactional
 
-해당 Annotation이 있는 클래스 내의 메소드, 또는 메소드는 하나의 Transaction으로 처리됨을 의미한다.(ACID)
+Spring 기반의 @Transactional은 AOP로 구현되어 있고, 해당 어노테이션이 추가된 메소드는 하나의 트랜잭션으로 처리됨을 의미한다.
+
+@Transaction은 PlatformTransactionManager 인터페이스에 의해 동작하고, 해당 인터페이스는 트랜잭션을 위해 DB Connection을 얻고 트랜잭션 완료 시, 커밋 또는 롤백을 수행한다.
+
+트랜잭션에 대한 격리성을 @Transactional의 isolation 속성을 통해 제어할 수 있다.
+
+또한, @Transactional 메소드에서 내부적으로 새로운 @Transactional 메소드를 실행할 수도 있다. 이때, PlatformTransactionManager에 의해 획득된 DB Connection을 그대로 이어갈지, 아니면 일시적으로 보류하고 내부 트랜잭션을 완료하고 커밋 및 롤백할지를 propagation 속성을 통해 제어할 수 있다.
+
+즉, PlatformTransactionalManager를 통해서 DB Connection을 획득하여 물리적인 트랜잭션을 실행하고, @Transactional 어노테이션을 통해 논리적으로 트랜잭션을 어떻게 실행할지를 결정함
+
+#### 동작 방식
+
+@Transactional은 TransactionManager 인터페이스의 구현체에 의해 
 
 #### Isolation Level
 - READ_UNCOMMITED
 - READ_COMMITED
 - REPEATABLE_READ
 - SERIALIZABLE
+
+#### Propagation Level
+- REQUIRED : 이미 생성된 트랜잭션이 있다면, 그 트랜잭션에 참여하도록 함
+- REQUIRED_NEW : 항상 새로운 트랜잭션을 생성. 기존 트랜잭션은 일시 정지.
+
+#### readOnly = true
+- JPA의 변경감지 모드가 수동으로 동작하도록 하여 데이터 수정이 flush 없이는 DB에 반영되지 않도록 함
+- 이에 따라 성능 이점이 있음
 
 
 ### 7.2 낙관적 락
