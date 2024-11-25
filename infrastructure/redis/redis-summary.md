@@ -43,20 +43,10 @@ LPOP stack
 LPUSH queue job1 job2 job3 (0(-3) # job3, 1(-2): job2, 2(-1): job3)
 LRANGE queue -2 -1 # job1, job2를 반환
 ```
-### 3.3 Sets
-- Unique Value를 저장하는 정렬되지 않은 자료구조
-```
-SADD myset:version:1 val1 val2 val3
+- LPUSH 및 LTRIM 명령어를 활용하여 고정된 크기의 LIST를 유지할 수 있음
+- 인덱스나 중간 데이터를 통해 리스트에 접근하는 것은 O(n)으로 처리되므로 주의 필요
 
-SMEMBER myset:version:1 # value 조회
-SCARD myset:version:1 # 개수 조회
-SISMBMER myset:version:1 val2 # 존재 여부 확인
-
-SINTER myset:version:1 myset:version:2 # 교집합
-SDIFF myset:version:1 myset:version:2 # 차집합
-SUNION myset:version:1 myset:version2 # 합집합
-```
-### 3.4 Hashes
+### 3.3 Hash
 - key-value를 저장하는 자료구조
 ```
 HSET [hash-name] [key1] [value1] [key2] [value2] ...
@@ -66,12 +56,32 @@ HMGET [hash-name] [key1] [key2] [key3] ...
 
 HINCRBY [hash-name] [numeric-key1] [number]
 ```
+
+### 3.4 Sets
+- Unique Value를 저장하는 정렬되지 않은 자료구조
+```
+SADD myset:version:1 val1 val2 val3
+
+SMEMBER myset:version:1 # value 조회
+SCARD myset:version:1 # 개수 조회
+SISMBMER myset:version:1 val2 # 존재 여부 확인
+SREM myseet:version:1 val1 # 원소 삭제
+SPOP myset:version:1 val1 # 원소 획득 후 삭제
+
+SINTER myset:version:1 myset:version:2 # 교집합
+SDIFF myset:version:1 myset:version:2 # 차집합
+SUNION myset:version:1 myset:version2 # 합집합
+```
+
 ### 3.5 Sorted Sets
 - score로 정렬 상태를 유지하는 Set 자료구조
+- 같은 score 끼리는 사전 순서로 정렬됨
+- O(n)으로 인덱스를 통해 원소에 접근할 수 있음
+
 ```
-ZADD [sorted-sets-name] [score1] [val1] [score2] [val2]
-ZRANGE [sorted-sets-name] 0 -1
-ZRANGE [sorted-sets-name] 0 -1 REV WITHSCORES
+ZADD [sorted-sets-key] [score1] [val1] [score2] [val2]
+ZRANGE [sorted-sets-key] 0 -1
+ZRANGE [sorted-sets-key] 0 -1 REV WITHSCORES
 
 ZRANK [sorted-sets-name] [val1] # val1의 순위 출력
 ```
