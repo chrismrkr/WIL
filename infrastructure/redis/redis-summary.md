@@ -237,9 +237,56 @@ EXEC # 트랜잭션 완료
 - 여러 동시 요청이 발생했으나 캐시에 데이터가 없을 때, 데이터베이스 중복 읽기 및 캐시 중복 쓰기가 발생하는 현상
 - 적절한 TTL 선택, 캐시 워밍, 뮤텍스 사용 등의 전략이 필요함
 ### 5.4 세션 스토어로의 Redis
-- Redis 서버 사이 공유 세션처럼 사용할 수 있음
-- 캐시란 모든 사용
+- Redis를 서버 사이 공유 세션처럼 사용할 수 있음
+
 
 ## 6. Redis를 메세지 브로커로 사용하기
+### 6.1 메세지 큐와 이벤트 스트림
+- 메세지 큐 : 생산자는 소비자의 큐로 직접 전달하므로 2개의 서로 다른 서비스로 메세지를 보내기 위해서는 2개의 큐에 메세지를 전달해야함
+  - 소비자가 메세지를 읽으면 큐에서 메세지를 삭제함
+  - List를 메세지 큐로 사용할 수 있고 fire-and-forget으로 동작하므로 신뢰성이 필요한 경우에는 사용되지 않아야함
+- 이벤트 스트림 : 생산자는 특정 저장소에 메세지를 쌓고, 서로 다른 소비자는 이를 Poll할 수 있음
+  - 소비자가 메세지를 읽으면 offset을 통해 현재 어디까지 읽었는지 기록함
+  - Stream 자료구조를 이벤트 스트림으로 사용할 수 있음
+ 
+### 6.2 List를 메세지 큐로 활용하기
+- LPUSH, RPUSH, LPOP, RPOP, RPUSHX 등의 명령어를 통해 큐로 활용할 수 있음
+- 폴링 대신 BRPOP, BLPOP 명령어를 통해 Block 기능을 제공함
+- ex. 소셜미디어 타임라인 기능에 활용될 수 있음
 
-
+### 6.3 Stream을 이벤트 스트림으로 활용하기
+- Stream은 데이터를 계속해서 추가하여 저장되는 append-only 자료구조임
+- 레디스 Stream 자료구조는 하나의 Stream만 갖음(Kafka가 Topic내 여러 Partition을 갖는 것과는 다른 구조)
+- Stream 내 저장된 메세지는 저장된 순서대로 <MilliSec>-<Seq>를 ID로 갖음
+- Stream은 따로 생성하는 과정이 필요하지 않고 XADD 커맨드로 메세지를 Stream에 쌓을 수 있음
+  - ```XADD Email * subject "first" body "hello"```
+  - Email가 Key인 Stream에 *를 ID로 {subject: "first, body: "hello"} 데이터를 쌓음
+  - *는 <MilliSec>-<Seq> 형태로 된 timestamp임
+- 데이터 조회 방식
+  - 실시간 데이터 리스닝
+  - ID를 통해 필요한 데이터 검색
+  - ex1. ```XREAD BLOCK 0 STREAMS EMAIL 0```
+    - BLOCK 0 : 읽을 데이터가 없어도 계속 기다리고
+    - STREAMS EMAIL 0 : Key가 EMAIL인 스트림의 ID가 0 이상인 메세지를 읽는다.(즉, 모두 읽는다)
+  - ex2. ```XREAD BLOCK 0 STREAMS EMAIL $```
+    - 위와 동일하나 커맨드 실행 이후 들어온 데이터만 읽음
+  - ex3. ```XRANGE EMAIL - +```
+    - EMAIL 스트림의 모든 테이터를 읽어옴
+  - ex4. ```XRANGE EMAIL (11231-0 + ```
+    - ID가 11231-0을 초과한 데이터를 읽어옴
+- 소비자와 소비자 그룹
+  - 서로 다른 소비자는 동일 Stream 내 메세지를 동시에 받아갈 수 있음(Fan-out)
+  - 동일 Stream 내 메세지들 소비자 끼리 나눠서 가져가는 것이 필요하다면, 해당 소비자들을 소비자 그룹으로 묶으면 됨
+    - Redis의 소비자 그룹과 Kafka의 소비자 그룹은 서로 다르게 동작함
+    - Redis 소비자 그룹 : 동일한 Stream 내 메세지를 소비자 그룹에서 나눠서 가져감. 읽지 않은 데이터를 나눠서 읽어감
+    - Kafka 소비자 그룹 : 소비자 그룹 내 참여자 끼리는 동일한 파티션을 구독할 수 없음
+  - ```XGROUP CREATE [Stream-key] [Group-Name] $``` : [Stream-key] Stream을 읽는 [Group-Name] 소비자 그룹을 생성하고 현재($) 연결된 시점 이후 부터만 읽어감
+  - ```XREADGROUP GROUP [Group-Name] [Consumer-Name] COUNT [N] Streams [Stream-key] >```
+- Ack와 보류 리스트
+  - 소비자에게 메세지를 전달한 후, Stream에서 소비자가 전달한 Ack를 받을 때 까지 해당 메세지를 보류 리스트에 저장함
+  - Stream이 Ack를 받으면 보류 리스트에서 삭제함
+  - Stream은 메세지를 전달하고 last_delivered_id를 통해 Stream의 어느 메세지까지 전송했는지 저장함
+  - 장애로 인해 시스템이 종료되었을 때, Ack, 보류 리스트, last_delivered_id를 통해 어느 시점부터 다시 전송할지를 알 수 있음
+  - ```XACK [Stream-Key] [Group-Name] [Message-ID]``` : 소비자 그룹 중 한명이 해당 메세지를 받았다고 Ack를 보냄
+  - ```XPENDIG [Stream-key] [Group-Name]``` : 보류 리스트를 확인함
+  - 특정 소비자가 장애가 발생한다면, 그룹 내 다른 소비자가 처리할 수 있도록 
