@@ -248,12 +248,10 @@ EXEC # 트랜잭션 완료
 - 이벤트 스트림 : 생산자는 특정 저장소에 메세지를 쌓고, 서로 다른 소비자는 이를 Poll할 수 있음
   - 소비자가 메세지를 읽으면 offset을 통해 현재 어디까지 읽었는지 기록함
   - Stream 자료구조를 이벤트 스트림으로 사용할 수 있음
- 
 ### 6.2 List를 메세지 큐로 활용하기
 - LPUSH, RPUSH, LPOP, RPOP, RPUSHX 등의 명령어를 통해 큐로 활용할 수 있음
 - 폴링 대신 BRPOP, BLPOP 명령어를 통해 Block 기능을 제공함
 - ex. 소셜미디어 타임라인 기능에 활용될 수 있음
-
 ### 6.3 Stream을 이벤트 스트림으로 활용하기
 - Stream은 데이터를 계속해서 추가하여 저장되는 append-only 자료구조임
 - 레디스 Stream 자료구조는 하나의 Stream만 갖음(Kafka가 Topic내 여러 Partition을 갖는 것과는 다른 구조)
@@ -318,8 +316,25 @@ EXEC # 트랜잭션 완료
   - AOF 재구성 실행 시, 백그라운드 프로세스에서 새로운 rdb 파일을 생성함
   - 백그라운드 실행 중 입력되는 커맨드는 aof 파일에 저장함
   - 백그라운드 프로세스가 완료되면, 새로 생성된 rdb를 기존 것과 대체함
- 
-  - 
+### 7.5 자동 AOF 재구성
+- aof_base_size : AOF 파일 재구성 기준
+- auto_aof_rewrite_percentage : aof_base_size에 비해 aof_current_size가 (100+auto_aof_rewrite_percentage)%이 되는 시점에 자동으로 재구성함
+### 7.6 수동 AOF 재구성
+- BGREWRTIEAOF 커맨드를 통해 직접 수동으로 AOF 파일 재구성이 가능함
+### 7.7 AOF 파일 안정성
+- 일반적으로 어플리케이션에서 디스크에 Write 작업을 할 때, OS Buffer에 저장하고 여유가 되는 시점에 디스크에 이를 반영함
+- FSYNC란 OS 버퍼에 저장된 내용을 디스크에 쓰도록 강제하는 명령어임
+- AOF 파일도 FSYNC와 관련한 옵션이 있음
+- APPENDFSYNC
+  - no : OS Buffer에만 Write하고 FSYNC를 강제하지 않음
+  - always : 항상 Write와 FSYNC를 실행함
+  - everysec : 1초에 1번 FSYNC를 호출함
+ ### 7.8 백업 시 주의사항
+ - 백업은 백그라운드 프로세스를 통해 레디스 메모리 스냅샷을 임시 파일로 저장하고, 완료된 이후에 덮어쓰는 방식이였음
+ - 그러므로, 기존 메모리 용량의 최대 2배까지 차지할 수 있음
+
+## 8. 복제
+
 
 
 
