@@ -60,12 +60,16 @@
 ### 2. Publisher Confirms
 - publisher가 전달한 메세지가 broker에 정상적으로 전달되었는지 Ack를 통해 확인하는 메커니즘을 publisher confirms라 함
 - confirm mode: publisher confirms을 사용하는 기능
-  - channel을 통해 confirm.select, confirm.select-ok를 통해 confirm mode가 활성화됨
+  - channel을 통해 Publiser의 confirm.select, 그리고 Broker의 confirm.select-ok를 통해 confirm mode가 활성화됨
 - 동작 방식
-  - ack: broker가 메세지를 수신하여 Queue와 Disk에 저장하면, publisher에게 Ack를 전송함
+  - basic.ack: broker가 메세지를 수신하여 Queue와 Disk에 저장하면, publisher에게 Ack를 전송함
+    - basic.ack.delivery-tag 필드에 현재 Ack된 메세지의 Seq가 기록됨
+    - basic.ack.multiple 필드를 true로 활성화하면 특정 시퀀스까지의 메세지가 모두 Ack되었음을 나타냄
     - durable mode가 동작하지 않으면 Queue에 저장되었을 때만 Ack를 전송함
     - 수신 받은 메세지에 대한 Ack를 여러개 묶어서 한번에 보내는 옵션도 존재함
-  - nack: broker가 메세지를 정상적으로 처리할 수 없는 상황임을 알림
+  - nack: broker가 메세지를 정상적으로 처리하지 못함을 알림
+    - 모든 큐로 전달하지 못하면 nack르 반환함. 즉, 하나라도 실패하면 nack를 반환함
+    - 이에 대한 재전송 정책이 필요함
 - 디스크 저장 방식
   - broker는 메세지를 일정 주기로 디스크에 저장함
   - 그러므로, 성능을 높이기 위해 배치 단위로 메세지를 주고 받거나 publisher는 Ack를 비동기적으로 처리해야함
