@@ -82,22 +82,21 @@
   - 이에 따라, consumer는 메세지를 받을 수 없음
 
 ## Clustering
-### 1. 주요 개념
-- Identifier : RabbitMQ 노드마다 하나씩 부여되고, Identifier를 통해 식별하여 클러스터링할 수 있음
-  - 환경변수 ```RABBITMQ_NODENAME```를 통해서 Identifier를 설정할 수 있음
-  - [prefix]@[hostname] 형태로 되어있고, hostname을 찾기 위한 DNS 또는 host 파일 설정이 필요함
-- Port Access : 아래 포트가 허용되어 있어야함
-  - 4369, 6000-6500, 25672, 35672-35682
-### 2. 클러스터 내 노드 특징
-- 복제 대상
-  - RabbitMQ를 실행하는데 필요한 모든 데이터/상태는 노드들끼리 복제하여 사용함
-  - 메세지 큐는 특정 노드에만 존재함
-  - 단, Queue Mirroring 기법 등을 통해서 노드마다 개별적으로 메세지 큐를 갖도록 할 수 있음
-- Equal Peers
-  - 노드들은 Leader, Follower가 존재하지 않고 모두 동일하므로 어느 노드에서 조회하더라도 클러스터 정보를 조회할 수 있음
-  - 클러스터 내 노드끼리는 동일한 Erlang Cookie를 공유하여 통신할 수 있음
-    - cookie는 로컬에 파일로 존재하며 600 이상의 권한 필요
-    - /var/lib/rabbitmq/.erlang.cookie(서버), $HOME/.erlang.cookie(CLI tool)
-- 클러스터 노드 개수는 홀수를 권장함. 왜냐하면, 장애상황으로 노드가 정상적으로 클러스터링되지 않을 때도 quorum을 형성하기 위함임
-### 3. 클러스터링 방법
-- 
+### 1. Preview
+![rabbitmq-cluster drawio](https://github.com/user-attachments/assets/c52f08bb-ad5a-4757-b407-becf8c8b48d1)
+
+- RabbitMQ Cluster는 위와 같은 형태로 클러스터링됨
+- 설명
+  - RabbitMQ 노드에 Exchange와 Queue를 등록함
+    - 해당 정보들을 메타데이터라고 하며, 메타데이터는 노드 내 MnesiaDB(Khepri)에 저장됨
+    - 메타 데이터의 변동사항은 25672 포트를 통해 클러스터 내 다른 노드들로 전달되어 MnesiaDB를 통기화함
+    - 메타 데이터는 아래와 같이 트리 구조로 저장하고 있음
+
+
+
+  - Producer가 RabbitMQ Cluster 중 하나의 Node로 메세지를 PUB함(ex. /message.1)
+  - Node는 메세지를 받아 25672 포트를 통해 다른 노드로 전달함
+  - Exchange에 등록된 바인딩 키를 통해 메세지의 라우팅 키와 매치되는 Queue에 메세지를 전달함
+ 
+
+
