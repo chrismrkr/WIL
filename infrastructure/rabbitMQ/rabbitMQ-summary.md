@@ -81,22 +81,76 @@
   - 만약 Disk Write에 실패했다면, broker는 재시작됨
   - 이에 따라, consumer는 메세지를 받을 수 없음
 
-## Clustering
+## RabbitMQ Cluster
 ### 1. Preview
-![rabbitmq-cluster drawio](https://github.com/user-attachments/assets/c52f08bb-ad5a-4757-b407-becf8c8b48d1)
-
+![rabbitmq-cluster drawio](https://github.com/user-attachments/assets/7c7880e7-e4fd-4cfb-b8d5-44dc14d6e3ed)
 - RabbitMQ Cluster는 위와 같은 형태로 클러스터링됨
 - 설명
   - RabbitMQ 노드에 Exchange와 Queue를 등록함
-    - 해당 정보들을 메타데이터라고 하며, 메타데이터는 노드 내 MnesiaDB(Khepri)에 저장됨
-    - 메타 데이터의 변동사항은 25672 포트를 통해 클러스터 내 다른 노드들로 전달되어 MnesiaDB를 통기화함
-    - 메타 데이터는 아래와 같이 트리 구조로 저장하고 있음
-
-
-
+  - 해당 정보들을 메타데이터라고 하며, 메타데이터는 노드 내 MnesiaDB(Khepri)에 저장됨
+  - 메타 데이터의 변동사항은 25672 포트를 통해 클러스터 내 다른 노드들로 전달되어 MnesiaDB를 통기화함
   - Producer가 RabbitMQ Cluster 중 하나의 Node로 메세지를 PUB함(ex. /message.1)
   - Node는 메세지를 받아 25672 포트를 통해 다른 노드로 전달함
   - Exchange에 등록된 바인딩 키를 통해 메세지의 라우팅 키와 매치되는 Queue에 메세지를 전달함
  
+### 2. Metadata 저장소
+- 사용자, 권한, virtual hosts, topology, exchange, queue, binding 등을 메타데이터라고 함
+- Metadata는 MnesiaDB 또는 Khepri에 저장됨
+- MnesiaDB
+  - RabbitMQ 3.13.x 이하 버전에서 사용됨
+  - 트랜잭션을 통해 메타데이터를 수정함
+  - 단점 : 네트워크 파티션 등의 장애 상황에서 MnesiaDB는 단절된 노드들에 대한 메타데이터를 모두 삭제함
+- Khepri
+  - RabbitMQ 4.0.x 이상 버전에서 사용됨
+
+- 참고사항: Metadatadml Exchange는 아래와 같이 트리 구조로 저장됨
+
+
+![rabbitmq-metadata drawio](https://github.com/user-attachments/assets/4469bcdc-0b3a-4a90-a58d-667b460a7221)
+
+
+### 3. 클러스터링 가이드
+#### 3.1 클러스터 생성
+- 1. 클러스터 생성 방법
+  - Config 파일을 통해 노드 간 연결 가능
+  - DNS-based Discovery 가능
+- 2. Node Names
+  - Node Name을 클러스터 내 노드 사이 Identifier로 사용되고, RABBITMQ_NODENAME 환경변수에 저장됨
+#### 3.2 클러스터 형성 필요 조건
+- 1. Host Resolution
+  - /etc/hosts 파일 또는 DNS 설정 필요
+- 2. Port Access
+  - 클라이언트 연결, CLI, 노드 간 연결 등을 위한 포트 할당 및 방화벽 해제 필요
+#### 3.3 클러스터 내 노드의 특징
+- 1. 복제되는 것
+  - Queue를 제외한 모든 메타 데이터가 노드 사이에 동기화됨
+- 2. Equal Nodes
+  - 노드 사이에 master - replica 개념이 없음. 모든 노드는 다른 노드에 명령어를 보낼 수 있음
+- 3. 노드 간 인증 방법
+  - 클러스터 내 노드 끼리는 Erlang cookie를 공유하여 인증함
+  - 인증이 완료된 노드 끼리만 클러스터를 형성할 수 있음
+  - Erlang cookie는 /var/lib/rabbitmq/.erlang.cookie, $HOME/.erlang.cookie에 저장
+  - 전자는 server, 후자는 cli에 사용됨
+- 4. Node 개수 및 Quorum Queue
+  - 클러스터 내 노드 개수는 홀수로 유지하는게 좋음
+  - 왜냐하면 네트워크 파티션 상황 시, 노드 개수가 짝수라면 다수가 어디인지 알 수 없는 상황이 발생할 수 있기 때문임
+  - Quorum Queue
+    - 고가용성(HA) Queue이다. Leader-follower가 있는 Queue로 Leader가 존재하는 노드에서 장애가 발생하면, Leader를 재선출함
+    - Leader Queue와 Follower Queue는 서로 다른 노드에 존재함
+    - Classic Queue는 Follower가 존재하지 않음
+- 5. Clustering and Clients
+  - Queue Clients
+    - 클러스터 내 노드들은 서로 메세지를 라우팅하므로 클라이언트는 어느 노드와 연결되어도 상관 없음
+    - 그러므로, 클라이언트는 연결 가는ㅇ한 노드들을 리스트로 등록할 수 있음
+  - Stream Clients
+    - Queue Publishing과 동일하게 Stream Client는 어느 노드에 연결되어 Pub해도 상관없음
+    - 그러나, SUB은 리더 또는 팔로워 Stream에 직접 연결되어야 하므로 토폴로지를 알아야 함
+  - Queue and Stream Leaer Replica Placement
+    - 특정 노드로 Queue가 몰리지 않도록 노드에 적절히 분배될 수 있어야함
+    - queue_leader_locator 
+
+
+
+
 
 
