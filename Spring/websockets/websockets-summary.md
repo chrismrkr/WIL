@@ -196,6 +196,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 ### 8. External Broker
 - 웹 소켓 컨테이너가 클러스터링 되는 상황에서 사용됨
+- 통신이 필요한 세션끼리 서로 다른 컨테이너에 연결되어 있을 때, External Broker를 활용하여 아래와 같이 통신할 수 있음
+
+![stomp-external-broker drawio](https://github.com/user-attachments/assets/a6c53193-cd21-4227-8c6c-294a23437d34)
+
+- /msg.1 메세지를 InboundChannel을 통해 웹 소켓 컨테이너로 전달
+- 컨테이너는 Broker Relay를 통해 External Broker에 전달
+- External Broker는 등록된 Exchange를 확인하여 전송된 메세지 라우팅 키와 바인딩 키 패턴이 일치하는 Queue를 조회함
+  - 이와 관련 내용은 해당 링크 참고 : https://github.com/chrismrkr/WIL/blob/main/infrastructure/rabbitMQ/rabbitMQ-summary.md#rabbitmq-cluster
+- 해당 Queue로 메세지를 전송하고, Broker Relay와 연결된 Outbound Channel에서 이를 수신함
+  
+
 #### External Broker로 전달하는 방법
 - ```enableSimpleBroker``` 대신 ```enableStompBrokerRelay```를 사용함
 - 특정 path에 해당되는 메세지가 MessageHandler에 전달되는 경우, StompBrokerRelay를 통해 External Broker로 메세지를 전달함
@@ -299,6 +310,8 @@ public class KafkaConsumerService {
     }
 }
 ```
+
+- 모든 메세지를 항상 모든 컨테이너로 Broadcast하므로 권장되지 않음
 
 ### 9. Dot(.) 분리자
 - 일반적으로 /(slash)를 분리자로 사용하나 메세징 방식에서는 .(dot)를 분리자로 사용하는 것이 컨벤션임
