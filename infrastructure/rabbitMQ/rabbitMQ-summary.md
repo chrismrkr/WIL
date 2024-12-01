@@ -147,7 +147,9 @@
     - 그러나, SUB은 리더 또는 팔로워 Stream에 직접 연결되어야 하므로 토폴로지를 알아야 함
   - Queue and Stream Leaer Replica Placement
     - 특정 노드로 Queue가 몰리지 않도록 노드에 적절히 분배될 수 있어야함
-    - queue_leader_locator 
+    - queue_leader_locator 설정
+      - client-local : 클라이언트가 직접 노드를 선택
+      - balanced : 노드에 현재 생성된 큐 개수를 고려하여 연결
 
 
 
