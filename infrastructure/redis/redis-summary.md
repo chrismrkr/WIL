@@ -514,7 +514,22 @@ master_repli_offset:802
 - 클러스터 초기화
   - 클러스터에 포함할 노드는 ```cluster-enabled yes``` 설정이 반드시 필요함
   - 추가적으로 노드 사이 연결 요청을 받기 위해 ```bind```, ```protected-mode``` 등 설정도 확인 필요
-  - 
+- 클러스터 생성
+  - 총 6개 노드로 master 3 - replica 3 구성
+  - ```redis-cli --cluster create <ip1>:<port> <ip2>:<port> <ip3>:<port> <ip4>:<port> <ip5>:<port> <ip6>:<port> --cluster-replicas 1 [-a <password>]```
+- 클러스터 상태 확인
+  - ```redis-cli cluster nodes```
+- 클러스터 접근 및 리다이렉트
+  - ```redis-cli -c``` 어느 노드와 연결되어 사용하더라도 적절히 리다이렉트됨
+  - Jedis, Redisson 등의 레디스 클라이언트에서 사용 가능
+- 페일오버 테스트
+  - 자동 페일오버 : ```redis-cli <master-host> -p <master-port> shutdown```
+    - 복제본이 마스터 노드로 ping을 보내고, 일정 시간 실패 시 fail-over를 트리거함 
+  - 수동 페일오버 : ```CLUSTER FAILOVER```
+
+### 10.4 클러스터 운영하기
+- 클러스터 리샤딩
+  - 마스터 노드가 가진 해시슬롯 중 일부를 다른 마스터로 이동하는 작업
 
 
 
