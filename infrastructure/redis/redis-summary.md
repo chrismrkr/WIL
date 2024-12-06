@@ -530,6 +530,33 @@ master_repli_offset:802
 ### 10.4 클러스터 운영하기
 - 클러스터 리샤딩
   - 마스터 노드가 가진 해시슬롯 중 일부를 다른 마스터로 이동하는 작업
+  - ```redis-cli --cluster reshard <node-ip> <port>```
+    - <node-ip>가 포함되어 있는 클러스터 구조를 파악하여 reshard하기 위해 필요함
+  - 위 커맨드 입력 후, reshard할 슬롯 수와 노드를 지정하면 성공함
+- 클러스터 확장
+  - 마스터를 새로 추가하거나, 가용성을 위해 복제본을 추가할 수 있음
+  - 마스터 노드로 추가하기 : ```redis-cli --cluster add-node <new-node-ip:port> <cluster-node-ip:port>```
+  - 복제 노드로 추가하기 : ```redis-cli --cluster add-node <new-node-ip:port> <cluster-node-ip:port> --cluster-slave [--cluster-master-id <master-node-id>]```
+    - [--cluster-master-id <master-node-ip>]를 입력하지 않으면 임의의 마스터 노드 중 하나의 복제본이 됨
+- 클러스터 내 노드 제거
+  - ```redis-cli --cluster del-node <node-ip:port> <node-id>```
+  - 단, 노드에 저장된 데이터가 없어야 함
+  - 그러므로, 리샤딩 또는 페일오버를 진행 후 노드를 제거할 수 있음
+  - 제거 시 ```CLUSTER FORGET``` 및 ```CLUSTER RESET```이 수행됨
+  - CLUSTER FORGET : 클러스터 내 다른 노드들에게 해당 노드와 연결되지 않도록 명령함
+  - CLUSTER RESET
+- 클러스터로 데이터 마이그레이션
+  - ```redis-cli --cluster import <new-cluster-node-ip:port> --cluster-from <ex-cluster-node-ip:port> --cluster-copy```
+  - 마이그레이션 중 원본 레디스 노드에 변경이나 추가가 발생하면, 이는 마이그레이션 클러스터에 반영되지 않으므로 주의 필요
+- 복제본을 활용한 읽기 성능 향상
+  - 복제본으로 맺어지는 Connection을 READONLY 모드로 변경하여 데이터를 직접 읽을 수 있음
+
+### 10.5 클러스터 동작 방법
+- 
+  
 
 
+
+
+   
 
