@@ -29,9 +29,9 @@
 
 + S(Single Responsibility): 하나의 클래스는 하나의 책임만 있다.
 + **O(OpenClose)**: 확장에는 열려있고 변경에는 닫혀있다.
-+ L(Liskov Subsitution): 클래스는 인터페이스의 역할을 지키며 구현해야 한다.
-+ I(Interface segregation): 하나의 인터페이스는 하나의 역할만 갖는 것이 좋다.
-+ **D(Dependency inversion)**: 클라이언트는 클래스(구현)가 아닌 인터페이스(역할)에 의존한다.
++ L(Liskov Subsitution): 하위 타입 클래스는 상위 타입 클래스를 대체할 수 있어야 한다.
++ I(Interface segregation): 인터페이스는 클라이언트의 요구에 따라 분리되어야 한다.
++ **D(Dependency inversion)**: 특정 클래스를 참조가 필요하다면, 구체 클래스가 아닌 인터페이스 또는 추상 클래슬를 참조해야한다.
 
 클라이언트는 구현 클래스를 직접 선택하는 것이 아닌 역할 인터페이스를 선택해야 한다.
 ```java
