@@ -472,6 +472,25 @@ ADD INDEX ix_full_name ((CONCAT(first_name, ' ', last_name)));
 
 ***
 
+## 6. 옵티마이저와 힌트
+
+### 6.1 개요
+
+### 6.2 기본 데이터 처리
+
+#### 6.2.1 Table Full Scan vs Index Full Scan
+
+#### 6.2.2 병렬 처리
+
+#### 6.2.3 ORDER BY 처리
+
+정렬을 처리할 때는 인덱스를 활용하는 방법 Filesort 이용하는 방법 2가지가 있다.
+
+정렬 기준이 너무 많거나, GROUP BY 등의 결과를 정렬해야 할 수 있으므로 항상 인덱스를 활용할 수는 없다. 그러므로, 때로는 MySQL은 FileSort를 이용하여 정렬을 수행한다.
+
+FileSort 방식으로 정렬을 할 때, 별도의 메모리 공간을 필요로 하는데 이를 Sort Buffer라고 한다.
+
+
 
 
 
