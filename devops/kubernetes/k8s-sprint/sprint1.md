@@ -611,10 +611,111 @@ Replicaset은 yaml 파일에서는 명시적으로 드러나지는 않지만, De
 
 4-2. Object : Pod
 
-쿠버네티스 Object를 훑어보았으니 개별 Object에 대해서 좀 더 상세하게 확인해보겠습니다.
+Object를 전체적으로 훑었으므로 하나씩 상세히 알아보겠습니다. 첫번째는 Pod 입니다.
+
+Deployment 오브젝트가 생성될 때 Pod 오브젝트도 함께 생성되며 어플리케이션이 실제로 기동되는 오브젝트를 의미합니다.
+
+Deployment 오브젝트를 생성하는 yaml 파일에서 Pod를 생성하는 부분은 아래와 같습니다.
+
+```yaml
+# Deployment 오브젝트 내 Pod에 해당되는 설정
+
+  template:
+    metadata:
+      labels:
+        part-of: k8s-anotherclass
+        component: backend-server
+        name: api-tester
+        instance: api-tester-1231
+        version: 1.0.0
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-master
+      containers:
+        - name: api-tester-1231
+          image: 1pro/api-tester:v1.0.0
+          ports:
+          - name: http
+            containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: api-tester-1231-properties
+          startupProbe:
+            httpGet:
+              path: "/startup"
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet:
+              path: "/readiness"
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: "/liveness"
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: files
+              mountPath: /usr/src/myapp/files/dev
+            - name: secret-datasource
+              mountPath: /usr/src/myapp/datasource
+```
+
+Deployment의 name이 ```deployment-123```이라면, Replicaset은 ```deployment-123-xxx```, Pod는 ```deployment-123-xxx-yyy```와 같이 자동으로 이름이 지정됩니다.
+
+startupProbe, readinessProbe, livenessProbe 3가지 속성의 역할은 다음과 같습니다.
+
+4-2-1. startupProbe
+
+어플리케이션이 정상적으로 실행되었는지를 확인하는 API를 설정하는 속성입니다.
+
+위 예시에서는 GET /ready API를 5초 주기로 최대 36번까지 호출하고, 그 안에 성공 응답이 오면 어플리케이션이 정상적으로 기동되었음을 의미합니다.
+
+성공 응답을 받으면 startupProbe는 종료됩니다.
+
+이 시점에 DB 연결, Spring 컨텍스트 초기화, Jar 실행 등이 이루어집니다.
+
+4-2-2. livenessProbe
+
+어플리케이션이 실행 중인지를 확인하는 API를 설정하는 속성입니다.
+
+startupProbe가 완료된 이후에 실행되며, 위 예시에서는 GET /liveness를 10초 주기로 3번 호출해서 그 안에 응답을 받아야 성공이라는 것을 의미합니다.
+
+만약 실패한다면, 쿠버네티스를 장애 상황으로 간주하여 Pod를 재시동합니다.
+
+4-2-3. readinessProbe
+
+어플리케이션이 외부로부터 요청을 받을 준비가 되었는지를 확인하는 API를 설정하는 속성입니다.
+
+startupProbe가 완료된 이후에 동작하며, 위 예시에서는 GET /readiness를 10초 주기로 3번 호출하여 그 안에 성공 응답을 받아야 정상 상태임을 의미합니다.
+
+만약 실패한다면, 외부서의 요청이 Pod로 도달하지 않는 다는 것을 의미하므로 Service - Deployment 오브젝트 사이 재연결을 시도합니다.
+
+4-2-4. livenessProbe, readinessProbe 전략
+
+livenessProbe 주기는 readiness Probe 주기보다 길게 하는 것이 바람직합니다.
+
+Pod 내 어플리케이션이 잠깐 일시적으로 장애가 발생하는 상황에 livenessProbe의 주기가 짧고 Threshold가 낮게 설정되어 있다고 가정해보겠습니다.
+
+어플리케이션이 자체적으로 정상으로 돌아올 수 있었지만, livenessProbe 주기 짧고 임계치가 낮다면 쿠버네티스는 Pod를 재기동할 수 있습니다.
+
+이를 방지하기 위해서는 liveness 주기를 길게 하는 것도 방법입니다. 하지만, 정말로 장애 상황이 발생한다면, Pod가 늦게 재기동 된다는 단점이 있습니다.
+
+이를 해결하기 위해서 readiness 주기는 짧게하여 장애가 감지된다면, 먼저 빠르게 외부로 부터의 요청을 끊어내고, 짧은 주기로 readinessProbe를 진행하며 성공하면 다시 연결을 하도록 합니다.
 
 
-
+4-3. ConfigMap, Secret
 
 
 
