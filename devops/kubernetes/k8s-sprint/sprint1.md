@@ -537,7 +537,7 @@ spec:
       stabilizationWindowSeconds: 120
 ```
 
-위를 훑어보면, yaml 파일을 통해 생성되는 Object가 어떤 기능을 하게 될지 짐작할 수 있습니다.
+생성되는 오브젝트와 그것의 필드를 살펴보면, yaml 파일을 통해 생성되는 Object가 어떤 기능을 하게 될지 짐작할 수 있습니다.
 
 
 4-2. labels, selector, naming
@@ -1010,29 +1010,41 @@ kubectl -exec -n <another-namespace> -it <another-pod> -- curl http://api-tester
 ```
 
 
-4-8. Object : HPA
+4-8. Object : HPA(Horizontal Pod Autoscaler)
 
+컨테이너의 평균 CPU 사용량이 일정 수준을 넘으면 자동으로 Scale-Out 하는 것을 돕는 오브젝트입니다. 
 
+```yaml
+# HPA 설정 일부
 
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-tester-1231
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 120
+    scaleDown:
+      stabilizationWindowSeconds: 600
+```
 
+spec.scaleTargetRef 속성읉 통해서 어떤 Pod를 모니터링할지 결정합니다. 
 
+spec.behavior.scaleUp.stabilizationWindowSeconds 동안 평균 CPU 사용률이 spec.metrics.resource.target.averagleUtilization 이상이면 컨테이너를 추가 실행합니다.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+그리고, 평균 CPU 사용량이 다시 감소하더라도 spec.behavior.scaleDown.stabilizationWindowSeconds 만큼 증설된 컨테이너를 유지하고 종료합니다.
 
 
 
